@@ -1,32 +1,64 @@
 /*
-  theme.css -- your theme overrides. This is the file to edit to
-  retheme the site.
-
-  Every design token lives in src/styles/tokens.css (colors, type
-  scale, spacing, layout, shadows) with its default value. Override any
-  of them here: declarations in this file are unlayered, so they always
-  beat the @layer base defaults in tokens.css.
-
-  Colors are defined with light-dark(). Overriding with a plain color
-  changes light and dark mode at once; use light-dark(<light>, <dark>)
-  to set different values per mode.
-
-  Webfonts are loaded in astro.config.mjs (--font-body, --font-mono).
-  Swap the loaded font there; use overrides here for system fonts or a
-  separate heading face.
-
-  Example:
-
-  :root {
-    --color-brand: light-dark(#0f766e, #2dd4bf);
-    --font-heading: "Iowan Old Style", Georgia, serif;
-    --radius: 8px;
-  }
-*/
+ * Huashu Dark Theme - Variation 1
+ * Dark theme with orange/purple gradients
+ * Based on huashu-variation-1.html
+ */
 
 :root {
+	--bg-dark: #0a0a0c;
+	--bg-card: #131316;
+	--text-primary: #ffffff;
+	--text-secondary: #a0a0a0;
+	--accent-orange: #f97316;
+	--accent-purple: #c026d3;
+	--accent-orange-hover: #ea580c;
+	--accent-purple-hover: #a21caf;
+	--border-color: #26262c;
+	--transition: all 0.3s ease;
 }
 
-.nav-admin {
-	margin-inline-start: var(--spacing-5);
+/* Gradient animation for text and backgrounds */
+.gradient-text {
+	background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-purple) 100%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+	background-size: 200% 200%;
+	animation: gradientMove 3s ease infinite;
+}
+
+@keyframes gradientMove {
+	0%, 100% { background-position: 0% 50%; }
+	50% { background-position: 100% 50%; }
+}
+
+/* Navigation animations */
+.nav-logo {
+	background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-purple) 100%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+	background-size: 200% 200%;
+	animation: gradientMove 3s ease infinite;
+}
+
+/* Button hover effects */
+.cta-button:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+}
+
+/* Feature card hover */
+.feature-card:hover {
+	transform: translateY(-8px);
+	border-color: var(--accent-orange);
+	box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Stat numbers */
+.stat-number {
+	background: linear-gradient(135deg, var(--accent-orange), var(--accent-purple));
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
 }
