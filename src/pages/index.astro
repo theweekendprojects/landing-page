@@ -7,6 +7,7 @@ import {
 import { Image } from "emdash/ui";
 import Base from "../layouts/Base.astro";
 import PostCard from "../components/PostCard.astro";
+import ProjectCard from "../components/ProjectCard.astro";
 import { getReadingTime } from "../utils/reading-time";
 import { resolveBlogSiteIdentity } from "../utils/site-identity";
 
@@ -22,6 +23,15 @@ const [{ entries: posts, cacheHint }, settings] = await Promise.all([
 	getSiteSettings(),
 ]);
 const { siteTitle, siteTagline } = resolveBlogSiteIdentity(settings);
+
+// Also fetch projects to display on the home page
+const projects = await getEmDashCollection("projects", {
+	orderBy: { published_at: "desc" },
+	limit: 3, // Show up to 3 featured projects
+});
+const featuredProjects = projects.entries.filter(
+	(p) => p.data.featured_image && p.data.featured_image !== undefined
+).slice(0, 2); // Show up to 2 featured projects
 
 if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
 
