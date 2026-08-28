@@ -193,6 +193,30 @@ function formatDate(date: Date | null | undefined) {
 						</div>
 					</section>
 				)}
+
+				{/* Featured Projects */}
+				{featuredProjects.length > 0 && (
+					<section class="projects-section">
+						<header class="section-header">
+							<h2 class="section-title">Featured Projects</h2>
+							<a href="/projects" class="section-link">
+								View all
+							</a>
+						</header>
+						<div class="projects-grid">
+							{featuredProjects.map((project) => (
+								<ProjectCard
+									title={project.data.title ?? "Untitled"}
+									description={project.data.description}
+									featuredImage={project.data.featured_image}
+									href={`/projects/${project.id}`}
+									techStack={project.data.tech_stack}
+									category={project.data.category}
+								/>
+							))}
+						</div>
+					</section>
+				)}
 			</div>
 		)
 	}
