@@ -1229,7 +1229,6 @@
 				"id": "project-4",
 				"slug": "portfolio-generator",
 				"status": "published",
-				"featured": false,
 				"data": {
 					"title": "Portfolio Generator",
 					"description": "Generate a beautiful portfolio website from a simple JSON configuration in seconds.",
@@ -1237,6 +1236,8 @@
 					"github_url": "https://github.com/theweekendprojects/portfolio-generator",
 					"live_url": "https://portfolio-generator.vercel.app",
 					"category": "library",
+					"featured": false,
+					"published_at": "2026-07-26T09:00:00Z",
 					"featured_image": {
 						"$media": {
 							"url": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=800&fit=crop",
