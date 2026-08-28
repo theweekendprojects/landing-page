@@ -1,0 +1,22 @@
+/*
+ * Huashu Light Theme - Variation 3
+ * Light/editorial theme with clean, readable typography
+ */
+
+:root {
+	--color-bg: #ffffff;
+	--color-bg-subtle: #f8f9fa;
+	--color-surface: #ffffff;
+	--color-text: #1a1a1a;
+	--color-text-secondary: #4a4a4a;
+	--color-text-muted: #707070;
+	--color-border: #e5e5e5;
+	--color-border-subtle: #f0f0f0;
+	--color-brand: #1e3a8a;
+	--color-brand-hover: #2563eb;
+	--color-on-brand: #ffffff;
+	--color-accent: #0d9488;
+	--color-accent-hover: #0f766e;
+	--color-shadow: rgba(0, 0, 0, 0.1);
+	--color-brand-ring: rgba(30, 58, 138, 0.2);
+}
