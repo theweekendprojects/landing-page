@@ -1,8 +1,0 @@
-{
-  "version": "v1",
-  "hooks": [{
-    "name": "Auto-commit on Stop",
-    "trigger": "Stop",
-    "action": { "type": "command", "command": "cd \"/Users/shahriarrobbani/Documents/GitHub/theweekendprojects-landing-page\" && if [ -n \"$(git status --porcelain)\" ]; then git add . && git commit -m \"Update: Changes made during session\"; fi" }
-  }]
-}
