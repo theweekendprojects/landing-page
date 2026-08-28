@@ -1,0 +1,104 @@
+---
+import { getEmDashCollection } from "emdash";
+import Base from "../../layouts/Base.astro";
+import ProjectCard from "../../components/ProjectCard.astro";
+
+const { entries: projects, cacheHint } = await getEmDashCollection("projects", {
+	orderBy: { published_at: "desc" },
+});
+
+if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+
+const formatDate = (date: Date) =>
+	date.toLocaleDateString("en-US", {
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+	});
+---
+
+<Base title="All Projects" description="Browse all my projects">
+	<div class="projects-page">
+		<header class="page-header">
+			<h1 class="page-title">All Projects</h1>
+			<p class="page-description">
+				{projects.length}
+				{projects.length === 1 ? "project" : "projects"}
+			</p>
+		</header>
+
+		{
+			projects.length === 0 ? (
+				<p class="empty">No projects yet.</p>
+			) : (
+				<div class="projects-grid">
+					{projects.map((project) => (
+						<ProjectCard
+							title={project.data.title}
+							description={project.data.description}
+							featuredImage={project.data.featured_image}
+							href={`/projects/${project.id}`}
+							techStack={project.data.tech_stack}
+							category={project.data.category}
+						/>
+					))}
+				</div>
+			)
+		}
+	</div>
+</Base>
+
+<style>
+	.projects-page {
+		max-width: var(--content-width);
+		margin: 0 auto;
+		padding: var(--spacing-8) var(--spacing-6) var(--spacing-16);
+	}
+
+	.page-header {
+		margin-bottom: var(--spacing-12);
+	}
+
+	.page-title {
+		font-size: var(--font-size-4xl);
+		font-weight: var(--font-weight-display);
+		letter-spacing: var(--tracking-tight);
+		margin-bottom: var(--spacing-2);
+	}
+
+	.page-description {
+		font-size: var(--font-size-lg);
+		color: var(--color-muted);
+	}
+
+	.empty {
+		color: var(--color-muted);
+		font-size: var(--font-size-lg);
+	}
+
+	.projects-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: var(--spacing-8);
+	}
+
+	@media (max-width: 900px) {
+		.projects-page {
+			padding: var(--spacing-6) var(--spacing-4) var(--spacing-12);
+		}
+
+		.page-title {
+			font-size: var(--font-size-3xl);
+		}
+
+		.projects-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (max-width: 600px) {
+		.projects-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>
