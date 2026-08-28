@@ -212,13 +212,18 @@
 				},
 				{
 					"type": "custom",
-					"label": "About",
-					"url": "/pages/about"
+					"label": "Projects",
+					"url": "/projects"
 				},
 				{
 					"type": "custom",
-					"label": "Posts",
+					"label": "Blog",
 					"url": "/posts"
+				},
+				{
+					"type": "custom",
+					"label": "About",
+					"url": "/pages/about"
 				}
 			]
 		}
