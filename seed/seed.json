@@ -124,6 +124,17 @@
 						{ "value": "design", "label": "Design/UX" },
 						{ "value": "other", "label": "Other" }
 					]
+				},
+				{
+					"slug": "featured",
+					"label": "Featured",
+					"type": "boolean",
+					"helpText": "Show this project in the homepage's featured projects section"
+				},
+				{
+					"slug": "published_at",
+					"label": "Published Date",
+					"type": "datetime"
 				}
 			]
 		}
