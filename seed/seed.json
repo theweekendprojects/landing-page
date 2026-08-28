@@ -1013,7 +1013,6 @@
 				"id": "project-1",
 				"slug": "weekend-coder-dashboard",
 				"status": "published",
-				"featured": true,
 				"data": {
 					"title": "Weekend Coder Dashboard",
 					"description": "A beautiful, dark-themed dashboard for tracking your coding productivity during weekend side projects.",
@@ -1021,6 +1020,8 @@
 					"github_url": "https://github.com/theweekendprojects/weekend-coder",
 					"live_url": "https://weekend-coder.vercel.app",
 					"category": "web",
+					"featured": true,
+					"published_at": "2026-08-16T09:00:00Z",
 					"featured_image": {
 						"$media": {
 							"url": "https://images.unsplash.com/photo-1611040441398-738f35753034?w=1200&h=800&fit=crop",
