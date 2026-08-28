@@ -1,0 +1,8 @@
+{
+  "version": "v1",
+  "hooks": [{
+    "name": "Capture Session Description",
+    "trigger": "SessionStart",
+    "action": { "type": "command", "command": "echo \"$(date '+%Y-%m-%d %H:%M:%S') - Session started\" > ~/.kiro/session-desc.txt" }
+  }]
+}
