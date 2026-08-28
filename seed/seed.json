@@ -63,6 +63,69 @@
 					"searchable": true
 				}
 			]
+		},
+		{
+			"slug": "projects",
+			"label": "Projects",
+			"labelSingular": "Project",
+			"supports": ["drafts", "revisions", "search", "seo"],
+			"fields": [
+				{
+					"slug": "title",
+					"label": "Title",
+					"type": "string",
+					"required": true,
+					"searchable": true
+				},
+				{
+					"slug": "featured_image",
+					"label": "Featured Image",
+					"type": "image"
+				},
+				{
+					"slug": "description",
+					"label": "Short Description",
+					"type": "text"
+				},
+				{
+					"slug": "full_content",
+					"label": "Full Content",
+					"type": "portableText",
+					"searchable": true
+				},
+				{
+					"slug": "tech_stack",
+					"label": "Tech Stack",
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				{
+					"slug": "github_url",
+					"label": "GitHub URL",
+					"type": "string"
+				},
+				{
+					"slug": "live_url",
+					"label": "Live Demo URL",
+					"type": "string"
+				},
+				{
+					"slug": "category",
+					"label": "Category",
+					"type": "string",
+					"options": [
+						{ "value": "web", "label": "Web Application" },
+						{ "value": "mobile", "label": "Mobile App" },
+						{ "value": "cli", "label": "CLI Tool" },
+						{ "value": "library", "label": "Library/Package" },
+						{ "value": "api", "label": "API/Backend" },
+						{ "value": "design", "label": "Design/UX" },
+						{ "value": "other", "label": "Other" }
+					]
+				}
+			]
 		}
 	],
 	"taxonomies": [
