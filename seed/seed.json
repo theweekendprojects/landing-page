@@ -1169,7 +1169,6 @@
 				"id": "project-3",
 				"slug": "react-native-todo-app",
 				"status": "published",
-				"featured": true,
 				"data": {
 					"title": "React Native Todo App",
 					"description": "A beautiful, feature-rich todo application built with React Native for both iOS and Android.",
@@ -1177,6 +1176,8 @@
 					"github_url": "https://github.com/theweekendprojects/react-native-todo",
 					"live_url": "https://expo.dev/@theweekendprojects/react-native-todo",
 					"category": "mobile",
+					"featured": true,
+					"published_at": "2026-08-02T09:00:00Z",
 					"featured_image": {
 						"$media": {
 							"url": "https://images.unsplash.com/photo-1555421689-48f3321073e2?w=1200&h=800&fit=crop",
