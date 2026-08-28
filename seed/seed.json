@@ -1097,7 +1097,6 @@
 				"id": "project-2",
 				"slug": "api-monitor-tool",
 				"status": "published",
-				"featured": true,
 				"data": {
 					"title": "API Monitor Tool",
 					"description": "A lightweight command-line tool for monitoring API endpoints and getting notified when they go down.",
@@ -1105,6 +1104,8 @@
 					"github_url": "https://github.com/theweekendprojects/api-monitor",
 					"live_url": "https://github.com/theweekendprojects/api-monitor",
 					"category": "cli",
+					"featured": true,
+					"published_at": "2026-08-09T09:00:00Z",
 					"featured_image": {
 						"$media": {
 							"url": "https://images.unsplash.com/photo-1555099962-4199c345e5dd?w=1200&h=800&fit=crop",
