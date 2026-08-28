@@ -495,3 +495,26 @@ function formatDate(date: Date | null | undefined) {
 		}
 	}
 </style>
+	/* Projects Section */
+	.projects-section {
+		margin-bottom: var(--spacing-16);
+	}
+
+	.projects-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: var(--spacing-8);
+	}
+
+	@media (max-width: 900px) {
+		.projects-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (max-width: 600px) {
+		.projects-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>
