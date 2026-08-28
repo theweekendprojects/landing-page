@@ -996,6 +996,83 @@
 					]
 				}
 			}
+		],
+		"projects": [
+			{
+				"id": "project-1",
+				"slug": "my-awesome-project",
+				"status": "published",
+				"data": {
+					"title": "My Awesome Project",
+					"description": "A brief description of this amazing project that solves a real problem.",
+					"tech_stack": ["React", "Node.js", "PostgreSQL"],
+					"github_url": "https://github.com/username/project",
+					"live_url": "https://example.com",
+					"category": "web",
+					"full_content": [
+						{
+							"_type": "block",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"text": "This is a detailed description of the project. It includes all the technical details, screenshots, and information that visitors would want to know.",
+									"_key": "k1"
+								}
+							],
+							"_key": "k0"
+						},
+						{
+							"_type": "block",
+							"style": "h2",
+							"children": [
+								{
+									"_type": "span",
+									"text": "Features",
+									"_key": "k3"
+								}
+							],
+							"_key": "k2"
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"text": "- Real-time updates\n- Beautiful UI\n- Fast performance\n- Easy to use",
+									"_key": "k5"
+								}
+							],
+							"_key": "k4"
+						},
+						{
+							"_type": "block",
+							"style": "h2",
+							"children": [
+								{
+									"_type": "span",
+									"text": "Tech Stack",
+									"_key": "k7"
+								}
+							],
+							"_key": "k6"
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"children": [
+								{
+									"_type": "span",
+									"text": "Built with React for the frontend, Node.js for the backend, and PostgreSQL for data storage.",
+									"_key": "k9"
+								}
+							],
+							"_key": "k8"
+						}
+					]
+				}
+			}
 		]
 	}
 }
