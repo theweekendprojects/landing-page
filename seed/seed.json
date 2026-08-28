@@ -2,13 +2,13 @@
 	"$schema": "https://emdashcms.com/seed.schema.json",
 	"version": "1",
 	"meta": {
-		"name": "Blog Starter",
-		"description": "A blog with posts and pages",
-		"author": "EmDash"
+		"name": "The Weekend Projects",
+		"description": "A landing page + blog for a community of weekend hackers and side-project builders",
+		"author": "The Weekend Projects"
 	},
 	"settings": {
-		"title": "My Blog",
-		"tagline": "Thoughts on building for the web"
+		"title": "The Weekend Projects",
+		"tagline": "Creative coding beyond the 9-to-5."
 	},
 	"collections": [
 		{
