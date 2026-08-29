@@ -1,0 +1,217 @@
+/*
+ * Theme: huashu-variation-2 -- "Build Creative Freedom into Your Weekend"
+ * Ported from design-demos/huashu-variation-2.html
+ *
+ * Dark glassmorphism theme: violet -> teal gradient brand, translucent
+ * "glass" cards with a soft blur, pill buttons and nav.
+ *
+ * The source mockup pairs this palette with Space Grotesk for headings.
+ * To match it exactly, add a Space Grotesk entry to the `fonts` array in
+ * astro.config.mjs bound to --font-heading, then it'll apply automatically
+ * (see AGENTS.md > Customisation). Left as Inter here so switching themes
+ * never silently changes the font pipeline underneath you.
+ */
+
+:root {
+	color-scheme: dark;
+
+	--color-bg: #0f0f11;
+	--color-bg-subtle: #1a1a1d;
+	--color-surface: rgba(255, 255, 255, 0.05);
+	--color-text: #f9fafb;
+	--color-text-secondary: #9ca3af;
+	--color-muted: #9ca3af;
+	--color-border: rgba(255, 255, 255, 0.1);
+	--color-border-subtle: rgba(255, 255, 255, 0.06);
+	--color-brand: #7c3aed;
+	--color-brand-hover: #6d28d9;
+	--color-on-brand: #ffffff;
+	--color-brand-ring: color-mix(in srgb, #7c3aed 30%, transparent);
+
+	--radius-lg: 24px;
+
+	--theme-gradient-primary: linear-gradient(135deg, #7c3aed 0%, #0d9488 100%);
+	--theme-gradient-secondary: linear-gradient(135deg, #8b5cf6 0%, #14b8a6 100%);
+	--theme-accent-teal: #14b8a6;
+}
+
+body {
+	background: var(--color-bg);
+}
+
+.site-header {
+	background: rgba(15, 15, 17, 0.7);
+	backdrop-filter: blur(20px);
+}
+
+.site-title {
+	background: var(--theme-gradient-secondary);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+	letter-spacing: -0.5px;
+}
+
+/* Hero */
+.hero-title {
+	letter-spacing: -0.04em;
+	font-weight: 800;
+}
+
+.hero-badge {
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
+	color: var(--theme-accent-teal);
+}
+
+.btn {
+	border-radius: 999px;
+}
+
+.btn-primary {
+	background: var(--theme-gradient-primary);
+	box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
+	border: none;
+}
+
+.btn-primary:hover {
+	box-shadow: 0 8px 30px rgba(124, 58, 237, 0.4);
+}
+
+.btn-secondary {
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
+}
+
+.btn-secondary:hover {
+	background: rgba(255, 255, 255, 0.1);
+	border-color: rgba(255, 255, 255, 0.2);
+}
+
+.section-heading {
+	background: linear-gradient(135deg, var(--color-text) 0%, #e5e7eb 100%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+
+/* Glass cards */
+.feature-card,
+.project-card,
+.post-card {
+	background: var(--color-bg-subtle);
+	border: 1px solid var(--color-border);
+	position: relative;
+	overflow: hidden;
+}
+
+.feature-card::before,
+.project-card::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 3px;
+	background: var(--theme-gradient-primary);
+	opacity: 0;
+	transition: opacity var(--transition-base);
+}
+
+.feature-card:hover,
+.project-card:hover {
+	transform: translateY(-8px) scale(1.01);
+	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+	border-color: rgba(255, 255, 255, 0.2);
+}
+
+.feature-card:hover::before,
+.project-card:hover::before {
+	opacity: 1;
+}
+
+.post-card:hover {
+	transform: translateY(-6px);
+	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.feature-icon {
+	background: var(--theme-gradient-secondary);
+	color: #ffffff;
+}
+
+.card-category,
+.tech-tag,
+.card-tag {
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
+	color: var(--theme-accent-teal);
+}
+
+.card-link:hover .card-title {
+	color: var(--theme-accent-teal);
+}
+
+.blog-section {
+	background: var(--color-bg-subtle);
+}
+
+/* Newsletter */
+.newsletter-form-wrap .ec-form {
+	--ec-form-field-border: 1px solid var(--color-border);
+	--ec-form-field-radius: 999px;
+	--ec-form-field-padding: var(--spacing-3) var(--spacing-5);
+	--ec-form-field-bg: var(--color-surface);
+	--ec-form-help-color: var(--color-muted);
+	--ec-form-submit-bg: transparent;
+	--ec-form-submit-color: #ffffff;
+	--ec-form-submit-radius: 999px;
+	--ec-form-submit-padding: var(--spacing-3) var(--spacing-6);
+	color: var(--color-text);
+}
+
+.newsletter-form-wrap .ec-form-label {
+	color: var(--color-text);
+}
+
+.newsletter-form-wrap .ec-form-input {
+	color: var(--color-text);
+	font-family: var(--font-body);
+}
+
+.newsletter-form-wrap .ec-form-input:focus {
+	outline: none;
+	border-color: var(--color-brand);
+	box-shadow: 0 0 0 3px var(--color-brand-ring);
+}
+
+.newsletter-form-wrap .ec-form-submit {
+	background: var(--theme-gradient-primary);
+	font-weight: 600;
+	box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
+	transition:
+		transform var(--transition-fast),
+		box-shadow var(--transition-fast);
+}
+
+.newsletter-form-wrap .ec-form-submit:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 8px 30px rgba(124, 58, 237, 0.4);
+}
+
+.newsletter-form-wrap .ec-form-status--success {
+	background: rgba(20, 184, 166, 0.12);
+	color: #5eead4;
+	border: 1px solid rgba(20, 184, 166, 0.3);
+}
+
+.newsletter-form-wrap .ec-form-status--error {
+	background: rgba(239, 68, 68, 0.12);
+	color: #fca5a5;
+	border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.site-footer {
+	background: var(--color-bg-subtle);
+	border-top-color: var(--color-border);
+}

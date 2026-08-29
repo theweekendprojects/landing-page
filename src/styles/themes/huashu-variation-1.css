@@ -1,0 +1,169 @@
+/*
+ * Theme: huashu-variation-1 -- "Code on Your Terms"
+ * Ported from design-demos/huashu-variation-1.html
+ *
+ * Dark theme with an orange -> purple/magenta gradient brand mark.
+ */
+
+:root {
+	color-scheme: dark;
+
+	--color-bg: #0a0a0c;
+	--color-bg-subtle: #131316;
+	--color-surface: #1a1a1f;
+	--color-text: #ffffff;
+	--color-text-secondary: #a0a0a0;
+	--color-muted: #6b6b75;
+	--color-border: #26262c;
+	--color-border-subtle: #1c1c21;
+	--color-brand: #f97316;
+	--color-brand-hover: #ea580c;
+	--color-on-brand: #ffffff;
+	--color-brand-ring: color-mix(in srgb, #f97316 25%, transparent);
+
+	--theme-gradient: linear-gradient(135deg, #f97316 0%, #c026d3 100%);
+	--theme-accent: #c026d3;
+}
+
+@keyframes theme-gradient-move {
+	0%,
+	100% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+}
+
+body {
+	background: var(--color-bg);
+}
+
+.site-header {
+	background: color-mix(in srgb, var(--color-bg) 80%, transparent);
+}
+
+.site-title {
+	background: var(--theme-gradient);
+	background-size: 200% 200%;
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+	animation: theme-gradient-move 3s ease infinite;
+}
+
+/* Hero */
+.hero-title {
+	font-weight: 800;
+}
+
+.hero-badge {
+	background: rgba(249, 115, 22, 0.1);
+	border-color: rgba(249, 115, 22, 0.25);
+	color: #fdba74;
+}
+
+.btn-primary {
+	background: var(--theme-gradient);
+	border: none;
+}
+
+.btn-primary:hover {
+	box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
+}
+
+.btn-secondary:hover {
+	border-color: var(--theme-accent);
+	background: rgba(192, 38, 211, 0.1);
+}
+
+.feature-icon {
+	background: linear-gradient(135deg, rgba(249, 115, 22, 0.12), rgba(192, 38, 211, 0.12));
+	color: #f97316;
+}
+
+.feature-card:hover,
+.project-card:hover {
+	border-color: var(--color-brand);
+	transform: translateY(-6px);
+	box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+}
+
+.post-card:hover {
+	transform: translateY(-6px);
+	box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+}
+
+.card-category,
+.tech-tag,
+.card-tag {
+	background: rgba(249, 115, 22, 0.1);
+	color: var(--color-brand);
+}
+
+.card-link:hover .card-title {
+	color: var(--color-brand);
+}
+
+.blog-section {
+	background: linear-gradient(180deg, var(--color-bg) 0%, var(--color-bg-subtle) 100%);
+}
+
+/* Newsletter */
+.newsletter-form-wrap .ec-form {
+	--ec-form-field-border: 1px solid var(--color-border);
+	--ec-form-field-radius: var(--radius-lg);
+	--ec-form-field-padding: var(--spacing-3) var(--spacing-4);
+	--ec-form-field-bg: var(--color-surface);
+	--ec-form-help-color: var(--color-muted);
+	--ec-form-submit-bg: var(--theme-accent);
+	--ec-form-submit-color: #ffffff;
+	--ec-form-submit-radius: var(--radius-lg);
+	--ec-form-submit-padding: var(--spacing-3) var(--spacing-6);
+	color: var(--color-text);
+}
+
+.newsletter-form-wrap .ec-form-label {
+	color: var(--color-text);
+}
+
+.newsletter-form-wrap .ec-form-input {
+	color: var(--color-text);
+	font-family: var(--font-body);
+}
+
+.newsletter-form-wrap .ec-form-input:focus {
+	outline: none;
+	border-color: var(--color-brand);
+	box-shadow: 0 0 0 3px var(--color-brand-ring);
+}
+
+.newsletter-form-wrap .ec-form-submit {
+	background: var(--theme-gradient);
+	font-weight: 600;
+	transition:
+		transform var(--transition-fast),
+		box-shadow var(--transition-fast);
+}
+
+.newsletter-form-wrap .ec-form-submit:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
+}
+
+.newsletter-form-wrap .ec-form-status--success {
+	background: rgba(16, 185, 129, 0.12);
+	color: #6ee7b7;
+	border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.newsletter-form-wrap .ec-form-status--error {
+	background: rgba(239, 68, 68, 0.12);
+	color: #fca5a5;
+	border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.site-footer {
+	background: var(--color-surface);
+	border-top-color: var(--color-border);
+}

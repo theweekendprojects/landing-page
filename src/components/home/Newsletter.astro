@@ -4,10 +4,13 @@
  *
  * The form itself ("newsletter-signup") is created once in the admin UI at
  * /_emdash/admin/plugins/emdash-forms -- see AGENTS.md for setup steps. This
- * component just renders whatever form matches `formId` and skins it with
- * theme tokens instead of the plugin's default styles.
+ * component just renders whatever form matches `formId` and lays it out;
+ * all color theming (the --ec-form-* variables) lives in each theme file
+ * under the `.newsletter-form-wrap .ec-form` selector so it always wins over
+ * the plugin's own defaults, regardless of stylesheet load order.
  */
 import { Form } from "@emdash-cms/plugin-forms/ui";
+import "@emdash-cms/plugin-forms/styles";
 
 interface Props {
 	title: string;
@@ -56,33 +59,18 @@ const { title, subtitle, formId = "newsletter-signup" } = Astro.props;
 		text-align: left;
 	}
 
-	/*
-	 * Theme the forms plugin's default markup with our design tokens
-	 * instead of its hardcoded fallback colors. Themes can still override
-	 * further (e.g. pill-shaped inputs, gradient submit button) by
-	 * targeting .newsletter-form-wrap :global(.ec-form-*) in theme.css.
-	 */
+	/* Layout only -- colors come from theme.css's .ec-form overrides. */
 	.newsletter-form-wrap :global(.ec-form) {
-		--ec-form-gap: var(--spacing-3);
-		--ec-form-field-border: 1px solid var(--color-border);
-		--ec-form-field-radius: var(--radius);
-		--ec-form-field-padding: var(--spacing-3) var(--spacing-4);
-		--ec-form-field-bg: var(--color-surface);
-		--ec-form-error-color: #dc2626;
-		--ec-form-required-color: #dc2626;
-		--ec-form-help-color: var(--color-muted);
-		--ec-form-submit-bg: var(--color-brand);
-		--ec-form-submit-color: var(--color-on-brand);
-		--ec-form-submit-radius: var(--radius);
-		--ec-form-submit-padding: var(--spacing-3) var(--spacing-6);
 		flex-direction: row;
 		flex-wrap: wrap;
 		align-items: flex-start;
-		color: var(--color-text);
 	}
 
 	.newsletter-form-wrap :global(.ec-form-page) {
 		flex: 1;
+		display: flex;
+		flex-wrap: wrap;
+		gap: inherit;
 	}
 
 	.newsletter-form-wrap :global(.ec-form-field) {
@@ -90,54 +78,12 @@ const { title, subtitle, formId = "newsletter-signup" } = Astro.props;
 		min-width: 200px;
 	}
 
-	.newsletter-form-wrap :global(.ec-form-label) {
-		color: var(--color-text);
-		font-size: var(--font-size-sm);
-	}
-
-	.newsletter-form-wrap :global(.ec-form-input) {
-		font-family: var(--font-body);
-		font-size: var(--font-size-base);
-		color: var(--color-text);
-		transition:
-			border-color var(--transition-fast),
-			box-shadow var(--transition-fast);
-	}
-
-	.newsletter-form-wrap :global(.ec-form-input:focus) {
-		outline: none;
-		border-color: var(--color-brand);
-		box-shadow: 0 0 0 3px var(--color-brand-ring);
-	}
-
 	.newsletter-form-wrap :global(.ec-form-submit) {
-		font-family: var(--font-body);
-		font-weight: 600;
 		white-space: nowrap;
-		transition:
-			background var(--transition-fast),
-			transform var(--transition-fast);
-	}
-
-	.newsletter-form-wrap :global(.ec-form-submit:hover) {
-		background: var(--color-brand-hover);
-		transform: translateY(-1px);
 	}
 
 	.newsletter-form-wrap :global(.ec-form-nav) {
 		align-self: stretch;
-	}
-
-	.newsletter-form-wrap :global(.ec-form-status--success) {
-		background: color-mix(in srgb, #16a34a 12%, transparent);
-		color: light-dark(#166534, #86efac);
-		border: 1px solid color-mix(in srgb, #16a34a 30%, transparent);
-	}
-
-	.newsletter-form-wrap :global(.ec-form-status--error) {
-		background: color-mix(in srgb, #dc2626 12%, transparent);
-		color: light-dark(#991b1b, #fca5a5);
-		border: 1px solid color-mix(in srgb, #dc2626 30%, transparent);
 	}
 
 	@media (max-width: 640px) {

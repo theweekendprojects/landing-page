@@ -63,10 +63,24 @@ A blog with posts, pages, categories, tags, full-text search, and RSS. Designed 
 
 - `posts` collection: `title`, `featured_image`, `content` (Portable Text), `excerpt` (text).
 - `pages` collection: `title`, `content` (Portable Text). Used for `/about` etc.
-- Taxonomies: `category`, `tag`.
-- Single `primary` menu (Home, About, Posts by default).
+- `projects` collection: `title`, `featured_image`, `description` (text), `full_content` (Portable Text), `tech_stack` (array of string), `github_url`, `live_url`, `category` (select), `featured` (boolean, shows on the homepage), `published_at` (datetime, used for ordering).
+- Taxonomies: `category`, `tag` (both attached to `posts` only).
+- Single `primary` menu (Home, Projects, Blog, About by default).
 
-Site settings have `title` and `tagline` -- both render in the header / footer.
+Site settings have `title` and `tagline` -- both render in the header / footer / hero.
+
+## Newsletter signup
+
+The homepage's newsletter section renders a real form via `@emdash-cms/plugin-forms`, already registered in `astro.config.mjs`. The plugin only stores form *definitions* in its own admin-managed storage -- there's no seed.json support for forms, so the form has to be created once by hand:
+
+1. Start the site and open `/_emdash/admin/plugins/emdash-forms`.
+2. Create a form with slug `newsletter-signup` (this must match the `formId` prop on `<Newsletter>` in `src/pages/index.astro`) and at least one `email` field.
+3. In the form's settings, set `notifyEmails` to get pinged on new signups, and/or a `webhookUrl` to forward submissions elsewhere. Both are handled by the plugin itself -- no extra wiring needed.
+4. Submissions are reviewable at `/_emdash/admin/plugins/emdash-forms/submissions`.
+
+Notification emails require an email-transport plugin (e.g. Resend, Postmark, SES) to be installed and selected in Settings > Email -- this template doesn't ship one. Without it, `notifyEmails` falls back to EmDash's dev console provider, which just logs the email to the server console instead of sending it. The `webhookUrl` option works regardless, since it only needs the `network:request` capability the forms plugin already has.
+
+Newsletter field colors (`--ec-form-*`) are themed per theme file under `.newsletter-form-wrap .ec-form` -- see `src/components/home/Newsletter.astro` for the structural markup and any theme file in `src/styles/themes/` for the color pattern.
 
 ## Visual character
 
@@ -76,9 +90,33 @@ The brand colour is `#0066cc` (`--color-brand`) -- used for links, the post-card
 
 The article layout is the standout feature: a three-column reading view with a left meta column (author bylines, date), centred 680px body column, and a right gutter for search, table of contents, and categories. Don't flatten that into one column on desktop -- the layout signals "this is something to read".
 
+## Themes
+
+This site ships 6 interchangeable theme packs in `src/styles/themes/`, each a full port of one of the mockups in `design-demos/`:
+
+| Theme                | Look                                                       |
+| --------------------- | ----------------------------------------------------------- |
+| `variation-1`         | Dark, indigo -> pink gradient brand mark                   |
+| `variation-2`         | Dark, rotating cyan/violet/pink/amber gradient, pill buttons |
+| `variation-3`         | Light editorial, slate ink + amber accent                  |
+| `huashu-variation-1`  | Dark, orange -> purple gradient (default)                  |
+| `huashu-variation-2`  | Dark glassmorphism, violet -> teal                         |
+| `huashu-variation-3`  | Dark navy, single teal accent, large image-led cards        |
+
+`src/styles/theme.css` holds a single `@import` line pointing at the active theme file. Switch with:
+
+```bash
+npx pnpm theme <name>      # e.g. npx pnpm theme variation-2
+npx pnpm theme --list      # see all available themes
+```
+
+Restart the dev server after switching. Each theme file only overrides `tokens.css` variables and a handful of section classes (`.hero`, `.feature-card`, `.project-card`, `.post-card`, `.newsletter-form-wrap .ec-form`, etc.) -- none of them touch markup, so switching is always non-destructive. To build a 7th theme, copy an existing file in `src/styles/themes/` as a starting point and point the `@import` at it.
+
+Two of the ported mockups (`huashu-variation-2`, `huashu-variation-3`) pair their palette with a second display font (Space Grotesk / Playfair Display). That swap isn't applied automatically -- see the comment at the top of each theme file for how to add it via the `fonts` array in `astro.config.mjs`.
+
 ## Customisation
 
-Design tokens live in `src/styles/tokens.css` with their default values. To restyle the site, override tokens in `src/styles/theme.css` -- declarations there are unlayered, so they always beat the `@layer base` defaults. Don't edit `tokens.css` or `Base.astro` for visual changes.
+Design tokens live in `src/styles/tokens.css` with their default values. To restyle the site, override tokens in `src/styles/theme.css` -- declarations there are unlayered, so they always beat the `@layer base` defaults. Don't edit `tokens.css` or `Base.astro` for visual changes. If you're customizing rather than switching themes outright, edit the active file under `src/styles/themes/` instead of `theme.css` itself, since `theme.css` is just the `@import` switch.
 
 Colours are defined with `light-dark(<light>, <dark>)`, so each token carries both modes. Overriding with a plain colour changes light and dark at once; use `light-dark()` in the override to keep them distinct. There is no separate dark palette to maintain.
 

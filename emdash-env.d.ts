@@ -33,9 +33,31 @@ export interface Post {
   terms?: Record<string, TaxonomyTerm[]>;
 }
 
+export interface Project {
+  id: string;
+  slug: string | null;
+  status: string;
+  title: string;
+  featured_image?: { id: string; src?: string; alt?: string; width?: number; height?: number };
+  description?: string;
+  full_content?: PortableTextBlock[];
+  tech_stack?: string[];
+  github_url?: string;
+  live_url?: string;
+  category?: string;
+  featured?: boolean;
+  published_at?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
 declare module "emdash" {
   interface EmDashCollections {
     pages: Page;
     posts: Post;
+    projects: Project;
   }
 }

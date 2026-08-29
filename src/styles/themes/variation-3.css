@@ -1,0 +1,185 @@
+/*
+ * Theme: variation-3 -- "Creative Coding Beyond the 9-5" (editorial light)
+ * Ported from design-demos/variation-3.html
+ *
+ * Light-only editorial theme: slate ink, warm amber accent, generous
+ * whitespace, subtle underline nav hovers.
+ */
+
+:root {
+	color-scheme: light;
+
+	--color-bg: #ffffff;
+	--color-bg-subtle: #f8fafc;
+	--color-surface: #ffffff;
+	--color-text: #0f172a;
+	--color-text-secondary: #1e293b;
+	--color-muted: #64748b;
+	--color-border: #e2e8f0;
+	--color-border-subtle: #eef2f6;
+	--color-brand: #1e293b;
+	--color-brand-hover: #334155;
+	--color-on-brand: #ffffff;
+	--color-brand-ring: color-mix(in srgb, #1e293b 20%, transparent);
+
+	--theme-accent: #d97706;
+}
+
+body {
+	background: var(--color-bg);
+}
+
+.site-header {
+	background: rgba(255, 255, 255, 0.95);
+}
+
+.site-title {
+	color: var(--color-text);
+	font-weight: 800;
+}
+
+.nav-links a {
+	position: relative;
+}
+
+.nav-links a::after {
+	content: "";
+	position: absolute;
+	bottom: -5px;
+	left: 0;
+	width: 0;
+	height: 2px;
+	background: var(--theme-accent);
+	transition: width var(--transition-fast);
+}
+
+.nav-links a:hover::after {
+	width: 100%;
+}
+
+/* Hero */
+.hero::before {
+	background: radial-gradient(circle, rgba(217, 119, 6, 0.06) 0%, transparent 70%);
+}
+
+.hero-badge {
+	background: var(--color-bg-subtle);
+	border-color: var(--color-border);
+	color: var(--theme-accent);
+}
+
+.hero-title {
+	color: var(--color-text);
+}
+
+.btn-primary {
+	background: var(--color-brand);
+}
+
+.btn-primary:hover {
+	background: var(--color-brand-hover);
+	box-shadow: 0 10px 20px rgba(15, 23, 42, 0.12);
+}
+
+.btn-secondary {
+	background: #ffffff;
+	color: var(--color-brand);
+	border: 2px solid var(--color-border);
+}
+
+.btn-secondary:hover {
+	border-color: var(--color-brand);
+	background: var(--color-bg-subtle);
+}
+
+.section-heading {
+	color: var(--color-text);
+	font-weight: 700;
+}
+
+/* Feature + project + post cards */
+.feature-card,
+.project-card,
+.post-card {
+	background: #ffffff;
+	border: 1px solid var(--color-border);
+}
+
+.feature-card:hover,
+.project-card:hover {
+	border-color: var(--color-brand);
+	transform: translateY(-4px);
+	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+}
+
+.post-card:hover .card-title,
+.card-link:hover .card-title {
+	color: var(--theme-accent);
+}
+
+.feature-icon {
+	background: var(--color-bg-subtle);
+	color: var(--theme-accent);
+}
+
+.card-category,
+.tech-tag,
+.card-tag {
+	background: var(--color-bg-subtle);
+	color: var(--theme-accent);
+}
+
+.blog-section {
+	background: var(--color-bg-subtle);
+}
+
+/* Newsletter */
+.newsletter-form-wrap .ec-form {
+	--ec-form-field-border: 1px solid var(--color-border);
+	--ec-form-field-radius: var(--radius);
+	--ec-form-field-padding: var(--spacing-3) var(--spacing-4);
+	--ec-form-field-bg: #ffffff;
+	--ec-form-help-color: var(--color-muted);
+	--ec-form-submit-bg: var(--color-brand);
+	--ec-form-submit-color: #ffffff;
+	--ec-form-submit-radius: var(--radius);
+	--ec-form-submit-padding: var(--spacing-3) var(--spacing-6);
+	color: var(--color-text);
+}
+
+.newsletter-form-wrap .ec-form-label {
+	color: var(--color-text);
+}
+
+.newsletter-form-wrap .ec-form-input {
+	color: var(--color-text);
+	font-family: var(--font-body);
+}
+
+.newsletter-form-wrap .ec-form-input:focus {
+	outline: none;
+	border-color: var(--theme-accent);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-accent) 20%, transparent);
+}
+
+.newsletter-form-wrap .ec-form-submit:hover {
+	background: var(--color-brand-hover);
+	transform: translateY(-2px);
+}
+
+.newsletter-form-wrap .ec-form-status--success {
+	background: #f0fdf4;
+	color: #166534;
+	border: 1px solid #bbf7d0;
+}
+
+.newsletter-form-wrap .ec-form-status--error {
+	background: #fef2f2;
+	color: #991b1b;
+	border: 1px solid #fecaca;
+}
+
+.site-footer {
+	background: var(--color-bg-subtle);
+	border-top-color: var(--color-border);
+}

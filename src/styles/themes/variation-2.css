@@ -1,0 +1,252 @@
+/*
+ * Theme: variation-2 -- "Build in Public"
+ * Ported from design-demos/variation-2.html
+ *
+ * Dark theme with a rotating cyan -> violet -> pink -> amber gradient
+ * family, pill-shaped buttons, and glassy translucent cards.
+ */
+
+:root {
+	color-scheme: dark;
+
+	--color-bg: #0f0f1a;
+	--color-bg-subtle: #1a1a2e;
+	--color-surface: rgba(255, 255, 255, 0.03);
+	--color-text: #ffffff;
+	--color-text-secondary: #a0a0b0;
+	--color-muted: #a0a0b0;
+	--color-border: rgba(255, 255, 255, 0.08);
+	--color-border-subtle: rgba(255, 255, 255, 0.05);
+	--color-brand: #06b6d4;
+	--color-brand-hover: #0891b2;
+	--color-on-brand: #ffffff;
+	--color-brand-ring: color-mix(in srgb, #06b6d4 30%, transparent);
+
+	--radius-lg: 20px;
+
+	--theme-gradient-1: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
+	--theme-gradient-2: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+	--theme-gradient-3: linear-gradient(135deg, #ec4899 0%, #f59e0b 100%);
+}
+
+body {
+	background: var(--color-bg);
+}
+
+.site-header {
+	background: color-mix(in srgb, var(--color-bg) 75%, transparent);
+	backdrop-filter: blur(12px);
+}
+
+.site-title {
+	background: var(--theme-gradient-1);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+
+/* Hero */
+.hero::before {
+	background: radial-gradient(circle at 30% 20%, rgba(6, 182, 212, 0.16) 0%, transparent 55%),
+		radial-gradient(circle at 70% 60%, rgba(139, 92, 246, 0.14) 0%, transparent 55%);
+}
+
+.hero-title {
+	background: var(--theme-gradient-1);
+	background-size: 200% auto;
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+	animation: theme-gradient-shift 4s ease-in-out infinite;
+}
+
+@keyframes theme-gradient-shift {
+	0%,
+	100% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+}
+
+.hero-badge {
+	background: rgba(6, 182, 212, 0.1);
+	border-color: rgba(6, 182, 212, 0.3);
+	color: #67e8f9;
+}
+
+.btn {
+	border-radius: 999px;
+	font-weight: 700;
+}
+
+.btn-primary {
+	background: var(--theme-gradient-1);
+	border: none;
+}
+
+.btn-primary:hover {
+	box-shadow: 0 15px 30px rgba(6, 182, 212, 0.4);
+}
+
+.btn-secondary {
+	background: rgba(255, 255, 255, 0.08);
+	border: 2px solid rgba(6, 182, 212, 0.3);
+}
+
+.btn-secondary:hover {
+	background: rgba(255, 255, 255, 0.14);
+	border-color: rgba(6, 182, 212, 0.6);
+}
+
+/* Section headings get an accent underline like the source demo */
+.section-heading {
+	background: linear-gradient(to right, #ffffff, #94a3b8);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+	position: relative;
+	display: inline-block;
+	padding-bottom: var(--spacing-3);
+}
+
+.section-heading::after {
+	content: "";
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 60px;
+	height: 4px;
+	border-radius: 2px;
+	background: var(--theme-gradient-1);
+}
+
+.section-header--centered .section-heading::after {
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+/* Feature + project + post cards: glassy with gradient top border reveal */
+.feature-card,
+.project-card,
+.post-card {
+	background: var(--color-surface);
+	backdrop-filter: blur(10px);
+	position: relative;
+	overflow: hidden;
+}
+
+.feature-card::before,
+.project-card::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 4px;
+	background: var(--theme-gradient-1);
+	transform: scaleX(0);
+	transform-origin: left;
+	transition: transform var(--transition-base);
+}
+
+.feature-card:hover,
+.project-card:hover {
+	transform: translateY(-10px);
+	border-color: rgba(6, 182, 212, 0.3);
+	box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+}
+
+.feature-card:hover::before,
+.project-card:hover::before {
+	transform: scaleX(1);
+}
+
+.post-card:hover {
+	transform: translateY(-6px);
+	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+}
+
+.feature-icon {
+	background: var(--theme-gradient-2);
+	color: #ffffff;
+}
+
+.card-category,
+.tech-tag,
+.card-tag {
+	background: rgba(6, 182, 212, 0.1);
+	color: #67e8f9;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.card-link:hover .card-title {
+	color: var(--color-brand);
+}
+
+/* Blog section on home reuses .blog-section background */
+.blog-section {
+	background: var(--color-bg-subtle);
+}
+
+/* Newsletter */
+.newsletter-form-wrap .ec-form {
+	--ec-form-field-border: 1px solid var(--color-border);
+	--ec-form-field-radius: 999px;
+	--ec-form-field-padding: var(--spacing-3) var(--spacing-5);
+	--ec-form-field-bg: rgba(255, 255, 255, 0.05);
+	--ec-form-help-color: var(--color-muted);
+	--ec-form-submit-bg: transparent;
+	--ec-form-submit-color: #ffffff;
+	--ec-form-submit-radius: 999px;
+	--ec-form-submit-padding: var(--spacing-3) var(--spacing-6);
+	color: var(--color-text);
+}
+
+.newsletter-form-wrap .ec-form-label {
+	color: var(--color-text);
+}
+
+.newsletter-form-wrap .ec-form-input {
+	color: var(--color-text);
+	font-family: var(--font-body);
+}
+
+.newsletter-form-wrap .ec-form-input:focus {
+	outline: none;
+	border-color: var(--color-brand);
+	box-shadow: 0 0 0 3px var(--color-brand-ring);
+}
+
+.newsletter-form-wrap .ec-form-submit {
+	background: var(--theme-gradient-1);
+	font-weight: 700;
+	transition:
+		transform var(--transition-fast),
+		box-shadow var(--transition-fast);
+}
+
+.newsletter-form-wrap .ec-form-submit:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 15px 30px rgba(6, 182, 212, 0.4);
+}
+
+.newsletter-form-wrap .ec-form-status--success {
+	background: rgba(34, 197, 94, 0.12);
+	color: #86efac;
+	border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.newsletter-form-wrap .ec-form-status--error {
+	background: rgba(220, 38, 38, 0.12);
+	color: #fca5a5;
+	border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+.site-footer {
+	background: var(--color-bg-subtle);
+	border-top-color: var(--color-border);
+}

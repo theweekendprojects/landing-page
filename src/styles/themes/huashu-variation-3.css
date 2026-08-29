@@ -1,0 +1,190 @@
+/*
+ * Theme: huashu-variation-3 -- "Build Something Every Weekend"
+ * Ported from design-demos/huashu-variation-3.html
+ *
+ * Dark navy editorial theme with a single teal accent, pill CTAs, and
+ * large image-led cards.
+ *
+ * The source mockup pairs this palette with Playfair Display serif
+ * headings. To match it exactly, add a Playfair Display entry to the
+ * `fonts` array in astro.config.mjs bound to --font-heading (see
+ * AGENTS.md > Customisation), then lower --font-weight-heading /
+ * --font-weight-display since serif faces read heavier at the same
+ * weight. Left as Inter here so switching themes never silently changes
+ * the font pipeline underneath you.
+ */
+
+:root {
+	color-scheme: dark;
+
+	--color-bg: #0f172a;
+	--color-bg-subtle: #162032;
+	--color-surface: #1e293b;
+	--color-text: #f8fafc;
+	--color-text-secondary: #94a3b8;
+	--color-muted: #94a3b8;
+	--color-border: rgba(255, 255, 255, 0.08);
+	--color-border-subtle: rgba(255, 255, 255, 0.05);
+	--color-brand: #14b8a6;
+	--color-brand-hover: #0d9488;
+	--color-on-brand: #0f172a;
+	--color-brand-ring: color-mix(in srgb, #14b8a6 25%, transparent);
+
+	--radius-lg: 24px;
+
+	--theme-gradient-text: linear-gradient(90deg, #e0f2fe 0%, #93c5fd 50%, #3b82f6 100%);
+}
+
+body {
+	background: var(--color-bg);
+}
+
+.site-header {
+	background: color-mix(in srgb, var(--color-bg) 80%, transparent);
+}
+
+.site-title {
+	color: var(--color-text);
+}
+
+/* Hero */
+.hero-badge {
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
+	color: var(--color-brand);
+	border-radius: 100px;
+}
+
+.hero-title {
+	background: var(--theme-gradient-text);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+	line-height: 0.95;
+}
+
+.btn {
+	border-radius: 100px;
+}
+
+.btn-primary {
+	background: var(--color-brand);
+	color: var(--color-on-brand);
+	border: none;
+}
+
+.btn-primary:hover {
+	background: var(--color-brand-hover);
+	box-shadow: 0 10px 20px rgba(20, 184, 166, 0.2);
+}
+
+.btn-secondary {
+	background: transparent;
+	border: 1px solid var(--color-border);
+	color: var(--color-text);
+}
+
+.btn-secondary:hover {
+	border-color: var(--color-brand);
+}
+
+/* Project + post cards: image-led, large radius */
+.feature-card,
+.project-card,
+.post-card {
+	background: var(--color-surface);
+	border-radius: var(--radius-lg);
+}
+
+.card-image,
+.card-placeholder {
+	border-radius: var(--radius-lg);
+}
+
+.feature-card:hover,
+.project-card:hover {
+	transform: translateY(-8px);
+	box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25);
+}
+
+.post-card:hover .card-title,
+.card-link:hover .card-title {
+	color: var(--color-brand);
+}
+
+.feature-icon {
+	background: var(--color-bg-subtle);
+	color: var(--color-brand);
+}
+
+.card-category,
+.tech-tag,
+.card-tag {
+	color: var(--color-brand);
+	background: transparent;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.blog-section {
+	background: var(--color-bg-subtle);
+}
+
+/* Newsletter */
+.newsletter-form-wrap .ec-form {
+	--ec-form-field-border: 1px solid var(--color-border);
+	--ec-form-field-radius: 100px;
+	--ec-form-field-padding: var(--spacing-4) var(--spacing-5);
+	--ec-form-field-bg: var(--color-surface);
+	--ec-form-help-color: var(--color-muted);
+	--ec-form-submit-bg: var(--color-brand);
+	--ec-form-submit-color: var(--color-on-brand);
+	--ec-form-submit-radius: 100px;
+	--ec-form-submit-padding: var(--spacing-4) var(--spacing-8);
+	color: var(--color-text);
+}
+
+.newsletter-form-wrap .ec-form-label {
+	color: var(--color-text);
+}
+
+.newsletter-form-wrap .ec-form-input {
+	color: var(--color-text);
+	font-family: var(--font-body);
+}
+
+.newsletter-form-wrap .ec-form-input:focus {
+	outline: none;
+	border-color: var(--color-brand);
+	box-shadow: 0 0 0 3px var(--color-brand-ring);
+}
+
+.newsletter-form-wrap .ec-form-submit {
+	font-weight: 600;
+	transition:
+		background var(--transition-fast),
+		transform var(--transition-fast);
+}
+
+.newsletter-form-wrap .ec-form-submit:hover {
+	background: var(--color-brand-hover);
+	transform: translateY(-2px);
+}
+
+.newsletter-form-wrap .ec-form-status--success {
+	background: rgba(20, 184, 166, 0.12);
+	color: #5eead4;
+	border: 1px solid rgba(20, 184, 166, 0.3);
+}
+
+.newsletter-form-wrap .ec-form-status--error {
+	background: rgba(239, 68, 68, 0.12);
+	color: #fca5a5;
+	border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.site-footer {
+	background: var(--color-bg-subtle);
+	border-top-color: var(--color-border);
+}

@@ -120,9 +120,62 @@ body {
 	color: var(--theme-accent);
 }
 
-/* Newsletter */
+/* Newsletter -- colors for the plugin-forms markup (see forms.css for the
+   full variable list; layout lives in Newsletter.astro). */
+.newsletter-form-wrap .ec-form {
+	--ec-form-field-border: 1px solid var(--color-border);
+	--ec-form-field-radius: var(--radius-lg);
+	--ec-form-field-padding: var(--spacing-3) var(--spacing-4);
+	--ec-form-field-bg: var(--color-surface);
+	--ec-form-help-color: var(--color-muted);
+	--ec-form-submit-bg: var(--theme-accent);
+	--ec-form-submit-color: #ffffff;
+	--ec-form-submit-radius: var(--radius-lg);
+	--ec-form-submit-padding: var(--spacing-3) var(--spacing-6);
+	color: var(--color-text);
+}
+
+.newsletter-form-wrap .ec-form-label {
+	color: var(--color-text);
+}
+
+.newsletter-form-wrap .ec-form-input,
+.newsletter-form-wrap .ec-form select,
+.newsletter-form-wrap .ec-form textarea {
+	color: var(--color-text);
+	font-family: var(--font-body);
+}
+
+.newsletter-form-wrap .ec-form-input:focus {
+	outline: none;
+	border-color: var(--color-brand);
+	box-shadow: 0 0 0 3px var(--color-brand-ring);
+}
+
 .newsletter-form-wrap .ec-form-submit {
 	background: var(--theme-gradient);
+	font-family: var(--font-body);
+	font-weight: 600;
+	transition:
+		transform var(--transition-fast),
+		box-shadow var(--transition-fast);
+}
+
+.newsletter-form-wrap .ec-form-submit:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 10px 20px rgba(99, 102, 241, 0.35);
+}
+
+.newsletter-form-wrap .ec-form-status--success {
+	background: rgba(34, 197, 94, 0.12);
+	color: #86efac;
+	border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.newsletter-form-wrap .ec-form-status--error {
+	background: rgba(220, 38, 38, 0.12);
+	color: #fca5a5;
+	border: 1px solid rgba(220, 38, 38, 0.3);
 }
 
 /* Footer */

@@ -1,0 +1,414 @@
+---
+import {
+	getEmDashEntry,
+	getEmDashCollection,
+	getSeoMeta,
+	decodeSlug,
+	getSiteSettings,
+} from "emdash";
+import { Image, PortableText } from "emdash/ui";
+import Base from "../../layouts/Base.astro";
+import ProjectCard from "../../components/ProjectCard.astro";
+import { resolveBlogSiteIdentity } from "../../utils/site-identity";
+
+const slug = decodeSlug(Astro.params.slug);
+
+if (!slug) {
+	return Astro.redirect("/404");
+}
+
+const { entry: project, cacheHint } = await getEmDashEntry("projects", slug);
+
+if (!project) {
+	return Astro.redirect("/404");
+}
+
+if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+
+function getImageUrl(img: unknown): string | undefined {
+	if (!img || typeof img !== "object") return undefined;
+	const image = img as Record<string, unknown>;
+	if (typeof image.src === "string" && image.src) {
+		return image.src.startsWith("http") ? image.src : `${Astro.url.origin}${image.src}`;
+	}
+	const meta = image.meta as Record<string, unknown> | undefined;
+	const storageKey =
+		(typeof meta?.storageKey === "string" ? meta.storageKey : undefined) ||
+		(typeof image.id === "string" ? image.id : undefined);
+	if (storageKey) {
+		return `${Astro.url.origin}/_emdash/api/media/file/${storageKey}`;
+	}
+	return undefined;
+}
+const featuredImageUrl = getImageUrl(project.data.featured_image);
+const { siteTitle } = resolveBlogSiteIdentity(await getSiteSettings());
+
+const seo = getSeoMeta(project, {
+	siteTitle,
+	siteUrl: Astro.url.origin,
+	path: `/projects/${slug}`,
+	defaultOgImage: featuredImageUrl,
+});
+
+const categoryLabels: Record<string, string> = {
+	web: "Web Application",
+	mobile: "Mobile App",
+	cli: "CLI Tool",
+	library: "Library/Package",
+	api: "API/Backend",
+	design: "Design/UX",
+	other: "Other",
+};
+
+const publishDate =
+	project.data.publishedAt?.toLocaleDateString("en-US", {
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+	}) ?? null;
+
+// A few other projects for the "more projects" rail.
+const { entries: recentProjects } = await getEmDashCollection("projects", {
+	orderBy: { published_at: "desc" },
+	limit: 4,
+});
+const otherProjects = recentProjects.filter((p) => p.id !== project.id).slice(0, 3);
+---
+
+<Base
+	title={seo.title}
+	pageTitle={seo.ogTitle}
+	description={seo.description}
+	image={seo.ogImage}
+	canonical={seo.canonical}
+	robots={seo.robots}
+	type="article"
+	publishedTime={project.data.publishedAt?.toISOString() ?? null}
+	modifiedTime={project.data.updatedAt.toISOString()}
+	content={{ collection: "projects", id: project.data.id, slug }}
+>
+	<article class="project-detail">
+		{
+			project.data.featured_image && (
+				<div class="detail-hero" {...project.edit.featured_image}>
+					<Image image={project.data.featured_image} />
+				</div>
+			)
+		}
+
+		<div class="detail-grid">
+			<header class="detail-header">
+				<div class="detail-meta">
+					{project.data.category && (
+						<span class="detail-category">
+							{categoryLabels[project.data.category] ?? project.data.category}
+						</span>
+					)}
+					{project.data.category && publishDate && <span class="meta-dot" />}
+					{publishDate && <time>{publishDate}</time>}
+				</div>
+				<h1 class="detail-title" {...project.edit.title}>{project.data.title}</h1>
+				{
+					project.data.description && (
+						<p class="detail-description" {...project.edit.description}>
+							{project.data.description}
+						</p>
+					)
+				}
+				<div class="detail-links">
+					{project.data.live_url && (
+						<a href={project.data.live_url} class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+							View live
+						</a>
+					)}
+					{project.data.github_url && (
+						<a href={project.data.github_url} class="btn btn-secondary" target="_blank" rel="noopener noreferrer">
+							View source
+						</a>
+					)}
+				</div>
+				{
+					project.data.tech_stack && project.data.tech_stack.length > 0 && (
+						<div class="detail-tech-stack">
+							{project.data.tech_stack.map((tech) => (
+								<span class="tech-tag">{tech}</span>
+							))}
+						</div>
+					)
+				}
+			</header>
+
+			{
+				project.data.full_content && (
+					<div class="detail-content">
+						<PortableText value={project.data.full_content} />
+					</div>
+				)
+			}
+		</div>
+	</article>
+
+	{
+		otherProjects.length > 0 && (
+			<section class="more-projects">
+				<div class="more-inner">
+					<h2 class="more-title">More projects</h2>
+					<div class="more-grid">
+						{otherProjects.map((p) => (
+							<ProjectCard
+								title={p.data.title}
+								description={p.data.description}
+								featuredImage={p.data.featured_image}
+								href={`/projects/${p.id}`}
+								techStack={p.data.tech_stack}
+								category={p.data.category}
+							/>
+						))}
+					</div>
+				</div>
+			</section>
+		)
+	}
+</Base>
+
+<style>
+	.project-detail {
+		max-width: var(--content-width);
+		margin: 0 auto;
+	}
+
+	.detail-hero {
+		max-width: var(--wide-width);
+		margin: var(--spacing-16) auto;
+		margin-inline: max(var(--spacing-6), calc((var(--wide-width) - var(--content-width)) / -2));
+		border-radius: var(--radius-lg);
+		overflow: hidden;
+		background: var(--color-surface);
+	}
+
+	.detail-hero img {
+		width: 100%;
+		height: auto;
+		max-height: 500px;
+		object-fit: cover;
+	}
+
+	.detail-grid {
+		padding: 0 var(--spacing-6) var(--spacing-16);
+	}
+
+	.detail-header {
+		margin-bottom: var(--spacing-10);
+	}
+
+	.detail-meta {
+		display: flex;
+		align-items: center;
+		gap: var(--spacing-3);
+		font-size: var(--font-size-sm);
+		color: var(--color-muted);
+		margin-bottom: var(--spacing-4);
+	}
+
+	.detail-category {
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-wider);
+		font-weight: 500;
+	}
+
+	.meta-dot {
+		width: 3px;
+		height: 3px;
+		border-radius: 50%;
+		background: var(--color-muted);
+	}
+
+	.detail-title {
+		font-size: clamp(2rem, 5vw, var(--font-size-5xl));
+		font-weight: var(--font-weight-display);
+		line-height: var(--leading-tight);
+		letter-spacing: var(--tracking-tight);
+		margin-bottom: var(--spacing-4);
+	}
+
+	.detail-description {
+		font-size: var(--font-size-xl);
+		line-height: var(--leading-relaxed);
+		color: var(--color-text-secondary);
+		margin-bottom: var(--spacing-6);
+	}
+
+	.detail-links {
+		display: flex;
+		gap: var(--spacing-4);
+		margin-bottom: var(--spacing-6);
+	}
+
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		padding: var(--spacing-3) var(--spacing-6);
+		border-radius: var(--radius-lg);
+		font-size: var(--font-size-base);
+		font-weight: 600;
+		text-decoration: none;
+		transition:
+			transform var(--transition-fast),
+			background var(--transition-fast),
+			border-color var(--transition-fast);
+	}
+
+	.btn-primary {
+		background: var(--color-brand);
+		color: var(--color-on-brand);
+	}
+
+	.btn-primary:hover {
+		background: var(--color-brand-hover);
+		transform: translateY(-2px);
+	}
+
+	.btn-secondary {
+		background: transparent;
+		color: var(--color-text);
+		border: 1px solid var(--color-border);
+	}
+
+	.btn-secondary:hover {
+		border-color: var(--color-text-secondary);
+		transform: translateY(-2px);
+	}
+
+	.detail-tech-stack {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--spacing-2);
+	}
+
+	.tech-tag {
+		display: inline-block;
+		padding: var(--tag-padding-y) var(--spacing-2);
+		font-size: var(--font-size-xs);
+		color: var(--color-text-secondary);
+		background: var(--color-surface);
+		border-radius: var(--radius);
+	}
+
+	/* Portable text content typography -- mirrors posts/[slug].astro */
+	.detail-content {
+		font-size: var(--font-size-lg);
+		line-height: var(--leading-relaxed);
+	}
+
+	.detail-content :global(p) {
+		margin-bottom: 1.5em;
+	}
+
+	.detail-content :global(h2) {
+		font-size: var(--font-size-2xl);
+		margin-top: 2.5em;
+		margin-bottom: 0.75em;
+	}
+
+	.detail-content :global(h3) {
+		font-size: var(--font-size-xl);
+		margin-top: 2em;
+		margin-bottom: 0.5em;
+	}
+
+	.detail-content :global(pre) {
+		margin: 2em 0;
+		padding: var(--spacing-5);
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-lg);
+		overflow-x: auto;
+		font-family: var(--font-mono);
+		font-size: var(--font-size-sm);
+		line-height: 1.6;
+	}
+
+	.detail-content :global(code) {
+		font-family: var(--font-mono);
+		font-size: 0.9em;
+		background: var(--color-surface);
+		padding: 0.2em 0.4em;
+		border-radius: var(--radius);
+	}
+
+	.detail-content :global(pre code) {
+		background: none;
+		padding: 0;
+	}
+
+	.detail-content :global(ul),
+	.detail-content :global(ol) {
+		margin-bottom: 1.5em;
+		padding-left: 1.5em;
+	}
+
+	.detail-content :global(li) {
+		margin-bottom: 0.5em;
+	}
+
+	.detail-content :global(img) {
+		margin: 2em 0;
+		border-radius: var(--radius-lg);
+	}
+
+	.detail-content :global(a) {
+		color: var(--color-brand);
+		text-decoration: underline;
+		text-underline-offset: 3px;
+	}
+
+	/* More projects */
+	.more-projects {
+		background: var(--color-bg-subtle);
+		padding: var(--spacing-16) 0;
+	}
+
+	.more-inner {
+		max-width: var(--wide-width);
+		margin: 0 auto;
+		padding: 0 var(--spacing-6);
+	}
+
+	.more-title {
+		font-size: var(--font-size-2xl);
+		font-weight: var(--font-weight-heading);
+		margin-bottom: var(--spacing-10);
+	}
+
+	.more-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: var(--spacing-8);
+	}
+
+	@media (max-width: 900px) {
+		.detail-hero {
+			margin: var(--spacing-4) var(--spacing-4) var(--spacing-8);
+			margin-inline: var(--spacing-4);
+			border-radius: var(--radius);
+		}
+
+		.detail-grid {
+			padding: 0 var(--spacing-4) var(--spacing-12);
+		}
+
+		.more-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (max-width: 600px) {
+		.detail-links {
+			flex-direction: column;
+		}
+
+		.more-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>
