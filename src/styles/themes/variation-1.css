@@ -121,7 +121,7 @@ body {
 }
 
 /* Newsletter */
-.newsletter-form-wrap :global(.ec-form-submit) {
+.newsletter-form-wrap .ec-form-submit {
 	background: var(--theme-gradient);
 }
 
