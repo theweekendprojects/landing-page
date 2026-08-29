@@ -45,9 +45,28 @@ body {
 	color: transparent;
 }
 
-/* Hero */
+/* Hero -- pulsing radial glow behind the copy, matching the source demo */
 .hero::before {
 	background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, transparent 60%);
+	animation: theme-pulse 8s ease-in-out infinite;
+}
+
+@keyframes theme-pulse {
+	0%,
+	100% {
+		transform: scale(1);
+		opacity: 0.8;
+	}
+	50% {
+		transform: scale(1.1);
+		opacity: 1;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.hero::before {
+		animation: none;
+	}
 }
 
 .hero-title {

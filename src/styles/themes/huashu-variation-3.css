@@ -63,6 +63,12 @@ body {
 	line-height: 0.95;
 }
 
+/* Scroll progress bar -- this is the one theme whose source mockup ships
+   this chrome (#scrollProgress in huashu-variation-3.html). */
+.scroll-progress {
+	display: block;
+}
+
 .btn {
 	border-radius: 100px;
 }

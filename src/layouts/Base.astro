@@ -101,6 +101,7 @@ const isLoggedIn = !!Astro.locals.user;
 	</head>
 	<body>
 		<EmDashBodyStart page={pageCtx} />
+		<div class="scroll-progress" id="scroll-progress"></div>
 		<header class="site-header">
 			<nav class="nav">
 				<a href="/" class="site-title">
@@ -440,6 +441,55 @@ const isLoggedIn = !!Astro.locals.user;
 				::selection {
 					background: var(--color-brand);
 					color: var(--color-on-brand);
+				}
+
+				/*
+				 * Scroll-reveal base state. Elements start faded/offset and
+				 * transition to their resting state once .is-revealed is
+				 * added by the observer in the script below. Themes may
+				 * override the transition curve/distance but shouldn't need
+				 * to -- this matches the timing used across all six source
+				 * mockups (0.6s cubic-bezier, ~20px translateY).
+				 */
+				[data-reveal] {
+					opacity: 0;
+					transform: translateY(20px);
+					transition:
+						opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+						transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+					transition-delay: var(--reveal-delay, 0s);
+				}
+
+				[data-reveal].is-revealed {
+					opacity: 1;
+					transform: translateY(0);
+				}
+
+				@media (prefers-reduced-motion: reduce) {
+					[data-reveal] {
+						opacity: 1;
+						transform: none;
+						transition: none;
+					}
+				}
+
+				/*
+				 * Scroll progress bar. Hidden by default -- only
+				 * huashu-variation-3's theme file sets display: block,
+				 * since that's the one source mockup with this chrome.
+				 * The JS below always runs (cheap: one scroll listener,
+				 * one style write) but is invisible everywhere else.
+				 */
+				.scroll-progress {
+					display: none;
+					position: fixed;
+					top: 0;
+					left: 0;
+					width: 0%;
+					height: 3px;
+					background: var(--color-brand);
+					z-index: 200;
+					transition: width 0.1s linear;
 				}
 			}
 		</style>
@@ -870,6 +920,68 @@ const isLoggedIn = !!Astro.locals.user;
 				}
 			}
 		</style>
+
+		<script>
+			// Scroll-reveal: every design-demos mockup fades content up into
+			// view on scroll (cards, section headers, hero copy). Elements
+			// marked data-reveal fade in once, in view-order, honoring any
+			// data-reveal-delay for staggering. Respects reduced-motion.
+			const prefersReducedMotion = window.matchMedia(
+				"(prefers-reduced-motion: reduce)"
+			).matches;
+
+			if (!prefersReducedMotion) {
+				const revealObserver = new IntersectionObserver(
+					(entries) => {
+						for (const entry of entries) {
+							if (entry.isIntersecting) {
+								entry.target.classList.add("is-revealed");
+								revealObserver.unobserve(entry.target);
+							}
+						}
+					},
+					{ threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
+				);
+
+				document.querySelectorAll("[data-reveal]").forEach((el) => {
+					revealObserver.observe(el);
+				});
+			} else {
+				document.querySelectorAll("[data-reveal]").forEach((el) => {
+					el.classList.add("is-revealed");
+				});
+			}
+		</script>
+
+		<script>
+			// Scroll progress bar (only visible when a theme opts in via
+			// `.scroll-progress { display: block }`, e.g. huashu-variation-3).
+			const scrollProgress = document.getElementById("scroll-progress");
+			if (scrollProgress) {
+				const updateScrollProgress = () => {
+					const scrollTop = document.documentElement.scrollTop;
+					const scrollHeight =
+						document.documentElement.scrollHeight - document.documentElement.clientHeight;
+					const percent = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+					scrollProgress.style.width = `${percent}%`;
+				};
+				window.addEventListener("scroll", updateScrollProgress, { passive: true });
+				updateScrollProgress();
+			}
+
+			// Header "scrolled" state (shrinks/darkens on scroll). Toggled
+			// for all themes, but only visually different when a theme
+			// opts in with a `.site-header.is-scrolled` rule, e.g.
+			// huashu-variation-2's tighter padding + darker backdrop.
+			const siteHeader = document.querySelector(".site-header");
+			if (siteHeader) {
+				const updateHeaderScrolled = () => {
+					siteHeader.classList.toggle("is-scrolled", window.scrollY > 50);
+				};
+				window.addEventListener("scroll", updateHeaderScrolled, { passive: true });
+				updateHeaderScrolled();
+			}
+		</script>
 
 		<script>
 			// ⌘K / Ctrl+K to focus search

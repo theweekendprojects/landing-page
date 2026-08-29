@@ -21,7 +21,7 @@ const { projects, viewAllHref = "/projects" } = Astro.props;
 
 <section class="projects-section" id="projects">
 	<div class="projects-inner">
-		<header class="section-header">
+		<header class="section-header" data-reveal>
 			<div>
 				<h2 class="section-heading">Featured Projects</h2>
 				<p class="section-subtitle">
@@ -32,15 +32,17 @@ const { projects, viewAllHref = "/projects" } = Astro.props;
 		</header>
 		<div class="projects-grid">
 			{
-				projects.map((project) => (
-					<ProjectCard
-						title={project.title}
-						description={project.description}
-						featuredImage={project.featuredImage}
-						href={`/projects/${project.id}`}
-						techStack={project.techStack}
-						category={project.category}
-					/>
+				projects.map((project, index) => (
+					<div data-reveal style={`--reveal-delay: ${index * 0.1}s`}>
+						<ProjectCard
+							title={project.title}
+							description={project.description}
+							featuredImage={project.featuredImage}
+							href={`/projects/${project.id}`}
+							techStack={project.techStack}
+							category={project.category}
+						/>
+					</div>
 				))
 			}
 		</div>

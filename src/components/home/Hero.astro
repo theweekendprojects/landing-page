@@ -12,10 +12,18 @@ const { eyebrow, title, subtitle, primaryCta, secondaryCta } = Astro.props;
 
 <section class="hero">
 	<div class="hero-inner">
-		{eyebrow && <span class="hero-badge">{eyebrow}</span>}
-		<h1 class="hero-title">{title}</h1>
-		<p class="hero-subtitle">{subtitle}</p>
-		<div class="hero-actions">
+		{eyebrow && (
+			<span class="hero-badge" data-reveal>
+				{eyebrow}
+			</span>
+		)}
+		<h1 class="hero-title" data-reveal style="--reveal-delay: 0.1s">
+			{title}
+		</h1>
+		<p class="hero-subtitle" data-reveal style="--reveal-delay: 0.2s">
+			{subtitle}
+		</p>
+		<div class="hero-actions" data-reveal style="--reveal-delay: 0.3s">
 			<a href={primaryCta.href} class="btn btn-primary">{primaryCta.label}</a>
 			{
 				secondaryCta && (

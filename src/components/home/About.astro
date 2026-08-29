@@ -9,7 +9,7 @@ const { title, paragraphs, cta } = Astro.props;
 ---
 
 <section class="about" id="about">
-	<div class="about-inner">
+	<div class="about-inner" data-reveal>
 		<h2 class="about-title">{title}</h2>
 		<div class="about-copy">
 			{paragraphs.map((paragraph) => <p>{paragraph}</p>)}

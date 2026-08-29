@@ -16,14 +16,18 @@ const { title, subtitle, features } = Astro.props;
 
 <section class="features" id="features">
 	<div class="features-inner">
-		<header class="section-header section-header--centered">
+		<header class="section-header section-header--centered" data-reveal>
 			<h2 class="section-heading">{title}</h2>
 			{subtitle && <p class="section-subtitle">{subtitle}</p>}
 		</header>
 		<div class="features-grid">
 			{
-				features.map((feature) => (
-					<div class="feature-card">
+				features.map((feature, index) => (
+					<div
+						class="feature-card"
+						data-reveal
+						style={`--reveal-delay: ${index * 0.1}s`}
+					>
 						<div class="feature-icon" aria-hidden="true">
 							{feature.icon}
 						</div>

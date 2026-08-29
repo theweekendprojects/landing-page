@@ -23,7 +23,7 @@ const { posts, viewAllHref = "/posts" } = Astro.props;
 
 <section class="blog-section" id="blog">
 	<div class="blog-inner">
-		<header class="section-header">
+		<header class="section-header" data-reveal>
 			<div>
 				<h2 class="section-heading">From the Blog</h2>
 				<p class="section-subtitle">
@@ -34,17 +34,19 @@ const { posts, viewAllHref = "/posts" } = Astro.props;
 		</header>
 		<div class="blog-grid">
 			{
-				posts.map((post) => (
-					<PostCard
-						title={post.title}
-						excerpt={post.excerpt}
-						featuredImage={post.featuredImage}
-						href={`/posts/${post.id}`}
-						date={post.date}
-						readingTime={post.readingTime}
-						tags={post.tags}
-						bylines={post.bylines}
-					/>
+				posts.map((post, index) => (
+					<div data-reveal style={`--reveal-delay: ${index * 0.1}s`}>
+						<PostCard
+							title={post.title}
+							excerpt={post.excerpt}
+							featuredImage={post.featuredImage}
+							href={`/posts/${post.id}`}
+							date={post.date}
+							readingTime={post.readingTime}
+							tags={post.tags}
+							bylines={post.bylines}
+						/>
+					</div>
 				))
 			}
 		</div>

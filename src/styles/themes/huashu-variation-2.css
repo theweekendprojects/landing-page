@@ -42,6 +42,18 @@ body {
 .site-header {
 	background: rgba(15, 15, 17, 0.7);
 	backdrop-filter: blur(20px);
+	transition:
+		background var(--transition-base),
+		padding var(--transition-base);
+}
+
+.site-header.is-scrolled {
+	background: rgba(15, 15, 17, 0.9);
+}
+
+.site-header.is-scrolled .nav {
+	padding-top: var(--spacing-3);
+	padding-bottom: var(--spacing-3);
 }
 
 .site-title {
@@ -52,10 +64,40 @@ body {
 	letter-spacing: -0.5px;
 }
 
-/* Hero */
+/* Hero -- gradient text + softly floating glow orbs behind the copy,
+   matching the source demo's .bg-orb elements */
 .hero-title {
 	letter-spacing: -0.04em;
 	font-weight: 800;
+	background: var(--theme-gradient-secondary);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+
+.hero::before {
+	background: radial-gradient(circle at 20% 30%, rgba(124, 58, 237, 0.25) 0%, transparent 50%),
+		radial-gradient(circle at 80% 70%, rgba(20, 184, 166, 0.2) 0%, transparent 50%);
+	filter: blur(60px);
+	animation: theme-float 20s ease-in-out infinite alternate;
+}
+
+@keyframes theme-float {
+	0% {
+		transform: translate(0, 0) scale(1);
+	}
+	50% {
+		transform: translate(-4%, 4%) scale(1.08);
+	}
+	100% {
+		transform: translate(4%, -4%) scale(1);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.hero::before {
+		animation: none;
+	}
 }
 
 .hero-badge {
