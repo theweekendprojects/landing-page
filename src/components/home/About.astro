@@ -1,0 +1,75 @@
+---
+interface Props {
+	title: string;
+	paragraphs: string[];
+	cta?: { label: string; href: string };
+}
+
+const { title, paragraphs, cta } = Astro.props;
+---
+
+<section class="about" id="about">
+	<div class="about-inner">
+		<h2 class="about-title">{title}</h2>
+		<div class="about-copy">
+			{paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+		</div>
+		{
+			cta && (
+				<a href={cta.href} class="about-link">
+					{cta.label}
+				</a>
+			)
+		}
+	</div>
+</section>
+
+<style>
+	.about {
+		padding: var(--spacing-20) var(--spacing-6);
+	}
+
+	.about-inner {
+		max-width: 720px;
+		margin: 0 auto;
+		text-align: center;
+	}
+
+	.about-title {
+		font-size: clamp(var(--font-size-2xl), 4vw, var(--font-size-3xl));
+		font-weight: var(--font-weight-display);
+		letter-spacing: var(--tracking-tight);
+		margin-bottom: var(--spacing-6);
+	}
+
+	.about-copy {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-4);
+	}
+
+	.about-copy p {
+		font-size: var(--font-size-lg);
+		line-height: var(--leading-relaxed);
+		color: var(--color-text-secondary);
+	}
+
+	.about-link {
+		display: inline-block;
+		margin-top: var(--spacing-6);
+		font-size: var(--font-size-sm);
+		font-weight: 500;
+		color: var(--color-brand);
+		text-decoration: none;
+	}
+
+	.about-link:hover {
+		color: var(--color-brand-hover);
+	}
+
+	@media (max-width: 640px) {
+		.about {
+			padding: var(--spacing-12) var(--spacing-4);
+		}
+	}
+</style>
