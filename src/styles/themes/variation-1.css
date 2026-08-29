@@ -1,0 +1,132 @@
+/*
+ * Theme: variation-1 -- "Creative Coding Beyond the 9-5"
+ * Ported from design-demos/variation-1.html
+ *
+ * Dark, indigo -> pink gradient theme. Single-mode (dark only) by design,
+ * matching the source mockup -- tokens are set as flat values rather than
+ * light-dark() pairs.
+ */
+
+:root {
+	color-scheme: dark;
+
+	/* Colors */
+	--color-bg: #0f172a;
+	--color-bg-subtle: #1e293b;
+	--color-surface: #1e293b;
+	--color-text: #f8fafc;
+	--color-text-secondary: #94a3b8;
+	--color-muted: #94a3b8;
+	--color-border: #263449;
+	--color-border-subtle: #1b263b;
+	--color-brand: #6366f1;
+	--color-brand-hover: #4f46e5;
+	--color-on-brand: #ffffff;
+	--color-brand-ring: color-mix(in srgb, #6366f1 30%, transparent);
+
+	/* Layout accents from the source demo */
+	--theme-gradient: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
+	--theme-accent: #ec4899;
+}
+
+body {
+	background: var(--color-bg);
+}
+
+/* Header */
+.site-header {
+	background: color-mix(in srgb, var(--color-bg) 80%, transparent);
+}
+
+.site-title {
+	background: var(--theme-gradient);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+
+/* Hero */
+.hero::before {
+	background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, transparent 60%);
+}
+
+.hero-title {
+	background: linear-gradient(to right, #ffffff, #e2e8f0);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+
+.hero-badge {
+	background: rgba(99, 102, 241, 0.1);
+	border-color: rgba(99, 102, 241, 0.25);
+	color: #c7d2fe;
+}
+
+.btn-primary {
+	background: var(--theme-gradient);
+	border: none;
+}
+
+.btn-primary:hover {
+	box-shadow: 0 10px 20px rgba(99, 102, 241, 0.35);
+}
+
+.btn-secondary {
+	background: rgba(255, 255, 255, 0.06);
+	border-color: rgba(255, 255, 255, 0.1);
+}
+
+.btn-secondary:hover {
+	background: rgba(255, 255, 255, 0.1);
+	border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Section headings */
+.section-heading {
+	background: linear-gradient(to right, #ffffff, #94a3b8);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+
+/* Feature cards */
+.feature-icon {
+	background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(236, 72, 153, 0.15));
+	color: #a5b4fc;
+}
+
+.feature-card:hover {
+	border-color: rgba(99, 102, 241, 0.4);
+	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Project + post cards */
+.project-card:hover,
+.post-card:hover {
+	transform: translateY(-6px);
+	border-color: rgba(99, 102, 241, 0.35);
+	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.card-category,
+.tech-tag,
+.card-tag {
+	background: rgba(99, 102, 241, 0.1);
+	color: #a5b4fc;
+}
+
+.card-link:hover .card-title {
+	color: var(--theme-accent);
+}
+
+/* Newsletter */
+.newsletter-form-wrap :global(.ec-form-submit) {
+	background: var(--theme-gradient);
+}
+
+/* Footer */
+.site-footer {
+	background: var(--color-bg-subtle);
+	border-top-color: var(--color-border);
+}
