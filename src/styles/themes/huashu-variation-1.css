@@ -82,15 +82,40 @@ body {
 	color: #f97316;
 }
 
-.feature-card:hover,
-.project-card:hover {
+/*
+ * The source mockup's project/blog cards have no border at all -- just
+ * a solid card background, 16px radius, and a shadow that appears on
+ * hover. The shared component baseline (ProjectCard.astro/PostCard.astro)
+ * adds a border by default for the other themes; override it away here.
+ */
+.project-card,
+.post-card {
+	border: none;
+	border-radius: 16px;
+}
+
+.project-card .card-image,
+.project-card .card-placeholder,
+.post-card .card-image,
+.post-card .card-placeholder {
+	height: 240px;
+	aspect-ratio: auto;
+}
+
+.feature-card:hover {
 	border-color: var(--color-brand);
-	transform: translateY(-6px);
+	transform: translateY(-8px);
 	box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
 }
 
+/* Project cards only lift on hover -- no shadow, no border change
+   (unlike feature/blog cards), matching the source mockup exactly. */
+.project-card:hover {
+	transform: translateY(-8px);
+}
+
 .post-card:hover {
-	transform: translateY(-6px);
+	transform: translateY(-8px);
 	box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
 }
 
@@ -99,6 +124,8 @@ body {
 .card-tag {
 	background: rgba(249, 115, 22, 0.1);
 	color: var(--color-brand);
+	border-radius: 20px;
+	font-weight: 600;
 }
 
 .card-link:hover .card-title {

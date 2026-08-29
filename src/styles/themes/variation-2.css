@@ -187,6 +187,51 @@ body {
 	color: var(--color-brand);
 }
 
+/*
+ * The source mockup's project cards have no image (plain text cards
+ * with pill tags + a "View Project ->" link), and its blog cards use a
+ * solid gradient banner instead of a photo. Hiding the image/placeholder
+ * gets close without touching component markup.
+ */
+.project-card .card-image,
+.project-card .card-placeholder {
+	display: none;
+}
+
+.post-card .card-image img {
+	display: none;
+}
+
+.post-card .card-image,
+.post-card .card-placeholder {
+	background: var(--theme-gradient-1);
+	aspect-ratio: auto;
+	height: 160px;
+}
+
+.project-card .card-body::after {
+	content: "View Project →";
+	display: block;
+	margin-top: var(--spacing-4);
+	padding-top: var(--spacing-4);
+	border-top: 1px solid var(--color-border);
+	color: var(--color-brand);
+	font-weight: 700;
+	font-size: var(--font-size-sm);
+}
+
+.post-card .card-body::after {
+	content: "Read More";
+	display: inline-block;
+	margin-top: var(--spacing-4);
+	padding: var(--spacing-2) var(--spacing-4);
+	background: var(--theme-gradient-1);
+	color: #ffffff;
+	font-weight: 700;
+	font-size: var(--font-size-sm);
+	border-radius: 999px;
+}
+
 /* Blog section on home reuses .blog-section background */
 .blog-section {
 	background: var(--color-bg-subtle);

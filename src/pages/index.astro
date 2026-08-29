@@ -9,6 +9,9 @@ import About from "../components/home/About.astro";
 import Newsletter from "../components/home/Newsletter.astro";
 import { getReadingTime } from "../utils/reading-time";
 import { resolveBlogSiteIdentity } from "../utils/site-identity";
+import { getThemeCopy } from "../content/theme-copy";
+
+const themeCopy = getThemeCopy();
 
 const FEATURED_PROJECTS_LIMIT = 3;
 const LATEST_POSTS_LIMIT = 3;
@@ -88,11 +91,11 @@ const features = [
 
 <Base title={siteTitle} description={siteTagline}>
 	<Hero
-		eyebrow="Creative freedom for developers"
-		title="Code on Your Terms. Build Your Passion."
-		subtitle={siteTagline}
-		primaryCta={{ label: "Explore Projects", href: "/projects" }}
-		secondaryCta={{ label: "Read the Blog", href: "/posts" }}
+		eyebrow={themeCopy.hero.eyebrow}
+		title={themeCopy.hero.title}
+		subtitle={themeCopy.hero.subtitle}
+		primaryCta={themeCopy.hero.primaryCta}
+		secondaryCta={themeCopy.hero.secondaryCta}
 	/>
 
 	<Features
@@ -106,11 +109,8 @@ const features = [
 	{postsForHome.length > 0 && <LatestPosts posts={postsForHome} />}
 
 	<About
-		title="Built for people who code after hours"
-		paragraphs={[
-			"The Weekend Projects is a place to write down what you built between Friday night and Sunday afternoon — the tools, the experiments, the things nobody asked for but you made anyway.",
-			"No sprint planning, no pull request reviews. Just a text editor and a problem worth solving.",
-		]}
+		title={themeCopy.about.title}
+		paragraphs={themeCopy.about.paragraphs}
 		cta={{ label: "Read more about this site", href: "/pages/about" }}
 	/>
 

@@ -110,20 +110,30 @@ const formattedDate = date
 	.post-card {
 		display: flex;
 		flex-direction: column;
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-lg);
+		overflow: hidden;
+		transition:
+			transform var(--transition-fast),
+			border-color var(--transition-fast),
+			box-shadow var(--transition-fast);
 	}
 
 	.card-link {
-		display: block;
+		display: flex;
+		flex: 1;
+		flex-direction: column;
 		text-decoration: none;
 		color: inherit;
 	}
 
+	/* Image sits flush with the card's rounded top edge; text content
+	   below gets its own padding via .card-body. */
 	.card-image {
 		aspect-ratio: 16 / 10;
 		overflow: hidden;
-		border-radius: var(--radius-lg);
-		background: var(--color-surface);
-		margin-bottom: var(--spacing-4);
+		background: var(--color-bg-subtle);
 	}
 
 	.card-image img {
@@ -139,13 +149,12 @@ const formattedDate = date
 
 	.card-placeholder {
 		aspect-ratio: 16 / 10;
-		border-radius: var(--radius-lg);
-		background: var(--color-surface);
-		margin-bottom: var(--spacing-4);
+		background: var(--color-bg-subtle);
 	}
 
 	.card-body {
 		flex: 1;
+		padding: var(--spacing-6);
 	}
 
 	.card-meta {
@@ -198,7 +207,11 @@ const formattedDate = date
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--spacing-2);
-		margin-top: var(--spacing-3);
+		padding: 0 var(--spacing-6) var(--spacing-6);
+		/* .card-body already ends in --spacing-6 of bottom padding; pull
+		   tags up so the excerpt-to-tags gap reads as --spacing-3, not a
+		   doubled gap. */
+		margin-top: calc(var(--spacing-3) - var(--spacing-6));
 	}
 
 	.card-tag {

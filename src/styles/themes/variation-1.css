@@ -120,7 +120,28 @@ body {
 	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
-/* Project + post cards */
+/*
+ * Project cards -- the source mockup's project cards have no image at
+ * all (plain text cards with pill tags + a "View Project ->" link), and
+ * its blog cards use a solid gradient banner instead of a photo. Hiding
+ * the image/placeholder gets close without touching component markup.
+ */
+.project-card .card-image,
+.project-card .card-placeholder {
+	display: none;
+}
+
+.post-card .card-image img {
+	display: none;
+}
+
+.post-card .card-image,
+.post-card .card-placeholder {
+	background: var(--theme-gradient);
+	aspect-ratio: auto;
+	height: 160px;
+}
+
 .project-card:hover,
 .post-card:hover {
 	transform: translateY(-6px);
@@ -137,6 +158,35 @@ body {
 
 .card-link:hover .card-title {
 	color: var(--theme-accent);
+}
+
+/*
+ * Explicit "View Project ->" / "Read More" affordance under the card
+ * body, matching the source mockup's project-links / blog-card .btn.
+ * Pure CSS via generated content so the click target stays the whole
+ * card (ProjectCard.astro/PostCard.astro markup is unchanged).
+ */
+.project-card .card-body::after {
+	content: "View Project →";
+	display: block;
+	margin-top: var(--spacing-4);
+	padding-top: var(--spacing-4);
+	border-top: 1px solid var(--color-border);
+	color: var(--color-brand);
+	font-weight: 600;
+	font-size: var(--font-size-sm);
+}
+
+.post-card .card-body::after {
+	content: "Read More";
+	display: inline-block;
+	margin-top: var(--spacing-4);
+	padding: var(--spacing-2) var(--spacing-4);
+	background: var(--theme-gradient);
+	color: #ffffff;
+	font-weight: 600;
+	font-size: var(--font-size-sm);
+	border-radius: var(--radius);
 }
 
 /* Newsletter -- colors for the plugin-forms markup (see forms.css for the
