@@ -96,21 +96,31 @@ This site ships 6 interchangeable theme packs in `src/styles/themes/`, each a fu
 
 | Theme                | Look                                                       |
 | --------------------- | ----------------------------------------------------------- |
-| `variation-1`         | Dark, indigo -> pink gradient brand mark                   |
+| `variation-1`         | Dark, indigo -> pink gradient brand mark (currently active) |
 | `variation-2`         | Dark, rotating cyan/violet/pink/amber gradient, pill buttons |
 | `variation-3`         | Light editorial, slate ink + amber accent                  |
-| `huashu-variation-1`  | Dark, orange -> purple gradient (default)                  |
+| `huashu-variation-1`  | Dark, orange -> purple gradient                            |
 | `huashu-variation-2`  | Dark glassmorphism, violet -> teal                         |
 | `huashu-variation-3`  | Dark navy, single teal accent, large image-led cards        |
 
-`src/styles/theme.css` holds a single `@import` line pointing at the active theme file. Switch with:
+`src/styles/theme.css` holds a single `@import` line pointing at the active theme file. To switch:
 
 ```bash
-npx pnpm theme <name>      # e.g. npx pnpm theme variation-2
+npx pnpm theme <name>      # e.g. npx pnpm theme variation-2 -- rewrites the @import line
 npx pnpm theme --list      # see all available themes
 ```
 
-Restart the dev server after switching. Each theme file only overrides `tokens.css` variables and a handful of section classes (`.hero`, `.feature-card`, `.project-card`, `.post-card`, `.newsletter-form-wrap .ec-form`, etc.) -- none of them touch markup, so switching is always non-destructive. To build a 7th theme, copy an existing file in `src/styles/themes/` as a starting point and point the `@import` at it.
+Restart the dev server after switching locally. This site is also deployed to Cloudflare Workers (`https://landing-page.mineme-shahriar.workers.dev`), and switching the theme file alone doesn't change the live site -- you need to rebuild and redeploy for it to take effect there:
+
+```bash
+npx pnpm theme <name>
+git add src/styles/theme.css && git commit -m "Switch active theme to <name>"
+npx pnpm deploy            # astro build && wrangler deploy
+```
+
+`pnpm dev`/`pnpm preview` can't run in every environment (workerd requires macOS 13.5+ or Linux; this has bitten local dev before), so `pnpm deploy` is often the fastest way to actually see a theme change rendered -- it builds and pushes straight to the live Worker with no local server needed. Verify afterward by loading the live URL (curl or a browser) rather than assuming the deploy log alone means the visual change landed.
+
+Each theme file only overrides `tokens.css` variables and a handful of section classes (`.hero`, `.feature-card`, `.project-card`, `.post-card`, `.newsletter-form-wrap .ec-form`, etc.) -- none of them touch markup, so switching is always non-destructive. To build a 7th theme, copy an existing file in `src/styles/themes/` as a starting point and point the `@import` at it.
 
 Two of the ported mockups (`huashu-variation-2`, `huashu-variation-3`) pair their palette with a second display font (Space Grotesk / Playfair Display). That swap isn't applied automatically -- see the comment at the top of each theme file for how to add it via the `fonts` array in `astro.config.mjs`.
 
