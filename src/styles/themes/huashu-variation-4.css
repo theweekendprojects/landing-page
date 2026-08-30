@@ -158,10 +158,15 @@ body {
 .card-category,
 .tech-tag,
 .card-tag {
-	background: rgba(249, 115, 22, 0.1);
-	color: var(--accent-orange);
-	border-radius: 20px;
+	display: inline-block;
+	padding: 2px 8px;
+	font-size: var(--font-size-xs);
 	font-weight: 600;
+	color: var(--accent-orange);
+	background: rgba(249, 115, 22, 0.1);
+	border: none;
+	border-radius: 20px;
+	text-decoration: none;
 }
 
 .card-link:hover .card-title {
