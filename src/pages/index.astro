@@ -95,7 +95,9 @@ const projectsData = projectsForHome.map((project) => ({
 												<Image image={project.featuredImage} />
 											</div>
 										) : (
-											<div class="card-placeholder" />
+											<div class="card-placeholder">
+												<span class="placeholder-text">{project.title}</span>
+											</div>
 										)
 									}
 									<div class="card-body">
@@ -148,7 +150,9 @@ const projectsData = projectsForHome.map((project) => ({
 												<Image image={post.featuredImage} />
 											</div>
 										) : (
-											<div class="card-placeholder" />
+											<div class="card-placeholder">
+												<span class="placeholder-text">{post.title}</span>
+											</div>
 										)
 									}
 									<div class="card-body">
@@ -377,6 +381,23 @@ const projectsData = projectsForHome.map((project) => ({
 	.card-placeholder {
 		aspect-ratio: 16 / 9;
 		background: linear-gradient(135deg, var(--color-bg-subtle), var(--color-surface));
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.placeholder-text {
+		font-size: var(--font-size-2xl);
+		font-weight: var(--font-weight-display);
+		color: var(--color-text-secondary);
+		text-align: center;
+		padding: var(--spacing-4);
+		-webkit-background-clip: text;
+		background-clip: text;
+		background: linear-gradient(135deg, var(--color-text-secondary), var(--color-muted));
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
 	}
 
 	.card-body {

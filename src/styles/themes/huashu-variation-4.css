@@ -224,3 +224,20 @@ body {
 html {
 	scroll-behavior: smooth;
 }
+
+/* Placeholder for cards without images */
+.card-placeholder {
+	background: linear-gradient(135deg, #1a1a1d 0%, #2d1b2e 100%);
+}
+
+.placeholder-text {
+	font-size: var(--font-size-3xl);
+	font-weight: var(--font-weight-display);
+	color: rgba(255, 255, 255, 0.3);
+	text-align: center;
+	padding: var(--spacing-4);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 80%;
+}
