@@ -116,27 +116,6 @@ const isLoggedIn = !!Astro.locals.user;
 		font-size: var(--font-size-sm);
 		font-weight: 600;
 	}
-
-	/* Ensure mobile nav takes up space and pushes content */
-	@media (max-width: 640px) {
-		.mobile-nav {
-			display: flex;
-			position: relative;
-			width: 100%;
-			box-shadow: var(--shadow-sm);
-		}
-
-		/* When menu is open, add spacing below to push main content */
-		.mobile-nav-menu.open {
-			max-height: 400px;
-		}
-	}
-
-	@media (min-width: 641px) {
-		.mobile-nav {
-			display: none;
-		}
-	}
 </style>
 
 <script>
