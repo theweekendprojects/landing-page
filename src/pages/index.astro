@@ -157,9 +157,9 @@ const projectsData = projectsForHome.map((project) => ({
 									}
 									<div class="card-body">
 										<div class="post-meta">
-											{post.date && <time>{post.date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</time>}
+											{post.date && <time>📅 {post.date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</time>}
 											<span class="meta-dot" />
-											<span>{post.readingTime} min read</span>
+											<span>⏱️ {post.readingTime} min read</span>
 										</div>
 										<h3 class="card-title">{post.title}</h3>
 										{post.excerpt && <p class="card-excerpt">{post.excerpt}</p>}
