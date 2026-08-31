@@ -86,11 +86,11 @@ const isLoggedIn = !!Astro.locals.user;
 	/* Sheet - slides in from right */
 	.mobile-nav-menu {
 		position: fixed;
-		top: var(--nav-height);
+		top: 64px;
 		right: 0;
 		width: 80%;
 		max-width: 320px;
-		height: calc(100vh - var(--nav-height));
+		height: calc(100vh - 64px);
 		background: var(--color-bg);
 		box-shadow: -5px 0 25px rgba(0, 0, 0, 0.3);
 		transition: transform 0.3s ease;
@@ -131,7 +131,7 @@ const isLoggedIn = !!Astro.locals.user;
 	/* Overlay - covers the main content, not the nav bar */
 	.mobile-nav-overlay {
 		position: fixed;
-		top: var(--nav-height);
+		top: 64px;
 		left: 0;
 		right: 0;
 		bottom: 0;
@@ -163,7 +163,7 @@ const isLoggedIn = !!Astro.locals.user;
 <style>
 	/* When mobile nav is active, add padding to body to prevent content overlap */
 	.mobile-nav-open body {
-		padding-top: calc(var(--nav-height) + 64px);
+		padding-top: 128px;
 	}
 
 	@media (min-width: 641px) {
