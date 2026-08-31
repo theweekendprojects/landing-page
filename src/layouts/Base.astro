@@ -773,6 +773,13 @@ const isLoggedIn = !!Astro.locals.user;
 				font-weight: 600;
 			}
 
+			/* Show mobile nav on screens <= 640px */
+			@media (max-width: 640px) {
+				.mobile-nav {
+					display: flex;
+				}
+			}
+
 			/* Footer */
 			.site-footer {
 				background: var(--color-bg-subtle);
