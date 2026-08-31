@@ -37,6 +37,7 @@ const isLoggedIn = !!Astro.locals.user;
 		align-items: center;
 		padding: var(--spacing-3) var(--spacing-4);
 		gap: var(--spacing-2);
+		background: var(--color-bg);
 	}
 
 	.mobile-logo {
@@ -56,6 +57,7 @@ const isLoggedIn = !!Astro.locals.user;
 		border: none;
 		background: transparent;
 		padding: 0;
+		z-index: 101;
 	}
 
 	.bar {
@@ -86,7 +88,7 @@ const isLoggedIn = !!Astro.locals.user;
 		width: 100%;
 	}
 
-	/* When menu is open */
+	/* When menu is open - this pushes content down */
 	.mobile-nav-menu.open {
 		max-height: 400px;
 	}
@@ -115,9 +117,18 @@ const isLoggedIn = !!Astro.locals.user;
 		font-weight: 600;
 	}
 
+	/* Ensure mobile nav takes up space and pushes content */
 	@media (max-width: 640px) {
 		.mobile-nav {
 			display: flex;
+			position: relative;
+			width: 100%;
+			box-shadow: var(--shadow-sm);
+		}
+
+		/* When menu is open, add spacing below to push main content */
+		.mobile-nav-menu.open {
+			max-height: 400px;
 		}
 	}
 
@@ -132,14 +143,22 @@ const isLoggedIn = !!Astro.locals.user;
 	document.addEventListener("DOMContentLoaded", () => {
 		const navToggle = document.querySelector(".mobile-nav-toggle");
 		const navMenu = document.querySelector(".mobile-nav-menu");
+		const mainElement = document.querySelector("main");
 
-		if (!navToggle || !navMenu) return;
+		if (!navToggle || !navMenu || !mainElement) return;
 
 		navToggle.addEventListener("click", () => {
 			const isExpanded = navToggle.getAttribute("aria-expanded") === "true";
 			const isOpen = !isExpanded;
 			navToggle.setAttribute("aria-expanded", isOpen);
 			navMenu.classList.toggle("open", isOpen);
+			
+			// Add class to body when menu is open to add padding-top to main
+			if (isOpen) {
+				document.body.classList.add("mobile-nav-open");
+			} else {
+				document.body.classList.remove("mobile-nav-open");
+			}
 		});
 
 		// Close menu when clicking links
@@ -147,6 +166,7 @@ const isLoggedIn = !!Astro.locals.user;
 			link.addEventListener("click", () => {
 				navToggle.setAttribute("aria-expanded", "false");
 				navMenu.classList.remove("open");
+				document.body.classList.remove("mobile-nav-open");
 			});
 		});
 	});

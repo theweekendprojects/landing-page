@@ -679,6 +679,11 @@ const isLoggedIn = !!Astro.locals.user;
 				min-height: calc(100vh - var(--nav-height) - 300px);
 			}
 
+			/* When mobile nav is open, add padding to main so content isn't overlapped */
+			body.mobile-nav-open main {
+				padding-top: var(--spacing-12);
+			}
+
 			/* Footer */
 			.site-footer {
 				background: var(--color-bg-subtle);
