@@ -125,6 +125,11 @@ body {
 	border-color: rgba(6, 182, 212, 0.6);
 }
 
+/* Hero section - transparent to show animated background */
+.hero-section {
+	background: transparent;
+}
+
 /* Section headings get an accent underline like the source demo */
 .section-heading {
 	background: linear-gradient(to right, #ffffff, #94a3b8);
