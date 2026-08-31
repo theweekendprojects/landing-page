@@ -132,10 +132,13 @@ const isLoggedIn = !!Astro.locals.user;
 		font-weight: 600;
 	}
 
-	/* Overlay */
+	/* Overlay - covers the main content, not the nav bar */
 	.mobile-nav-overlay {
 		position: fixed;
-		inset: 0;
+		top: var(--nav-height);
+		left: 0;
+		right: 0;
+		bottom: 0;
 		background: rgba(0, 0, 0, 0.5);
 		opacity: 0;
 		visibility: hidden;
