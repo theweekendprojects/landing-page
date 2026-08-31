@@ -10,6 +10,7 @@ import { createPublicPageContext } from "emdash/page";
 import LiveSearch from "emdash/ui/search";
 import { Font } from "astro:assets";
 import { resolveBlogSiteIdentity } from "../utils/site-identity";
+import MobileNav from "../components/MobileNav.astro";
 import "../styles/tokens.css";
 import "../styles/theme.css";
 
@@ -138,6 +139,9 @@ const isLoggedIn = !!Astro.locals.user;
 				}
 			</nav>
 		</header>
+
+		<!-- Mobile navigation -->
+		<MobileNav />
 
 		<main>
 			<slot />
@@ -846,58 +850,16 @@ const isLoggedIn = !!Astro.locals.user;
 					border-bottom: none;
 				}
 
-				.nav {
-					display: grid;
-					grid-template-columns: minmax(0, 1fr) auto;
-					align-items: center;
-					height: auto;
-					column-gap: var(--spacing-3);
-					row-gap: var(--spacing-2);
-					padding: var(--spacing-3) var(--spacing-4);
+				.nav,
+				.nav-right,
+				.nav-links,
+				.nav-admin {
+					display: none;
 				}
 
 				.site-title {
-					grid-column: 1;
-					grid-row: 1;
 					font-size: var(--font-size-base);
 					min-width: 0;
-				}
-
-				.nav-right {
-					grid-column: 1 / -1;
-					grid-row: 2;
-					display: grid;
-					row-gap: var(--spacing-2);
-				}
-
-				.site-search {
-					grid-column: 1;
-					width: 100%;
-					max-width: none;
-				}
-
-				:global(.site-search-input) {
-					width: 100% !important;
-					padding: var(--spacing-1) var(--spacing-2) !important;
-					font-size: var(--font-size-sm) !important;
-				}
-
-				.nav-links {
-					grid-column: 1;
-					display: flex;
-					column-gap: var(--spacing-3);
-					row-gap: var(--spacing-1);
-					flex-wrap: wrap;
-					justify-content: flex-start;
-				}
-
-				.nav-admin {
-					grid-column: 2;
-					grid-row: 1;
-					justify-self: end;
-					font-size: var(--font-size-xs);
-					margin-inline-start: 0;
-					white-space: nowrap;
 				}
 
 				.footer-grid {
