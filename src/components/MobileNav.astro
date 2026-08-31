@@ -84,6 +84,7 @@ const isLoggedIn = !!Astro.locals.user;
 	}
 
 	/* Sheet - slides in from right */
+	/* Sheet - slides in from right */
 	.mobile-nav-menu {
 		position: fixed;
 		top: var(--nav-height);
@@ -100,11 +101,11 @@ const isLoggedIn = !!Astro.locals.user;
 		overflow-y: auto;
 	}
 
-	.mobile-nav-sheet.open {
+	.mobile-nav-menu.open {
 		transform: translateX(0);
 	}
 
-	.mobile-nav-sheet.open {
+	.mobile-nav-menu.open {
 		transform: translateX(0);
 	}
 
@@ -146,7 +147,7 @@ const isLoggedIn = !!Astro.locals.user;
 		z-index: 999;
 	}
 
-	.mobile-nav-sheet.open + .mobile-nav-overlay {
+	.mobile-nav-menu.open + .mobile-nav-overlay {
 		opacity: 1;
 		visibility: visible;
 	}
