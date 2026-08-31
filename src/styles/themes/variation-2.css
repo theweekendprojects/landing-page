@@ -345,3 +345,72 @@ body {
 .project-card {
 	border-radius: 20px;
 }
+/* Project cards have 20px border-radius like original */
+.project-card {
+	border-radius: 20px;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 640px) {
+	/* Hero section */
+	.hero-section {
+		padding: var(--spacing-12) var(--spacing-4);
+	}
+
+	.hero-title {
+		font-size: clamp(1.5rem, 8vw, var(--font-size-3xl));
+	}
+
+	.hero-title-gradient {
+		font-size: clamp(1.5rem, 8vw, var(--font-size-3xl));
+	}
+
+	.hero-subtitle {
+		font-size: var(--font-size-base);
+	}
+
+	.hero-actions {
+		flex-direction: column;
+		gap: var(--spacing-2);
+	}
+
+	/* Section containers */
+	.section-container {
+		padding: 0 var(--spacing-4);
+	}
+
+	/* Grid layouts */
+	.projects-grid,
+	.posts-grid {
+		grid-template-columns: 1fr;
+	}
+
+	/* Project and post cards */
+	.project-card,
+	.post-card {
+		padding: var(--spacing-4);
+	}
+
+	.project-card .card-body {
+		padding: var(--spacing-4);
+	}
+
+	/* Footer */
+	.footer-grid {
+		grid-template-columns: 1fr;
+		gap: var(--spacing-6);
+	}
+}
+
+@media (max-width: 480px) {
+	/* Larger touch targets on mobile */
+	.btn {
+		width: 100%;
+	}
+
+	/* Stack cards on small screens */
+	.projects-grid,
+	.posts-grid {
+		grid-template-columns: 1fr;
+	}
+}
