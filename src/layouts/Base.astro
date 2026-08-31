@@ -10,7 +10,6 @@ import { createPublicPageContext } from "emdash/page";
 import LiveSearch from "emdash/ui/search";
 import { Font } from "astro:assets";
 import { resolveBlogSiteIdentity } from "../utils/site-identity";
-import MobileNav from "../components/MobileNav.astro";
 import "../styles/tokens.css";
 import "../styles/theme.css";
 
@@ -139,9 +138,6 @@ const isLoggedIn = !!Astro.locals.user;
 				}
 			</nav>
 		</header>
-
-		<!-- Mobile navigation -->
-		<MobileNav />
 
 		<main>
 			<slot />
@@ -678,109 +674,7 @@ const isLoggedIn = !!Astro.locals.user;
 			main {
 				min-height: calc(100vh - var(--nav-height) - 300px);
 			}
-
-			/* When mobile nav is open, add padding to main so content isn't overlapped */
-			body.mobile-nav-open main {
-				padding-top: var(--spacing-12);
-			}
-
-			/* Mobile Navigation */
-			.mobile-nav {
-				display: none;
-				justify-content: space-between;
-				align-items: center;
-				padding: var(--spacing-3) var(--spacing-4);
-				gap: var(--spacing-2);
-				background: var(--color-bg);
-				width: 100%;
-				box-sizing: border-box;
-			}
-
-			.mobile-logo {
-				font-size: var(--font-size-base);
-				font-weight: 700;
-				color: var(--color-text);
-				text-decoration: none;
-			}
-
-			.mobile-nav-toggle {
-				display: flex;
-				flex-direction: column;
-				gap: 5px;
-				width: 24px;
-				height: 24px;
-				cursor: pointer;
-				border: none;
-				background: transparent;
-				padding: 0;
-				z-index: 101;
-			}
-
-			.mobile-nav-toggle .bar {
-				width: 100%;
-				height: 2px;
-				background: var(--color-text);
-				transition: transform 0.3s ease, opacity 0.3s ease;
-			}
-
-			/* Hamburger to X animation */
-			.mobile-nav-toggle[aria-expanded="true"] .bar:nth-child(1) {
-				transform: rotate(45deg) translate(5px, 5px);
-			}
-
-			.mobile-nav-toggle[aria-expanded="true"] .bar:nth-child(2) {
-				opacity: 0;
-			}
-
-			.mobile-nav-toggle[aria-expanded="true"] .bar:nth-child(3) {
-				transform: rotate(-45deg) translate(7px, -8px);
-			}
-
-			/* Menu - hidden by default */
-			.mobile-nav-menu {
-				max-height: 0;
-				overflow: hidden;
-				transition: max-height 0.3s ease;
-				width: 100%;
-			}
-
-			/* When menu is open */
-			.mobile-nav-menu.open {
-				max-height: 400px;
-			}
-
-			.mobile-nav-link {
-				display: block;
-				padding: var(--spacing-3) var(--spacing-2);
-				color: var(--color-text);
-				text-decoration: none;
-				font-size: var(--font-size-lg);
-				border-radius: var(--radius);
-				transition: background 0.2s ease;
-			}
-
-			.mobile-nav-link:hover {
-				background: var(--color-surface);
-			}
-
-			.mobile-nav-admin {
-				display: block;
-				margin-top: var(--spacing-4);
-				padding: var(--spacing-3) var(--spacing-2);
-				color: var(--color-brand);
-				text-decoration: none;
-				font-size: var(--font-size-sm);
-				font-weight: 600;
-			}
-
-			/* Show mobile nav on screens <= 640px */
-			@media (max-width: 640px) {
-				.mobile-nav {
-					display: flex;
-				}
-			}
-
-			/* Footer */
+		
 			.site-footer {
 				background: var(--color-bg-subtle);
 				border-top: 1px solid var(--color-border-subtle);
@@ -951,16 +845,58 @@ const isLoggedIn = !!Astro.locals.user;
 					border-bottom: none;
 				}
 
-				.nav,
-				.nav-right,
-				.nav-links,
-				.nav-admin {
-					display: none;
+				.nav {
+					display: grid;
+					grid-template-columns: minmax(0, 1fr) auto;
+					align-items: center;
+					height: auto;
+					column-gap: var(--spacing-3);
+					row-gap: var(--spacing-2);
+					padding: var(--spacing-3) var(--spacing-4);
 				}
 
 				.site-title {
+					grid-column: 1;
+					grid-row: 1;
 					font-size: var(--font-size-base);
 					min-width: 0;
+				}
+
+				.nav-right {
+					grid-column: 1 / -1;
+					grid-row: 2;
+					display: grid;
+					row-gap: var(--spacing-2);
+				}
+
+				.site-search {
+					grid-column: 1;
+					width: 100%;
+					max-width: none;
+				}
+
+				:global(.site-search-input) {
+					width: 100% !important;
+					padding: var(--spacing-1) var(--spacing-2) !important;
+					font-size: var(--font-size-sm) !important;
+				}
+
+				.nav-links {
+					grid-column: 1;
+					display: flex;
+					column-gap: var(--spacing-3);
+					row-gap: var(--spacing-1);
+					flex-wrap: wrap;
+					justify-content: flex-start;
+				}
+
+				.nav-admin {
+					grid-column: 2;
+					grid-row: 1;
+					justify-self: end;
+					font-size: var(--font-size-xs);
+					margin-inline-start: 0;
+					white-space: nowrap;
 				}
 
 				.footer-grid {
