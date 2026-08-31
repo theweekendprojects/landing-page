@@ -85,9 +85,9 @@ const formattedDate = date
 						</>
 					)
 				}
-				{formattedDate && <time>{formattedDate}</time>}
+				{formattedDate && <time>📅 {formattedDate}</time>}
 				{formattedDate && readingTime && <span class="meta-dot" />}
-				{readingTime && <span>{readingTime} min</span>}
+				{readingTime && <span>⏱️ {readingTime} min</span>}
 			</div>
 			<h2 class="card-title">{title}</h2>
 			{excerpt && <p class="card-excerpt">{excerpt}</p>}
