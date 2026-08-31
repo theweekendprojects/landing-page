@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Weekend Projects | Code on Your Terms</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0a0c;
+            --bg-card: #131316;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --accent-orange: #f97316;
+            --accent-purple: #c026d3;
+            --accent-orange-hover: #ea580c;
+            --accent-purple-hover: #a21caf;
+            --border-color: #26262c;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-purple) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            background-size: 200% 200%;
+            animation: gradientMove 3s ease infinite;
+        }
+
+        @keyframes gradientMove {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 12, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            padding: 20px 0;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: var(--accent-orange);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-orange);
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: var(--accent-orange);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-button:hover {
+            background: var(--accent-orange-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 160px 0 100px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            letter-spacing: -0.02em;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 640px;
+            margin: 0 auto 48px;
+            line-height: 1.6;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+
+        .secondary-button {
+            display: inline-block;
+            padding: 12px 24px;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .secondary-button:hover {
+            border-color: var(--accent-purple);
+            background: rgba(192, 38, 211, 0.1);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 100px 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 64px;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            transition: var(--transition);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent-orange);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(192, 38, 211, 0.1));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            color: var(--accent-orange);
+            font-size: 1.5rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+        }
+
+        /* Projects Section */
+        .projects {
+            padding: 100px 0;
+            background: linear-gradient(to bottom, var(--bg-dark), #0d0d0f);
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+        }
+
+        .project-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .project-card:hover {
+            transform: translateY(-8px);
+        }
+
+        .project-image {
+            width: 100%;
+            height: 240px;
+            background: linear-gradient(135deg, #1a1a1d 0%, #2d1b2e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1.25rem;
+        }
+
+        .project-content {
+            padding: 24px;
+        }
+
+        .project-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(249, 115, 22, 0.1);
+            color: var(--accent-orange);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .project-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .project-card p {
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+            margin-bottom: 16px;
+        }
+
+        .project-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .project-stats {
+            display: flex;
+            gap: 16px;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* Blog Section */
+        .blog {
+            padding: 100px 0;
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+        }
+
+        .blog-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .blog-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .blog-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #1a1a1d 0%, #0d1b2a 100%);
+        }
+
+        .blog-content {
+            padding: 24px;
+        }
+
+        .blog-meta {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 12px;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .blog-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .blog-card h3:hover {
+            color: var(--accent-orange);
+        }
+
+        .blog-card p {
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+            margin-bottom: 16px;
+        }
+
+        .read-more {
+            color: var(--accent-orange);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: var(--transition);
+        }
+
+        .read-more:hover {
+            color: var(--accent-orange-hover);
+        }
+
+        /* About Section */
+        .about {
+            padding: 100px 0;
+            background: linear-gradient(to bottom, var(--bg-dark), #0d0d0f);
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 64px;
+            align-items: center;
+        }
+
+        .about-text h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            line-height: 1.1;
+        }
+
+        .about-text p {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .about-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-top: 48px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .about-image {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #2d1b2e 0%, #1a1a1d 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 1.5rem;
+        }
+
+        /* Newsletter */
+        .newsletter {
+            padding: 100px 0;
+            background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-purple) 100%);
+        }
+
+        .newsletter-content {
+            text-align: center;
+            color: white;
+        }
+
+        .newsletter-content h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .newsletter-content p {
+            font-size: 1.125rem;
+            opacity: 0.9;
+            margin-bottom: 32px;
+        }
+
+        .newsletter-form {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .newsletter-input {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .newsletter-button {
+            padding: 14px 28px;
+            background: var(--bg-dark);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .newsletter-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Footer */
+        footer {
+            background: #050506;
+            padding: 80px 0 32px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 64px;
+        }
+
+        .footer-brand h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .footer-brand span {
+            color: var(--accent-orange);
+        }
+
+        .footer-brand p {
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .footer-links h4 {
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9375rem;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-orange);
+        }
+
+        .footer-bottom {
+            padding-top: 32px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+                gap: 48px;
+            }
+
+            .about-image {
+                height: 300px;
+            }
+
+            .newsletter-form {
+                flex-direction: column;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container nav-container">
+            <a href="#" class="logo">The<span>Weekend</span>Projects</a>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="#blog">Blog</a></li>
+                <li><a href="#about">About</a></li>
+            </ul>
+            <a href="#" class="cta-button">Join Now</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1 class="fade-in">Code on Your Terms. Build Your Passion.</h1>
+            <p class="fade-in" style="animation-delay: 0.2s">
+                The Weekend Projects is your community for weekend hackers, side-project builders, and creative developers who code not just for work, but for joy.
+            </p>
+            <div class="hero-buttons fade-in" style="animation-delay: 0.4s">
+                <a href="#projects" class="cta-button">Start Building</a>
+                <a href="#about" class="secondary-button">Learn More</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-header fade-in">
+                <h2>Why Join The Weekend Projects?</h2>
+                <p>Everything you need to turn your weekend ideas into reality</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card fade-in" style="animation-delay: 0.2s">
+                    <div class="feature-icon">🚀</div>
+                    <h3>Project Showcase</h3>
+                    <p>Display your weekend projects to a community of like-minded developers who appreciate the craft.</p>
+                </div>
+                <div class="feature-card fade-in" style="animation-delay: 0.4s">
+                    <div class="feature-icon">💡</div>
+                    <h3>Tutorials & Guides</h3>
+                    <p>Learn from experienced developers with tutorials focused on side-project development.</p>
+                </div>
+                <div class="feature-card fade-in" style="animation-delay: 0.6s">
+                    <div class="feature-icon">👥</div>
+                    <h3>Community Support</h3>
+                    <p>Connect with other weekend hackers who understand the struggle of coding after work hours.</p>
+                </div>
+                <div class="feature-card fade-in" style="animation-delay: 0.8s">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Quick Wins</h3>
+                    <p>Find inspiration for small, impactful projects you can complete in a weekend.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="projects">
+        <div class="container">
+            <div class="section-header fade-in">
+                <h2>Featured Weekend Projects</h2>
+                <p>See what the community has built after work hours</p>
+            </div>
+            <div class="projects-grid">
+                <div class="project-card fade-in" style="animation-delay: 0.2s">
+                    <div class="project-image">
+                        <span>Weather Dashboard</span>
+                    </div>
+                    <div class="project-content">
+                        <span class="project-tag">JavaScript</span>
+                        <h3>Weather Dashboard</h3>
+                        <p>A beautiful weather app built with vanilla JavaScript and localStorage for favorite locations.</p>
+                        <div class="project-meta">
+                            <div class="project-stats">
+                                <span>⭐ 4.8</span>
+                                <span>💡 12 forks</span>
+                            </div>
+                            <span class="project-stats">2 days</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="project-card fade-in" style="animation-delay: 0.4s">
+                    <div class="project-image">
+                        <span>Task Manager</span>
+                    </div>
+                    <div class="project-content">
+                        <span class="project-tag">React</span>
+                        <h3>Focus Flow</h3>
+                        <p>A minimalist task manager with pomodoro timer and distraction-free interface.</p>
+                        <div class="project-meta">
+                            <div class="project-stats">
+                                <span>⭐ 4.9</span>
+                                <span>💡 24 forks</span>
+                            </div>
+                            <span class="project-stats">1 week</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="project-card fade-in" style="animation-delay: 0.6s">
+                    <div class="project-image">
+                        <span>Portfolio Site</span>
+                    </div>
+                    <div class="project-content">
+                        <span class="project-tag">Node.js</span>
+                        <h3>Portfolio v2</h3>
+                        <p>Responsive portfolio with dark mode, smooth animations, and SEO optimization.</p>
+                        <div class="project-meta">
+                            <div class="project-stats">
+                                <span>⭐ 4.7</span>
+                                <span>💡 8 forks</span>
+                            </div>
+                            <span class="project-stats">3 days</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog Section -->
+    <section id="blog" class="blog">
+        <div class="container">
+            <div class="section-header fade-in">
+                <h2>Latest from the Blog</h2>
+                <p>Tips, tutorials, and stories from weekend developers</p>
+            </div>
+            <div class="blog-grid">
+                <div class="blog-card fade-in" style="animation-delay: 0.2s">
+                    <div class="blog-image">
+                        <span>Blog Image</span>
+                    </div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span>Oct 15, 2024</span>
+                            <span>5 min read</span>
+                        </div>
+                        <h3>Building Side Projects While Working Full Time</h3>
+                        <p>Strategies for managing your time and energy to consistently work on your weekend projects without burning out.</p>
+                        <a href="#" class="read-more">Read Article →</a>
+                    </div>
+                </div>
+                <div class="blog-card fade-in" style="animation-delay: 0.4s">
+                    <div class="blog-image">
+                        <span>Blog Image</span>
+                    </div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span>Oct 12, 2024</span>
+                            <span>4 min read</span>
+                        </div>
+                        <h3>From Idea to Live: Your First Weekend Project</h3>
+                        <p>A step-by-step guide to getting your idea from concept to deployment in just 48 hours.</p>
+                        <a href="#" class="read-more">Read Article →</a>
+                    </div>
+                </div>
+                <div class="blog-card fade-in" style="animation-delay: 0.6s">
+                    <div class="blog-image">
+                        <span>Blog Image</span>
+                    </div>
+                    <div class="blog-content">
+                        <div class="blog-meta">
+                            <span>Oct 08, 2024</span>
+                            <span>6 min read</span>
+                        </div>
+                        <h3>Tech Stack Showdown: What We're Using in 2024</h3>
+                        <p>Community survey results on the best technologies for weekend side projects.</p>
+                        <a href="#" class="read-more">Read Article →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text fade-in">
+                    <h2>Created for Developers Who Love to Create</h2>
+                    <p>The Weekend Projects was born from a simple realization: coding shouldn't just be about work. Many of us spend our weekdays solving corporate problems, but our creative spark burns brightest on our personal projects.</p>
+                    <p>We've created a community where weekend hackers can share their journey, learn from each other, and find inspiration for their next big idea. Whether you're building a simple script or a full application, your weekend projects matter.</p>
+                    
+                    <div class="about-stats">
+                        <div class="stat-item fade-in" style="animation-delay: 0.2s">
+                            <div class="stat-number">2.5k+</div>
+                            <div class="stat-label">Active Members</div>
+                        </div>
+                        <div class="stat-item fade-in" style="animation-delay: 0.4s">
+                            <div class="stat-number">850+</div>
+                            <div class="stat-label">Projects Shared</div>
+                        </div>
+                        <div class="stat-item fade-in" style="animation-delay: 0.6s">
+                            <div class="stat-number">4.9/5</div>
+                            <div class="stat-label">Community Rating</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-image fade-in" style="animation-delay: 0.8s">
+                    <span>Community Workspace</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="newsletter">
+        <div class="container">
+            <div class="newsletter-content fade-in">
+                <h2>Join the Community</h2>
+                <p>Get weekly inspiration, tutorials, and project ideas delivered to your inbox.</p>
+                <form class="newsletter-form">
+                    <input type="email" class="newsletter-input" placeholder="Enter your email" required>
+                    <button type="submit" class="newsletter-button">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h3>The<span>Weekend</span>Projects</h3>
+                    <p>A community for developers who code not just for work, but for the joy of creating. Build on weekends, share your journey, and inspire others.</p>
+                    <p style="color: var(--text-secondary); font-size: 0.875rem;">
+                        © 2024 The Weekend Projects. All rights reserved.
+                    </p>
+                </div>
+                <div class="footer-links">
+                    <h4>Community</h4>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Code of Conduct</a></li>
+                        <li><a href="#">Success Stories</a></li>
+                        <li><a href="#">Community Guidelines</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Tutorials</a></li>
+                        <li><a href="#">Toolkits</a></li>
+                        <li><a href="#">Community Projects</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Connect</h4>
+                    <ul>
+                        <li><a href="#">Twitter</a></li>
+                        <li><a href="#">GitHub</a></li>
+                        <li><a href="#">Discord</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>Made with coffee and code by weekend developers, for weekend developers</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+            observer.observe(el);
+        });
+
+        // Navbar scroll effect
+        let lastScroll = 0;
+        const nav = document.querySelector('nav');
+
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 100) {
+                nav.style.background = 'rgba(10, 10, 12, 0.95)';
+                nav.style.boxShadow = '0 2px 12px rgba(0, 0, 0, 0.3)';
+            } else {
+                nav.style.background = 'rgba(10, 10, 12, 0.8)';
+                nav.style.boxShadow = 'none';
+            }
+            
+            lastScroll = currentScroll;
+        });
+    </script>
+</body>
+</html>

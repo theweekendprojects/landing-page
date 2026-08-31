@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Weekend Projects | Creative Freedom for Developers</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #1E293B;
+            --accent-teal: #14B8A6;
+            --dark-bg: #0F172A;
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --card-bg: #1E293B;
+            --gradient-primary: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
+            --gradient-text: linear-gradient(90deg, #E0F2FE 0%, #93C5FD 50%, #3B82F6 100%);
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.7;
+        }
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+
+        h1 {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+        }
+
+        h2 {
+            font-size: clamp(2rem, 4vw, 4rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        h3 {
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            font-weight: 600;
+        }
+
+        p {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 2rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-logo:hover {
+            opacity: 0.8;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+        }
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10rem 4rem 8rem;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            background: var(--primary-blue);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 100px;
+            font-size: 0.875rem;
+            color: var(--accent-teal);
+            margin-bottom: 2rem;
+        }
+
+        .hero-title {
+            font-size: clamp(4rem, 10vw, 7rem);
+            font-weight: 800;
+            line-height: 0.9;
+            margin-bottom: 1.5rem;
+            background: var(--gradient-text);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.25rem, 2vw, 2rem);
+            color: var(--text-secondary);
+            max-width: 650px;
+            margin-bottom: 3rem;
+            line-height: 1.5;
+        }
+
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1.25rem 3rem;
+            background: var(--accent-teal);
+            color: var(--dark-bg);
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 100px;
+            transition: all 0.3s ease;
+        }
+
+        .hero-cta:hover {
+            background: #0D9488;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(20, 184, 166, 0.2);
+        }
+
+        .hero-cta-arrow {
+            transition: transform 0.3s ease;
+        }
+
+        .hero-cta:hover .hero-cta-arrow {
+            transform: translateX(5px);
+        }
+        /* Projects Grid */
+        .projects-section {
+            padding: 12rem 4rem;
+        }
+
+        .section-header {
+            margin-bottom: 6rem;
+        }
+
+        .section-header h2 {
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            max-width: 600px;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 3rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .project-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 24px;
+            background: var(--card-bg);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            group: hover;
+        }
+
+        .project-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .project-card-image {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4/3;
+            overflow: hidden;
+        }
+
+        .project-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .project-card:hover .project-card-image img {
+            transform: scale(1.05);
+        }
+
+        .project-card-content {
+            padding: 2.5rem 2rem;
+        }
+
+        .project-card-category {
+            font-size: 0.875rem;
+            color: var(--accent-teal);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+        }
+
+        .project-card-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .project-card-description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .project-card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .project-card-author {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .project-card-date {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        /* Blog Section */
+        .blog-section {
+            padding: 12rem 4rem;
+            background: #162032;
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+            gap: 4rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .blog-card {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .blog-card-image {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            overflow: hidden;
+            border-radius: 16px;
+        }
+
+        .blog-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .blog-card:hover .blog-card-image img {
+            transform: scale(1.03);
+        }
+
+        .blog-card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding-top: 1rem;
+        }
+
+        .blog-card-category {
+            font-size: 0.875rem;
+            color: var(--accent-teal);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+        }
+
+        .blog-card-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .blog-card-excerpt {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 1.125rem;
+        }
+
+        .blog-card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .blog-card-author {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .blog-card-author strong {
+            color: var(--text-primary);
+        }
+
+        .blog-card-date {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .blog-card-link {
+            font-size: 1rem;
+            color: var(--accent-teal);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: gap 0.3s ease;
+        }
+
+        .blog-card-link:hover {
+            gap: 0.75rem;
+        }
+        /* Newsletter Section */
+        .newsletter-section {
+            padding: 10rem 4rem;
+            text-align: center;
+        }
+
+        .newsletter-content {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .newsletter-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .newsletter-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+        }
+
+        .newsletter-form {
+            display: flex;
+            gap: 1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .newsletter-input {
+            flex: 1;
+            padding: 1.25rem 1.5rem;
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 100px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .newsletter-input:focus {
+            outline: none;
+            border-color: var(--accent-teal);
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+        }
+
+        .newsletter-button {
+            padding: 1.25rem 2.5rem;
+            background: var(--accent-teal);
+            color: var(--dark-bg);
+            border: none;
+            border-radius: 100px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .newsletter-button:hover {
+            background: #0D9488;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(20, 184, 166, 0.2);
+        }
+        /* Footer */
+        .footer {
+            padding: 8rem 4rem 4rem;
+            background: var(--primary-blue);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 4rem;
+            max-width: 1400px;
+            margin: 0 auto 6rem;
+        }
+
+        .footer-brand {
+            margin-bottom: 2rem;
+        }
+
+        .footer-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-description {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.8;
+        }
+
+        .footer-links h4 {
+            font-size: 1rem;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-teal);
+        }
+
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-top: 4rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-copyright {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-social a {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-social a:hover {
+            color: var(--accent-teal);
+        }
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .nav {
+                padding: 2rem;
+            }
+
+            .projects-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+        }
+
+        @media (max-width: 968px) {
+            h1 {
+                font-size: clamp(2.5rem, 6vw, 4rem);
+            }
+
+            .nav {
+                padding: 1.5rem 2rem;
+            }
+
+            .nav-links {
+                gap: 1.5rem;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .blog-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .newsletter-form {
+                flex-direction: column;
+            }
+
+            .newsletter-button {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding: 6rem 2rem 4rem;
+            }
+
+            .hero-title {
+                font-size: clamp(2.5rem, 8vw, 3.5rem);
+            }
+
+            .projects-section,
+            .blog-section,
+            .newsletter-section {
+                padding: 8rem 2rem;
+            }
+
+            .footer {
+                padding: 6rem 2rem 3rem;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                gap: 2rem;
+                text-align: center;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            opacity: 0;
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+
+        /* Scroll Progress */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: var(--accent-teal);
+            z-index: 2000;
+            transform-origin: left;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Scroll Progress -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <a href="#" class="nav-logo">THE WEEKEND PROJECTS</a>
+        <div class="nav-links">
+            <a href="#projects" class="nav-link">Projects</a>
+            <a href="#blog" class="nav-link">Blog</a>
+            <a href="#about" class="nav-link">About</a>
+            <a href="#newsletter" class="nav-link">Newsletter</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <span class="hero-badge fade-in">Creative Freedom for Developers</span>
+            <h1 class="hero-title fade-in delay-1">Build Something<br>Every Weekend</h1>
+            <p class="hero-subtitle fade-in delay-2">
+                A curated collection of weekend projects, tutorials, and creative coding experiments. 
+                Turn your side ideas into reality.
+            </p>
+            <a href="#projects" class="hero-cta fade-in delay-3">
+                Start Exploring
+                <svg class="hero-cta-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </a>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section class="projects-section" id="projects">
+        <div class="section-header">
+            <h2>Featured Projects</h2>
+            <p>Hand-picked creative coding experiments and side projects from developers worldwide.</p>
+        </div>
+        
+        <div class="projects-grid">
+            <!-- Project Card 1 -->
+            <article class="project-card fade-in">
+                <div class="project-card-image">
+                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=800" alt="Abstract geometric shapes">
+                </div>
+                <div class="project-card-content">
+                    <span class="project-card-category">Generative Art</span>
+                    <h3 class="project-card-title">Neon Dreams</h3>
+                    <p class="project-card-description">
+                        A generative art experiment using JavaScript and HTML5 Canvas to create mesmerizing neon patterns that evolve in real-time.
+                    </p>
+                    <div class="project-card-meta">
+                        <span class="project-card-author">by Alex Chen</span>
+                        <span class="project-card-date">3 days ago</span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Project Card 2 -->
+            <article class="project-card fade-in delay-1">
+                <div class="project-card-image">
+                    <img src="https://images.unsplash.com/photo-1614728853965-15e8312f3b5f?auto=format&fit=crop&q=80&w=800" alt="Web browser interface">
+                </div>
+                <div class="project-card-content">
+                    <span class="project-card-category">Web Development</span>
+                    <h3 class="project-card-title">Glass UI Kit</h3>
+                    <p class="project-card-description">
+                        A modern glassmorphism UI kit for web applications. Fully responsive with smooth transitions and micro-interactions.
+                    </p>
+                    <div class="project-card-meta">
+                        <span class="project-card-author">by Maria Rodriguez</span>
+                        <span class="project-card-date">1 week ago</span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Project Card 3 -->
+            <article class="project-card fade-in delay-2">
+                <div class="project-card-image">
+                    <img src="https://images.unsplash.com/photo-1555099962-4199c345e5dd?auto=format&fit=crop&q=80&w=800" alt="Programming code on screen">
+                </div>
+                <div class="project-card-content">
+                    <span class="project-card-category">Tools</span>
+                    <h3 class="project-card-title">DevTimer Pro</h3>
+                    <p class="project-card-description">
+                        A专注 productivity timer built specifically for developers. Features pomodoro technique, task management, and distraction blocking.
+                    </p>
+                    <div class="project-card-meta">
+                        <span class="project-card-author">by James Wilson</span>
+                        <span class="project-card-date">2 weeks ago</span>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+    <!-- Blog Section -->
+    <section class="blog-section" id="blog">
+        <div class="section-header" style="text-align: center; margin-bottom: 6rem;">
+            <h2>From the Blog</h2>
+            <p style="margin: 0 auto;">Insights, tutorials, and stories from the weekend developer community.</p>
+        </div>
+        
+        <div class="blog-grid">
+            <!-- Blog Card 1 -->
+            <article class="blog-card fade-in">
+                <div class="blog-card-image">
+                    <img src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?auto=format&fit=crop&q=80&w=800" alt="Computer code on screen">
+                </div>
+                <div class="blog-card-content">
+                    <span class="blog-card-category">Tutorial</span>
+                    <h3 class="blog-card-title">Mastering CSS Grid Layouts</h3>
+                    <p class="blog-card-excerpt">
+                        Learn how to create complex layouts with CSS Grid in this comprehensive tutorial. From basic concepts to advanced techniques.
+                    </p>
+                    <div class="blog-card-meta">
+                        <span class="blog-card-author">by <strong>Sarah Johnson</strong></span>
+                        <span class="blog-card-date">5 days ago</span>
+                    </div>
+                    <a href="#" class="blog-card-link">Read Article →</a>
+                </div>
+            </article>
+
+            <!-- Blog Card 2 -->
+            <article class="blog-card fade-in delay-1">
+                <div class="blog-card-image">
+                    <img src="https://images.unsplash.com/photo-1555421689-49263d263711?auto=format&fit=crop&q=80&w=800" alt="Developer working on laptop">
+                </div>
+                <div class="blog-card-content">
+                    <span class="blog-card-category">Case Study</span>
+                    <h3 class="blog-card-title">Building Side Projects</h3>
+                    <p class="blog-card-excerpt">
+                        How to balance full-time work with creative weekend projects. Tips, tricks, and motivation to keep your ideas alive.
+                    </p>
+                    <div class="blog-card-meta">
+                        <span class="blog-card-author">by <strong>Michael Chen</strong></span>
+                        <span class="blog-card-date">2 weeks ago</span>
+                    </div>
+                    <a href="#" class="blog-card-link">Read Article →</a>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="newsletter-section" id="newsletter">
+        <div class="newsletter-content fade-in">
+            <h2 class="newsletter-title">Join the Community</h2>
+            <p class="newsletter-subtitle">
+                Get weekly updates on new projects, tutorials, and inspiration delivered straight to your inbox.
+            </p>
+            <form class="newsletter-form" onsubmit="event.preventDefault();">
+                <input type="email" class="newsletter-input" placeholder="Enter your email" required>
+                <button type="submit" class="newsletter-button">Subscribe</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="footer-logo">THE WEEKEND PROJECTS</div>
+                <p class="footer-description">
+                    Empowering developers to explore their creativity through weekend projects, experiments, and open source contributions.
+                </p>
+            </div>
+            <div class="footer-links">
+                <h4>Projects</h4>
+                <ul>
+                    <li><a href="#">All Projects</a></li>
+                    <li><a href="#">Featured</a></li>
+                    <li><a href="#">Newest</a></li>
+                    <li><a href="#">Popular</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Tutorials</a></li>
+                    <li><a href="#">Tools</a></li>
+                    <li><a href="#">Community</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Privacy</a></li>
+                    <li><a href="#">Terms</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="footer-copyright">© 2024 The Weekend Projects. All rights reserved.</p>
+            <div class="footer-social">
+                <a href="#">Twitter</a>
+                <a href="#">GitHub</a>
+                <a href="#">LinkedIn</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Scroll Progress
+        const scrollProgress = document.getElementById('scrollProgress');
+        
+        window.addEventListener('scroll', () => {
+            const scrollTop = document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrollPercent = (scrollTop / scrollHeight) * 100;
+            
+            scrollProgress.style.width = `${scrollPercent}%`;
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Add hover effects to project cards
+        document.querySelectorAll('.project-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.1)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.boxShadow = 'none';
+            });
+        });
+
+        // Fade in on scroll
+        const fadeElements = document.querySelectorAll('.fade-in');
+        
+        const fadeInOnScroll = () => {
+            const windowHeight = window.innerHeight;
+            
+            fadeElements.forEach((element, index) => {
+                const elementPosition = element.getBoundingClientRect().top;
+                
+                if (elementPosition < windowHeight - 100) {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }
+            });
+        };
+        
+        window.addEventListener('scroll', fadeInOnScroll);
+        fadeInOnScroll(); // Check on initial load
+    </script>
+</body>
+</html>

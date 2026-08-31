@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Weekend Projects | Creative Freedom for Developers</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-purple: #7C3AED;
+            --primary-teal: #0D9488;
+            --accent-purple: #8B5CF6;
+            --accent-teal: #14B8A6;
+            --dark-bg: #0F0F11;
+            --dark-card: #1A1A1D;
+            --text-primary: #F9FAFB;
+            --text-secondary: #9CA3AF;
+            --gradient-primary: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-teal) 100%);
+            --gradient-secondary: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-teal) 100%);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Animated Background */
+        .bg-animated {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: float 20s infinite alternate;
+        }
+
+        .orb-1 {
+            width: 600px;
+            height: 600px;
+            background: var(--gradient-primary);
+            top: -100px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 500px;
+            height: 500px;
+            background: var(--gradient-secondary);
+            bottom: -50px;
+            right: -50px;
+            animation-delay: -5s;
+        }
+
+        .orb-3 {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, #EC4899 0%, var(--primary-purple) 100%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                transform: translate(100px, 150px) scale(1.2);
+            }
+        }
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(20px);
+            background: rgba(15, 15, 17, 0.7);
+            border-bottom: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+        }
+
+        .nav.scrolled {
+            padding: 1rem 2rem;
+            background: rgba(15, 15, 17, 0.9);
+        }
+
+        .nav-logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+            background: var(--gradient-secondary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-cta {
+            padding: 0.75rem 1.5rem;
+            background: var(--gradient-primary);
+            border-radius: 50px;
+            text-decoration: none;
+            color: white;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3);
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8rem 2rem 6rem;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            text-align: center;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(3.5rem, 8vw, 5.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -2px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .gradient-text {
+            background: var(--gradient-secondary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            color: var(--text-secondary);
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeInUp 0.8s ease-out 0.2s backwards;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            animation: fadeInUp 0.8s ease-out 0.4s backwards;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(124, 58, 237, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--glass-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+        /* Project Cards Section */
+        .projects {
+            padding: 8rem 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .section-header h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--text-primary) 0%, #E5E7EB 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+        }
+
+        .projects-filters {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background: var(--gradient-primary);
+            color: white;
+            border-color: var(--primary-purple);
+            box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3);
+        }
+
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .project-card {
+            background: var(--dark-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+            transition: opacity 0.3s ease;
+            opacity: 0;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .project-card:hover::before {
+            opacity: 1;
+        }
+
+        .project-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #2D2D30 0%, #1A1A1D 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-image::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: var(--gradient-primary);
+            opacity: 0.1;
+            animation: rotate 20s linear infinite;
+        }
+
+        .project-content {
+            padding: 1.5rem;
+        }
+
+        .project-tags {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            padding: 0.35rem 0.85rem;
+            background: rgba(124, 58, 237, 0.15);
+            color: var(--accent-purple);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .project-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .project-description {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .project-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .project-tech {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tech-icon {
+            width: 24px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .project-link {
+            color: var(--primary-teal);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: gap 0.3s ease;
+        }
+
+        .project-link:hover {
+            gap: 0.5rem;
+        }
+        /* Blog Section */
+        .blog {
+            padding: 8rem 2rem;
+            position: relative;
+            z-index: 2;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .blog-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-purple);
+        }
+
+        .blog-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #3D3D40 0%, #2D2D30 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .blog-image::after {
+            content: '';
+            position: absolute;
+            top: -30%;
+            right: -30%;
+            width: 150%;
+            height: 150%;
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.3) 0%, transparent 70%);
+        }
+
+        .blog-content {
+            padding: 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .blog-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .blog-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .blog-category {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: rgba(13, 148, 136, 0.15);
+            color: var(--primary-teal);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            width: fit-content;
+        }
+
+        .blog-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .blog-excerpt {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            flex: 1;
+        }
+
+        .blog-read-more {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-purple);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: gap 0.3s ease;
+        }
+
+        .blog-read-more:hover {
+            gap: 0.75rem;
+        }
+
+        /* About Section */
+        .about {
+            padding: 8rem 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .about-text h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .about-text p {
+            color: var(--text-secondary);
+            font-size: 1.15rem;
+            margin-bottom: 2rem;
+        }
+
+        .about-values {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .value-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            padding: 1.5rem;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .value-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-3px);
+        }
+
+        .value-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .value-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .value-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .about-visual {
+            position: relative;
+        }
+
+        .visual-card {
+            background: var(--dark-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            position: relative;
+            animation: floatUpAndDown 6s ease-in-out infinite;
+        }
+
+        @keyframes floatUpAndDown {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        /* CTA Section */
+        .cta-section {
+            padding: 8rem 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta-card {
+            background: var(--gradient-primary);
+            border-radius: 32px;
+            padding: 4rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(124, 58, 237, 0.4);
+        }
+
+        .cta-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 150%;
+            height: 150%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            animation: rotate 30s linear infinite;
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 2;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .cta-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .cta-desc {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2.5rem;
+        }
+
+        .btn-white {
+            background: white;
+            color: var(--primary-purple);
+            padding: 1.25rem 3rem;
+            font-size: 1.1rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-white:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Footer */
+        .footer {
+            padding: 6rem 2rem 3rem;
+            position: relative;
+            z-index: 2;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 4rem;
+        }
+
+        .footer-brand h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            background: var(--gradient-secondary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .footer-desc {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .footer-links h4 {
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-links a {
+            display: block;
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-bottom: 0.75rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-teal);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            background: var(--gradient-primary);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 3rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-bottom p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        .fade-in-up {
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        . stagger-1 {
+            animation-delay: 0.1s;
+        }
+        . stagger-2 {
+            animation-delay: 0.2s;
+        }
+        . stagger-3 {
+            animation-delay: 0.3s;
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .about-content {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .blog-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .about-values {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-title {
+                font-size: 2.5rem;
+            }
+
+            .footer-bottom {
+                padding-top: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero {
+                padding: 6rem 1.5rem 4rem;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .projects, .blog, .about, .cta-section, .footer {
+                padding: 4rem 1.5rem;
+            }
+
+            .cta-card {
+                padding: 3rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animated">
+        <div class="bg-orb orb-1"></div>
+        <div class="bg-orb orb-2"></div>
+        <div class="bg-orb orb-3"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-logo">The Weekend Projects</div>
+        <div class="nav-links">
+            <a href="#projects">Projects</a>
+            <a href="#blog">Blog</a>
+            <a href="#about">About</a>
+            <a href="#community">Community</a>
+        </div>
+        <a href="#join" class="nav-cta">Join Now</a>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="fade-in-up">Build Creative Freedom into Your <span class="gradient-text">Weekend</span></h1>
+            <p class="fade-in-up stagger-1">A playground for developers who spend weekdays coding corporate apps but use weekends to unleash creativity, contribute to open source, and build projects that matter.</p>
+            <div class="hero-buttons fade-in-up stagger-2">
+                <a href="#projects" class="btn btn-primary">Explore Projects</a>
+                <a href="#blog" class="btn btn-secondary">Read Tutorials</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="projects">
+        <div class="section-header">
+            <h2>Featured Projects</h2>
+            <p>Discover amazing projects built by the community during their weekends</p>
+        </div>
+        <div class="projects-filters">
+            <button class="filter-btn active" data-category="all">All</button>
+            <button class="filter-btn" data-category="ai">AI & ML</button>
+            <button class="filter-btn" data-category="open-source">Open Source</button>
+            <button class="filter-btn" data-category="tools">Tools</button>
+            <button class="filter-btn" data-category="tutorials">Tutorials</button>
+        </div>
+        <div class="projects-grid">
+            <div class="project-card">
+                <div class="project-image">
+                    <span style="color: rgba(255,255,255,0.3); font-weight: 600;">AI Visualization</span>
+                </div>
+                <div class="project-content">
+                    <div class="project-tags">
+                        <span class="tag">AI</span>
+                        <span class="tag">Python</span>
+                        <span class="tag">Visualization</span>
+                    </div>
+                    <h3 class="project-title">Neural Art Generator</h3>
+                    <p class="project-description">Transform text prompts into stunning AI-generated artwork using the latest diffusion models.</p>
+                    <div class="project-meta">
+                        <div class="project-tech">
+                            <span class="tech-icon">Py</span>
+                            <span class="tech-icon">TF</span>
+                            <span class="tech-icon">JS</span>
+                        </div>
+                        <a href="#" class="project-link">View Project →</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-image">
+                    <span style="color: rgba(255,255,255,0.3); font-weight: 600;">Dev Tools</span>
+                </div>
+                <div class="project-content">
+                    <div class="project-tags">
+                        <span class="tag">Tools</span>
+                        <span class="tag">Node.js</span>
+                        <span class="tag">CLI</span>
+                    </div>
+                    <h3 class="project-title">Project Sprinter</h3>
+                    <p class="project-description">A CLI tool for managing weekend project sprints with built-in Pomodoro timers and progress tracking.</p>
+                    <div class="project-meta">
+                        <div class="project-tech">
+                            <span class="tech-icon">Node</span>
+                            <span class="tech-icon">TS</span>
+                        </div>
+                        <a href="#" class="project-link">View Project →</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-image">
+                    <span style="color: rgba(255,255,255,0.3); font-weight: 600;">Open Source</span>
+                </div>
+                <div class="project-content">
+                    <div class="project-tags">
+                        <span class="tag">Open Source</span>
+                        <span class="tag">React</span>
+                        <span class="tag">Community</span>
+                    </div>
+                    <h3 class="project-title">Community Dashboard</h3>
+                    <p class="project-description">Open-source dashboard for tracking community contributions, PRs, and project impact metrics.</p>
+                    <div class="project-meta">
+                        <div class="project-tech">
+                            <span class="tech-icon">React</span>
+                            <span class="tech-icon">TS</span>
+                            <span class="tech-icon">GraphQL</span>
+                        </div>
+                        <a href="#" class="project-link">View Project →</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-image">
+                    <span style="color: rgba(255,255,255,0.3); font-weight: 600;">Web Development</span>
+                </div>
+                <div class="project-content">
+                    <div class="project-tags">
+                        <span class="tag">Tutorials</span>
+                        <span class="tag">CSS</span>
+                        <span class="tag">Animations</span>
+                    </div>
+                    <h3 class="project-title">CSS Magic Playground</h3>
+                    <p class="project-description">Interactive playground for learning advanced CSS animations and effects with real-time previews.</p>
+                    <div class="project-meta">
+                        <div class="project-tech">
+                            <span class="tech-icon">HTML</span>
+                            <span class="tech-icon">CSS</span>
+                        </div>
+                        <a href="#" class="project-link">View Project →</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-image">
+                    <span style="color: rgba(255,255,255,0.3); font-weight: 600;">Cloud Tools</span>
+                </div>
+                <div class="project-content">
+                    <div class="project-tags">
+                        <span class="tag">DevOps</span>
+                        <span class="tag">AWS</span>
+                        <span class="tag">Automation</span>
+                    </div>
+                    <h3 class="project-title">Serverless Manager</h3>
+                    <p class="project-description">Simplify serverless deployments with this comprehensive AWS Lambda management tool.</p>
+                    <div class="project-meta">
+                        <div class="project-tech">
+                            <span class="tech-icon">AWS</span>
+                            <span class="tech-icon">Node</span>
+                        </div>
+                        <a href="#" class="project-link">View Project →</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-image">
+                    <span style="color: rgba(255,255,255,0.3); font-weight: 600;">Mobile Apps</span>
+                </div>
+                <div class="project-content">
+                    <div class="project-tags">
+                        <span class="tag">Mobile</span>
+                        <span class="tag">Flutter</span>
+                        <span class="tag">Productivity</span>
+                    </div>
+                    <h3 class="project-title">Focus Flow</h3>
+                    <p class="project-description">A minimalist productivity app designed specifically for weekend project sprints.</p>
+                    <div class="project-meta">
+                        <div class="project-tech">
+                            <span class="tech-icon">Flutter</span>
+                            <span class="tech-icon">Dart</span>
+                        </div>
+                        <a href="#" class="project-link">View Project →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Blog Section -->
+    <section id="blog" class="blog">
+        <div class="section-header">
+            <h2>Latest Tutorials & Posts</h2>
+            <p>Learn from the community and level up your weekend projects</p>
+        </div>
+        <div class="blog-grid">
+            <article class="blog-card">
+                <div class="blog-image"></div>
+                <div class="blog-content">
+                    <div class="blog-meta">
+                        <span class="blog-category">AI</span>
+                        <span>⏱ 8 min read</span>
+                        <span>📅 Oct 15, 2024</span>
+                    </div>
+                    <h3 class="blog-title">Building Your First AI Model: A Weekend Guide</h3>
+                    <p class="blog-excerpt">Learn how to train your first neural network over a weekend, from data preparation to deployment.</p>
+                    <a href="#" class="blog-read-more">Read Tutorial →</a>
+                </div>
+            </article>
+
+            <article class="blog-card">
+                <div class="blog-image"></div>
+                <div class="blog-content">
+                    <div class="blog-meta">
+                        <span class="blog-category">Development</span>
+                        <span>⏱ 12 min read</span>
+                        <span>📅 Oct 12, 2024</span>
+                    </div>
+                    <h3 class="blog-title">Mastering Modern JavaScript Patterns</h3>
+                    <p class="blog-excerpt">Explore advanced JavaScript patterns that can transform how you build your weekend projects.</p>
+                    <a href="#" class="blog-read-more">Read Tutorial →</a>
+                </div>
+            </article>
+
+            <article class="blog-card">
+                <div class="blog-image"></div>
+                <div class="blog-content">
+                    <div class="blog-meta">
+                        <span class="blog-category">Open Source</span>
+                        <span>⏱ 6 min read</span>
+                        <span>📅 Oct 10, 2024</span>
+                    </div>
+                    <h3 class="blog-title">Contributing to Open Source: The Complete Guide</h3>
+                    <p class="blog-excerpt">Everything you need to know about making your first open source contribution this weekend.</p>
+                    <a href="#" class="blog-read-more">Read Tutorial →</a>
+                </div>
+            </article>
+
+            <article class="blog-card">
+                <div class="blog-image"></div>
+                <div class="blog-content">
+                    <div class="blog-meta">
+                        <span class="blog-category">DevOps</span>
+                        <span>⏱ 10 min read</span>
+                        <span>📅 Oct 08, 2024</span>
+                    </div>
+                    <h3 class="blog-title">Serverless Architectures for Beginners</h3>
+                    <p class="blog-excerpt">Get started with serverless deployment and learn how to save time on weekend projects.</p>
+                    <a href="#" class="blog-read-more">Read Tutorial →</a>
+                </div>
+            </article>
+
+            <article class="blog-card">
+                <div class="blog-image"></div>
+                <div class="blog-content">
+                    <div class="blog-meta">
+                        <span class="blog-category">CSS</span>
+                        <span>⏱ 7 min read</span>
+                        <span>📅 Oct 05, 2024</span>
+                    </div>
+                    <h3 class="blog-title">Animated Interfaces: CSS Tricks for Impact</h3>
+                    <p class="blog-excerpt">Make your weekend projects stand out with these powerful CSS animation techniques.</p>
+                    <a href="#" class="blog-read-more">Read Tutorial →</a>
+                </div>
+            </article>
+
+            <article class="blog-card">
+                <div class="blog-image"></div>
+                <div class="blog-content">
+                    <div class="blog-meta">
+                        <span class="blog-category">Productivity</span>
+                        <span>⏱ 9 min read</span>
+                        <span>📅 Oct 03, 2024</span>
+                    </div>
+                    <h3 class="blog-title">Time Management for Weekend Developers</h3>
+                    <p class="blog-excerpt">How to balance full-time work with creative weekend projects without burning out.</p>
+                    <a href="#" class="blog-read-more">Read Tutorial →</a>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="about-content">
+            <div class="about-visual">
+                <div class="visual-card">
+                    <div style="margin-bottom: 1.5rem;">
+                        <div style="height: 120px; background: linear-gradient(135deg, #2D2D30, #1A1A1D); border-radius: 12px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center;">
+                            <span style="color: var(--primary-teal); font-size: 2rem;">🚀</span>
+                        </div>
+                        <div style="height: 80px; background: var(--glass-bg); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--text-secondary);">Weekly Progress</div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div style="height: 100px; background: var(--dark-card); border: 1px solid var(--glass-border); border-radius: 12px; padding: 1rem;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-teal);">500+</div>
+                            <div style="color: var(--text-secondary); font-size: 0.9rem;">Active Projects</div>
+                        </div>
+                        <div style="height: 100px; background: var(--dark-card); border: 1px solid var(--glass-border); border-radius: 12px; padding: 1rem;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-purple);">2.5k+</div>
+                            <div style="color: var(--text-secondary); font-size: 0.9rem;">Community Members</div>
+                        </div>
+                        <div style="height: 100px; background: var(--dark-card); border: 1px solid var(--glass-border); border-radius: 12px; padding: 1rem;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-teal);">150+</div>
+                            <div style="color: var(--text-secondary); font-size: 0.9rem;">Tutorials</div>
+                        </div>
+                        <div style="height: 100px; background: var(--dark-card); border: 1px solid var(--glass-border); border-radius: 12px; padding: 1rem;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-purple);">10k+</div>
+                            <div style="color: var(--text-secondary); font-size: 0.9rem;">Code Contributions</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="about-text">
+                <h2>More Than Just a Platform — <span class="gradient-text">A Creative Movement</span></h2>
+                <p>At The Weekend Projects, we believe that the best innovations happen outside the constraints of daily work. This is where developers transform their wildest ideas into reality.</p>
+                <p>Whether you're contributing to open source, building side projects, or experimenting with new technologies, you're part of a community that values creativity, learning, and growth.</p>
+                
+                <div class="about-values">
+                    <div class="value-card">
+                        <div class="value-icon">💡</div>
+                        <h4 class="value-title">Creative Freedom</h4>
+                        <p class="value-desc">Unlimited scope for experimentation without production constraints</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="value-icon">🤝</div>
+                        <h4 class="value-title">Community</h4>
+                        <p class="value-desc">Connect with like-minded developers who share your passion</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="value-icon">📈</div>
+                        <h4 class="value-title">Growth</h4>
+                        <p class="value-desc">Learn new skills and showcase your weekend experiments</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="value-icon">开源</div>
+                        <h4 class="value-title">Open Source</h4>
+                        <p class="value-desc">Contribute to and discover amazing open source projects</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section id="join" class="cta-section">
+        <div class="cta-card">
+            <div class="cta-content">
+                <h2 class="cta-title">Ready to Start Your <span class="gradient-text">Weekend Journey</span>?</h2>
+                <p class="cta-desc">Join 2,500+ developers who are building creative projects, contributing to open source, and learning new skills every weekend.</p>
+                <a href="#" class="btn btn-white" style="text-decoration: none; display: inline-block;">Join the Community</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h2>The Weekend Projects</h2>
+                <p class="footer-desc">A creative playground for developers who believe that the best work happens outside working hours.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link" aria-label="Twitter">𝕏</a>
+                    <a href="#" class="social-link" aria-label="GitHub">GH</a>
+                    <a href="#" class="social-link" aria-label="LinkedIn">In</a>
+                    <a href="#" class="social-link" aria-label="Instagram">IG</a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4>Explore</h4>
+                <a href="#projects">Featured Projects</a>
+                <a href="#blog">Tutorials</a>
+                <a href="#community">Community</a>
+                <a href="#">Success Stories</a>
+            </div>
+            <div class="footer-links">
+                <h4>Resources</h4>
+                <a href="#">Getting Started</a>
+                <a href="#">Project Showcase</a>
+                <a href="#">Code of Conduct</a>
+                <a href="#">FAQ</a>
+            </div>
+            <div class="footer-links">
+                <h4>Connect</h4>
+                <a href="#">Contact Us</a>
+                <a href="#">Media Kit</a>
+                <a href="#">Partner With Us</a>
+                <a href="#">Events</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 The Weekend Projects. All rights reserved. Built with passion on weekends.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Navigation scroll effect
+        const nav = document.querySelector('.nav');
+        
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        // Filter buttons functionality
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Filter logic would go here
+                const category = btn.dataset.category;
+                console.log(`Filtering by: ${category}`);
+            });
+        });
+
+        // Project card hover effects
+        const projectCards = document.querySelectorAll('.project-card');
+        
+        projectCards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-10px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Blog card hover effects
+        const blogCards = document.querySelectorAll('.blog-card');
+        
+        blogCards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-5px)';
+                card.style.borderColor = 'var(--primary-purple)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+                card.style.borderColor = 'var(--glass-border)';
+            });
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements for scroll animation
+        document.querySelectorAll('.project-card, .blog-card, .value-card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+            observer.observe(el);
+        });
+
+        // Dynamic background orb animation speed
+        const orbs = document.querySelectorAll('.bg-orb');
+        let animationSpeed = 1;
+
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            
+            orbs.forEach((orb, index) => {
+                const speed = (index + 1) * 0.05;
+                const moveX = x * 50 * speed;
+                const moveY = y * 50 * speed;
+                orb.style.transform = `translate(${moveX}px, ${moveY}px)`;
+            });
+        });
+
+        // Click effects
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('btn') || e.target.classList.contains('btn-primary') || e.target.classList.contains('btn-secondary') || e.target.classList.contains('filter-btn')) {
+                const ripple = document.createElement('span');
+                const rect = e.target.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.style.position = 'absolute';
+                ripple.style.borderRadius = '50%';
+                ripple.style.background = 'rgba(255, 255, 255, 0.3)';
+                ripple.style.transform = 'scale(0)';
+                ripple.style.animation = 'ripple 0.6s ease-out';
+                ripple.style.pointerEvents = 'none';
+
+                if (!e.target.hasChildNodes('.ripple')) {
+                    e.target.style.position = 'relative';
+                    e.target.style.overflow = 'hidden';
+                    e.target.appendChild(ripple);
+                }
+            }
+        });
+
+        // Add ripple keyframe
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
