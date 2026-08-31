@@ -167,6 +167,11 @@ body {
 	overflow: hidden;
 }
 
+/* Project cards have 2.5rem padding like original */
+.project-card .card-body {
+	padding: 2.5rem;
+}
+
 .feature-card::before,
 .project-card::before {
 	content: "";
@@ -205,7 +210,8 @@ body {
 
 .card-category,
 .tech-tag,
-.card-tag {
+.card-tag,
+.tag {
 	background: rgba(6, 182, 212, 0.1);
 	color: #67e8f9;
 	font-weight: 700;
@@ -215,6 +221,16 @@ body {
 
 .card-link:hover .card-title {
 	color: var(--color-brand);
+}
+
+/* Project card title and description match original */
+.project-card .card-title {
+	font-size: 1.5rem;
+	color: #ffffff;
+}
+
+.project-card .card-excerpt {
+	color: var(--color-text-secondary);
 }
 
 /*
@@ -324,4 +340,8 @@ body {
 .site-footer {
 	background: var(--color-bg-subtle);
 	border-top-color: var(--color-border);
+}
+/* Project cards have 20px border-radius like original */
+.project-card {
+	border-radius: 20px;
 }
