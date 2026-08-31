@@ -16,7 +16,7 @@ const isLoggedIn = !!Astro.locals.user;
 		<span class="bar" />
 		<span class="bar" />
 	</button>
-	<div class="mobile-nav-sheet">
+	<div class="mobile-nav-menu">
 		{menu?.items.map((item) => (
 			<a href={item.url} class="mobile-nav-link">
 				{item.label}
@@ -84,7 +84,7 @@ const isLoggedIn = !!Astro.locals.user;
 	}
 
 	/* Sheet - slides in from right */
-	.mobile-nav-sheet {
+	.mobile-nav-menu {
 		position: fixed;
 		top: var(--nav-height);
 		right: 0;
@@ -167,7 +167,7 @@ const isLoggedIn = !!Astro.locals.user;
 <script>
 	document.addEventListener("DOMContentLoaded", () => {
 		const navToggle = document.querySelector(".mobile-nav-toggle");
-		const navMenu = document.querySelector(".mobile-nav-sheet");
+		const navMenu = document.querySelector(".mobile-nav-menu");
 		const navOverlay = document.querySelector(".mobile-nav-overlay");
 
 		if (!navToggle || !navMenu) return;
