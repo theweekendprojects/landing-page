@@ -5,25 +5,20 @@ import { resolveBlogSiteIdentity } from "../utils/site-identity";
 const menu = await getMenu("primary");
 const { siteTitle } = resolveBlogSiteIdentity(await getSiteSettings());
 const isLoggedIn = !!Astro.locals.user;
-
-let isOpen = false;
-const setIsOpen = (value) => {
-	isOpen = value;
-};
 ---
 
-<nav class="mobile-nav">
+<nav class="mobile-nav" id="mobile-nav">
 	<a href="/" class="mobile-logo">
 		{siteTitle}
 	</a>
-	<div class="mobile-nav-toggle" role="button" aria-label="Toggle menu" aria-expanded={isOpen} onclick={() => setIsOpen(!isOpen)}>
+	<button class="mobile-nav-toggle" aria-label="Toggle menu" aria-expanded="false">
 		<span class="bar" />
 		<span class="bar" />
 		<span class="bar" />
-	</div>
-	<div class={`mobile-nav-menu ${isOpen ? "open" : ""}`}>
+	</button>
+	<div class="mobile-nav-menu">
 		{menu?.items.map((item) => (
-			<a href={item.url} class="mobile-nav-link" onclick={() => setIsOpen(false)}>
+			<a href={item.url} class="mobile-nav-link">
 				{item.label}
 			</a>
 		))}
@@ -33,7 +28,7 @@ const setIsOpen = (value) => {
 			</a>
 		)}
 	</div>
-	{isOpen && <div class="mobile-nav-overlay" onclick={() => setIsOpen(false)} />}
+	<div class="mobile-nav-overlay" />
 </nav>
 
 <style>
@@ -142,7 +137,7 @@ const setIsOpen = (value) => {
 		z-index: 999;
 	}
 
-	.mobile-nav-overlay:has(+ .mobile-nav-menu.open) {
+	.mobile-nav-menu.open + .mobile-nav-overlay {
 		opacity: 1;
 		visibility: visible;
 	}
@@ -159,3 +154,34 @@ const setIsOpen = (value) => {
 		}
 	}
 </style>
+
+<script>
+	document.addEventListener("DOMContentLoaded", () => {
+		const navToggle = document.querySelector(".mobile-nav-toggle");
+		const navMenu = document.querySelector(".mobile-nav-menu");
+		const navOverlay = document.querySelector(".mobile-nav-overlay");
+
+		if (!navToggle || !navMenu) return;
+
+		navToggle.addEventListener("click", () => {
+			const isExpanded = navToggle.getAttribute("aria-expanded") === "true";
+			navToggle.setAttribute("aria-expanded", !isExpanded);
+			navMenu.classList.toggle("open");
+		});
+
+		if (navOverlay) {
+			navOverlay.addEventListener("click", () => {
+				navToggle.setAttribute("aria-expanded", "false");
+				navMenu.classList.remove("open");
+			});
+		}
+
+		// Close menu when clicking links
+		navMenu.querySelectorAll("a").forEach((link) => {
+			link.addEventListener("click", () => {
+				navToggle.setAttribute("aria-expanded", "false");
+				navMenu.classList.remove("open");
+			});
+		});
+	});
+</script>
