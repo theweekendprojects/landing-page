@@ -255,28 +255,7 @@ body {
 	height: 160px;
 }
 
-.project-card .card-body::after {
-	content: "View Project →";
-	display: block;
-	margin-top: var(--spacing-4);
-	padding-top: var(--spacing-4);
-	border-top: 1px solid var(--color-border);
-	color: var(--color-brand);
-	font-weight: 700;
-	font-size: var(--font-size-sm);
-}
-
-.post-card .card-body::after {
-	content: "Read More";
-	display: inline-block;
-	margin-top: var(--spacing-4);
-	padding: var(--spacing-2) var(--spacing-4);
-	background: var(--theme-gradient-1);
-	color: #ffffff;
-	font-weight: 700;
-	font-size: var(--font-size-sm);
-	border-radius: 999px;
-}
+/* "Read More" and "View Project" links are now in component markup as real <a> elements */
 
 /* Blog section on home reuses .blog-section background */
 .blog-section {
