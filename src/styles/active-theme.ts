@@ -6,4 +6,4 @@
  *
  * Don't edit this file directly -- run `pnpm theme <name>` instead.
  */
-export const ACTIVE_THEME = "huashu-variation-1";
+export const ACTIVE_THEME = "variation-2";
