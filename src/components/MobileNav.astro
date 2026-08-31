@@ -30,114 +30,18 @@ const isLoggedIn = !!Astro.locals.user;
 	</div>
 </nav>
 
-<style>
-	.mobile-nav {
-		display: none;
-		justify-content: space-between;
-		align-items: center;
-		padding: var(--spacing-3) var(--spacing-4);
-		gap: var(--spacing-2);
-		background: var(--color-bg);
-	}
-
-	.mobile-logo {
-		font-size: var(--font-size-base);
-		font-weight: 700;
-		color: var(--color-text);
-		text-decoration: none;
-	}
-
-	.mobile-nav-toggle {
-		display: flex;
-		flex-direction: column;
-		gap: 5px;
-		width: 24px;
-		height: 24px;
-		cursor: pointer;
-		border: none;
-		background: transparent;
-		padding: 0;
-		z-index: 101;
-	}
-
-	.bar {
-		width: 100%;
-		height: 2px;
-		background: var(--color-text);
-		transition: transform 0.3s ease, opacity 0.3s ease;
-	}
-
-	/* Hamburger to X animation */
-	.mobile-nav-toggle[aria-expanded="true"] .bar:nth-child(1) {
-		transform: rotate(45deg) translate(5px, 5px);
-	}
-
-	.mobile-nav-toggle[aria-expanded="true"] .bar:nth-child(2) {
-		opacity: 0;
-	}
-
-	.mobile-nav-toggle[aria-expanded="true"] .bar:nth-child(3) {
-		transform: rotate(-45deg) translate(7px, -8px);
-	}
-
-	/* Menu - hidden by default */
-	.mobile-nav-menu {
-		max-height: 0;
-		overflow: hidden;
-		transition: max-height 0.3s ease;
-		width: 100%;
-	}
-
-	/* When menu is open - this pushes content down */
-	.mobile-nav-menu.open {
-		max-height: 400px;
-	}
-
-	.mobile-nav-link {
-		display: block;
-		padding: var(--spacing-3) var(--spacing-2);
-		color: var(--color-text);
-		text-decoration: none;
-		font-size: var(--font-size-lg);
-		border-radius: var(--radius);
-		transition: background 0.2s ease;
-	}
-
-	.mobile-nav-link:hover {
-		background: var(--color-surface);
-	}
-
-	.mobile-nav-admin {
-		display: block;
-		margin-top: var(--spacing-4);
-		padding: var(--spacing-3) var(--spacing-2);
-		color: var(--color-brand);
-		text-decoration: none;
-		font-size: var(--font-size-sm);
-		font-weight: 600;
-	}
-</style>
-
 <script>
 	document.addEventListener("DOMContentLoaded", () => {
 		const navToggle = document.querySelector(".mobile-nav-toggle");
 		const navMenu = document.querySelector(".mobile-nav-menu");
-		const mainElement = document.querySelector("main");
 
-		if (!navToggle || !navMenu || !mainElement) return;
+		if (!navToggle || !navMenu) return;
 
 		navToggle.addEventListener("click", () => {
 			const isExpanded = navToggle.getAttribute("aria-expanded") === "true";
 			const isOpen = !isExpanded;
 			navToggle.setAttribute("aria-expanded", isOpen);
 			navMenu.classList.toggle("open", isOpen);
-			
-			// Add class to body when menu is open to add padding-top to main
-			if (isOpen) {
-				document.body.classList.add("mobile-nav-open");
-			} else {
-				document.body.classList.remove("mobile-nav-open");
-			}
 		});
 
 		// Close menu when clicking links
@@ -145,7 +49,6 @@ const isLoggedIn = !!Astro.locals.user;
 			link.addEventListener("click", () => {
 				navToggle.setAttribute("aria-expanded", "false");
 				navMenu.classList.remove("open");
-				document.body.classList.remove("mobile-nav-open");
 			});
 		});
 	});
