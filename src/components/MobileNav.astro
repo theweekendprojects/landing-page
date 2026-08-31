@@ -84,7 +84,6 @@ const isLoggedIn = !!Astro.locals.user;
 	}
 
 	/* Sheet - slides in from right */
-	/* Sheet - slides in from right */
 	.mobile-nav-menu {
 		position: fixed;
 		top: var(--nav-height);
@@ -99,10 +98,6 @@ const isLoggedIn = !!Astro.locals.user;
 		z-index: 1000;
 		padding: var(--spacing-6) var(--spacing-4);
 		overflow-y: auto;
-	}
-
-	.mobile-nav-menu.open {
-		transform: translateX(0);
 	}
 
 	.mobile-nav-menu.open {
@@ -165,23 +160,44 @@ const isLoggedIn = !!Astro.locals.user;
 	}
 </style>
 
+<style>
+	/* When mobile nav is active, add padding to body to prevent content overlap */
+	.mobile-nav-open body {
+		padding-top: calc(var(--nav-height) + 64px);
+	}
+
+	@media (min-width: 641px) {
+		.mobile-nav-open body {
+			padding-top: 0;
+		}
+	}
+</style>
+
 <script>
 	document.addEventListener("DOMContentLoaded", () => {
 		const navToggle = document.querySelector(".mobile-nav-toggle");
 		const navMenu = document.querySelector(".mobile-nav-menu");
 		const navOverlay = document.querySelector(".mobile-nav-overlay");
+		const body = document.body;
 
 		if (!navToggle || !navMenu) return;
 
 		navToggle.addEventListener("click", () => {
 			const isExpanded = navToggle.getAttribute("aria-expanded") === "true";
-			navToggle.setAttribute("aria-expanded", !isExpanded);
-			navMenu.classList.toggle("open");
+			const isOpen = !isExpanded;
+			navToggle.setAttribute("aria-expanded", isOpen);
+			if (isOpen) {
+				body.classList.add("mobile-nav-open");
+			} else {
+				body.classList.remove("mobile-nav-open");
+			}
+			navMenu.classList.toggle("open", isOpen);
 		});
 
 		if (navOverlay) {
 			navOverlay.addEventListener("click", () => {
 				navToggle.setAttribute("aria-expanded", "false");
+				body.classList.remove("mobile-nav-open");
 				navMenu.classList.remove("open");
 			});
 		}
@@ -190,6 +206,7 @@ const isLoggedIn = !!Astro.locals.user;
 		navMenu.querySelectorAll("a").forEach((link) => {
 			link.addEventListener("click", () => {
 				navToggle.setAttribute("aria-expanded", "false");
+				body.classList.remove("mobile-nav-open");
 				navMenu.classList.remove("open");
 			});
 		});
