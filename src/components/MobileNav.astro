@@ -28,7 +28,6 @@ const isLoggedIn = !!Astro.locals.user;
 			</a>
 		)}
 	</div>
-	<div class="mobile-nav-overlay" />
 </nav>
 
 <style>
@@ -37,11 +36,7 @@ const isLoggedIn = !!Astro.locals.user;
 		justify-content: space-between;
 		align-items: center;
 		padding: var(--spacing-3) var(--spacing-4);
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		z-index: 1000;
+		gap: var(--spacing-2);
 	}
 
 	.mobile-logo {
@@ -83,25 +78,17 @@ const isLoggedIn = !!Astro.locals.user;
 		transform: rotate(-45deg) translate(7px, -8px);
 	}
 
-	/* Sheet - slides in from right */
+	/* Menu - hidden by default */
 	.mobile-nav-menu {
-		position: fixed;
-		top: 64px;
-		right: 0;
-		width: 80%;
-		max-width: 320px;
-		height: calc(100vh - 64px);
-		background: var(--color-bg);
-		box-shadow: -5px 0 25px rgba(0, 0, 0, 0.3);
-		transition: transform 0.3s ease;
-		transform: translateX(100%);
-		z-index: 1000;
-		padding: var(--spacing-6) var(--spacing-4);
-		overflow-y: auto;
+		max-height: 0;
+		overflow: hidden;
+		transition: max-height 0.3s ease;
+		width: 100%;
 	}
 
+	/* When menu is open */
 	.mobile-nav-menu.open {
-		transform: translateX(0);
+		max-height: 400px;
 	}
 
 	.mobile-nav-link {
@@ -128,25 +115,6 @@ const isLoggedIn = !!Astro.locals.user;
 		font-weight: 600;
 	}
 
-	/* Overlay - covers the main content, not the nav bar */
-	.mobile-nav-overlay {
-		position: fixed;
-		top: 64px;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background: rgba(0, 0, 0, 0.5);
-		opacity: 0;
-		visibility: hidden;
-		transition: opacity 0.3s ease, visibility 0.3s ease;
-		z-index: 999;
-	}
-
-	.mobile-nav-menu.open + .mobile-nav-overlay {
-		opacity: 1;
-		visibility: visible;
-	}
-
 	@media (max-width: 640px) {
 		.mobile-nav {
 			display: flex;
@@ -160,25 +128,10 @@ const isLoggedIn = !!Astro.locals.user;
 	}
 </style>
 
-<style>
-	/* When mobile nav is active, add padding to body to prevent content overlap */
-	.mobile-nav-open body {
-		padding-top: 128px;
-	}
-
-	@media (min-width: 641px) {
-		.mobile-nav-open body {
-			padding-top: 0;
-		}
-	}
-</style>
-
 <script>
 	document.addEventListener("DOMContentLoaded", () => {
 		const navToggle = document.querySelector(".mobile-nav-toggle");
 		const navMenu = document.querySelector(".mobile-nav-menu");
-		const navOverlay = document.querySelector(".mobile-nav-overlay");
-		const body = document.body;
 
 		if (!navToggle || !navMenu) return;
 
@@ -186,27 +139,13 @@ const isLoggedIn = !!Astro.locals.user;
 			const isExpanded = navToggle.getAttribute("aria-expanded") === "true";
 			const isOpen = !isExpanded;
 			navToggle.setAttribute("aria-expanded", isOpen);
-			if (isOpen) {
-				body.classList.add("mobile-nav-open");
-			} else {
-				body.classList.remove("mobile-nav-open");
-			}
 			navMenu.classList.toggle("open", isOpen);
 		});
-
-		if (navOverlay) {
-			navOverlay.addEventListener("click", () => {
-				navToggle.setAttribute("aria-expanded", "false");
-				body.classList.remove("mobile-nav-open");
-				navMenu.classList.remove("open");
-			});
-		}
 
 		// Close menu when clicking links
 		navMenu.querySelectorAll("a").forEach((link) => {
 			link.addEventListener("click", () => {
 				navToggle.setAttribute("aria-expanded", "false");
-				body.classList.remove("mobile-nav-open");
 				navMenu.classList.remove("open");
 			});
 		});
