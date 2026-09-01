@@ -6,6 +6,7 @@ dist
 .emdash/migrations.json
 uploads
 data.db
+.DS_Store
 
 # Environment / Wrangler secrets
 .env
