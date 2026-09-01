@@ -1,9 +1,10 @@
 ---
 import { getEmDashCollection, getTermsForEntries, getSiteSettings } from "emdash";
 import Base from "../layouts/Base.astro";
-import { Image } from "emdash/ui";
 import { getReadingTime } from "../utils/reading-time";
 import { resolveBlogSiteIdentity } from "../utils/site-identity";
+import FeaturedProjects from "../components/home/FeaturedProjects.astro";
+import LatestPosts from "../components/home/LatestPosts.astro";
 
 const FEATURED_PROJECTS_LIMIT = 3;
 const LATEST_POSTS_LIMIT = 4;
@@ -77,116 +78,10 @@ const projectsData = projectsForHome.map((project) => ({
 	</section>
 
 	<!-- Featured Projects Section -->
-	{projectsData.length > 0 && (
-		<section class="projects-section" id="projects">
-			<div class="section-container">
-				<header class="section-header">
-					<h2 class="section-heading">Featured Projects</h2>
-					<p class="section-subtitle">
-						Hand-picked builds from the community's weekends.
-					</p>
-					<a href="/projects" class="view-all-link">View all projects →</a>
-				</header>
-				<div class="projects-grid">
-					{projectsData.map((project, index) => (
-						<div class="project-card-wrapper" data-reveal style={`--reveal-delay: ${index * 0.1}s`}>
-							<article class="project-card">
-								<a href={`/projects/${project.id}`} class="card-link">
-									{
-										project.featuredImage ? (
-											<div class="card-image">
-												<Image image={project.featuredImage} />
-											</div>
-										) : (
-											<div class="card-placeholder">
-												<span class="placeholder-text">{project.title}</span>
-											</div>
-										)
-									}
-									<div class="card-body">
-										{project.category && (
-											<span class="card-category">
-												{project.category}
-											</span>
-										)}
-										<h3 class="card-title">{project.title}</h3>
-										{project.description && <p class="card-excerpt">{project.description}</p>}
-										{project.techStack && project.techStack.length > 0 && (
-											<div class="card-tech-stack">
-												{project.techStack.slice(0, 3).map((tech) => (
-													<span class="tech-tag">{tech}</span>
-												))}
-												{project.techStack.length > 3 && (
-													<span class="tech-more">+{project.techStack.length - 3}</span>
-												)}
-											</div>
-										)}
-									</div>
-								</a>
-							</article>
-						</div>
-					))}
-				</div>
-			</div>
-		</section>
-	)}
+	{projectsData.length > 0 && <FeaturedProjects projects={projectsData} viewAllHref="/projects" />}
 
 	<!-- Featured Posts Section -->
-	{postsForHome.length > 0 && (
-		<section class="posts-section">
-			<div class="section-container">
-				<header class="section-header">
-					<h2 class="section-heading">Latest Articles</h2>
-					<p class="section-subtitle">
-						Writes about coding, design, and the creative process.
-					</p>
-					<a href="/posts" class="view-all-link">Read all posts →</a>
-				</header>
-				<div class="posts-grid">
-					{postsForHome.map((post, index) => (
-						<div class="post-card-wrapper" data-reveal style={`--reveal-delay: ${index * 0.1}s`}>
-							<article class="post-card">
-								<a href={`/posts/${post.id}`} class="card-link">
-									{
-										post.featuredImage ? (
-											<div class="card-image">
-												<Image image={post.featuredImage} />
-											</div>
-										) : (
-											<div class="card-placeholder">
-												<span class="placeholder-text">{post.title}</span>
-											</div>
-										)
-									}
-									<div class="card-body">
-										<div class="post-meta">
-											{post.date && <time>📅 {post.date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</time>}
-											<span class="meta-dot" />
-											<span>⏱️ {post.readingTime} min read</span>
-										</div>
-										<h3 class="card-title">{post.title}</h3>
-										{post.excerpt && <p class="card-excerpt">{post.excerpt}</p>}
-										<div class="card-actions">
-											<a href={`/posts/${post.id}`} class="btn btn-primary">
-												Read More →
-											</a>
-										</div>
-										{post.tags.length > 0 && (
-											<div class="post-tags">
-												{post.tags.slice(0, 3).map((tag) => (
-													<a href={`/tag/${tag.slug}`} class="post-tag">{tag.label}</a>
-												))}
-											</div>
-										)}
-									</div>
-								</a>
-							</article>
-						</div>
-					))}
-				</div>
-			</div>
-		</section>
-	)}
+	{postsForHome.length > 0 && <LatestPosts posts={postsForHome} viewAllHref="/posts" />}
 
 	<!-- About Section -->
 	<section class="about-section">
@@ -326,20 +221,9 @@ const projectsData = projectsForHome.map((project) => ({
 		justify-content: center;
 	}
 
-	.project-card-wrapper,
-	.post-card-wrapper {
-		transition: transform 0.3s ease;
-	}
-
-	.project-card-wrapper:hover,
-	.post-card-wrapper:hover {
-		transform: translateY(-8px);
-	}
-
-	.projects-section,
-	.posts-section,
 	.about-section {
 		padding: var(--spacing-20) 0;
+		background: linear-gradient(180deg, var(--color-bg-subtle) 0%, var(--color-bg) 100%);
 	}
 
 	.section-container {
@@ -365,190 +249,6 @@ const projectsData = projectsForHome.map((project) => ({
 		color: var(--color-text-secondary);
 		max-width: 600px;
 		margin: 0 auto;
-	}
-
-	.view-all-link {
-		display: inline-block;
-		margin-top: var(--spacing-4);
-		font-weight: 500;
-		color: var(--color-brand);
-		text-decoration: none;
-		transition: color 0.2s;
-	}
-
-	.view-all-link:hover {
-		color: var(--color-brand-hover);
-	}
-
-	.projects-grid,
-	.posts-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-		gap: var(--spacing-8);
-	}
-
-	.project-card,
-	.post-card {
-		background: var(--color-surface);
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-lg);
-		overflow: hidden;
-		transition: all 0.3s ease;
-	}
-
-	.project-card:hover,
-	.post-card:hover {
-		transform: translateY(-4px);
-		box-shadow: var(--shadow-lg);
-		border-color: var(--color-border-subtle);
-	}
-
-	.card-link {
-		display: flex;
-		flex-direction: column;
-		text-decoration: none;
-		color: inherit;
-	}
-
-	.card-image {
-		aspect-ratio: 16 / 9;
-		overflow: hidden;
-		background: var(--color-bg-subtle);
-	}
-
-	.card-image img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		transition: transform 0.4s ease;
-	}
-
-	.project-card:hover .card-image img,
-	.post-card:hover .card-image img {
-		transform: scale(1.05);
-	}
-
-	.card-placeholder {
-		aspect-ratio: 16 / 9;
-		background: linear-gradient(135deg, #1a1a1d 0%, #2d1b2e 100%);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.placeholder-text {
-		font-size: var(--font-size-2xl);
-		font-weight: var(--font-weight-display);
-		color: rgba(255, 255, 255, 0.6);
-		text-align: center;
-		padding: var(--spacing-4);
-		-webkit-line-clamp: 2;
-		-webkit-box-orient: vertical;
-		overflow: hidden;
-	}
-
-	.card-body {
-		padding: var(--spacing-6);
-	}
-
-	.card-category,
-	.card-title {
-		color: var(--color-brand);
-	}
-
-	.card-title {
-		font-size: var(--font-size-xl);
-		font-weight: var(--font-weight-heading);
-		line-height: var(--leading-snug);
-		letter-spacing: var(--tracking-snug);
-		margin-bottom: var(--spacing-2);
-	}
-
-	.card-excerpt {
-		font-size: var(--font-size-base);
-		line-height: var(--leading-relaxed);
-		color: var(--color-text-secondary);
-		margin-bottom: var(--spacing-4);
-	}
-
-	.card-actions {
-		margin-top: var(--spacing-6);
-	}
-
-	.btn {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		gap: var(--spacing-2);
-		padding: var(--spacing-2) var(--spacing-4);
-		font-size: var(--font-size-sm);
-		font-weight: 700;
-		text-decoration: none;
-		border-radius: 999px;
-		transition:
-			transform var(--transition-fast),
-			box-shadow var(--transition-fast),
-			background var(--transition-fast);
-	}
-
-	.btn-primary {
-		background: var(--theme-gradient-1);
-		color: #ffffff;
-		border: none;
-	}
-
-	.btn-primary:hover {
-		transform: translateY(-3px);
-		box-shadow: 0 15px 30px rgba(6, 182, 212, 0.4);
-	}
-
-	.card-tech-stack,
-	.post-tags {
-		display: flex;
-		gap: var(--spacing-2);
-		flex-wrap: wrap;
-	}
-
-	.tech-tag,
-	.post-tag {
-		display: inline-block;
-		padding: var(--tag-padding-y) var(--spacing-2);
-		font-size: var(--font-size-xs);
-		color: var(--color-text-secondary);
-		background: var(--color-bg-subtle);
-		border-radius: var(--radius);
-		text-decoration: none;
-		transition: all 0.2s;
-	}
-
-	.tech-tag:hover,
-	.post-tag:hover {
-		background: var(--color-brand);
-		color: var(--color-on-brand);
-	}
-
-	.tech-more {
-		font-size: var(--font-size-xs);
-		color: var(--color-muted);
-	}
-
-	.post-meta {
-		display: flex;
-		gap: var(--spacing-3);
-		font-size: var(--font-size-sm);
-		color: var(--color-muted);
-		margin-bottom: var(--spacing-2);
-	}
-
-	.meta-dot {
-		width: 3px;
-		height: 3px;
-		border-radius: 50%;
-		background: var(--color-muted);
-	}
-
-	.about-section {
-		background: linear-gradient(180deg, var(--color-bg-subtle) 0%, var(--color-bg) 100%);
 	}
 
 	.about-content {
@@ -698,19 +398,13 @@ const projectsData = projectsForHome.map((project) => ({
 			padding: 6rem 1rem 3rem;
 		}
 
-		.projects-section,
-		.posts-section,
+		.about-section,
 		.newsletter-section {
 			padding: var(--spacing-12) 0;
 		}
 
 		.section-container {
 			padding: 0 var(--spacing-4);
-		}
-
-		.projects-grid,
-		.posts-grid {
-			grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 		}
 	}
 
