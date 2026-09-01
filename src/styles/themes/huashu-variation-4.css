@@ -246,7 +246,8 @@ body {
 
 .card-category,
 .tech-tag,
-.card-tag {
+.card-tag,
+.tag {
 	display: inline-block;
 	padding: 2px 8px;
 	font-size: var(--font-size-xs);

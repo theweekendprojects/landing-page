@@ -27,7 +27,7 @@ const {
 const formattedDate = date
 	? date.toLocaleDateString("en-US", {
 			year: "numeric",
-			month: "short",
+			month: "long",
 			day: "numeric",
 		})
 	: null;
@@ -45,64 +45,35 @@ const formattedDate = date
 			)
 		}
 		<div class="card-body">
-			<div class="card-meta">
+			<div class="post-meta">
 				{
 					bylines && bylines.length > 0 && (
 						<>
-							<div class="card-bylines">
-								{bylines.slice(0, 1).map((credit) => (
-									<span class="card-byline">
-										{credit.byline.avatarMediaId && (
-											<img
-												src={`/_emdash/api/media/file/${credit.byline.avatarMediaId}`}
-												alt={credit.byline.displayName}
-												class="card-byline-avatar"
-											/>
-										)}
-										<span class="card-byline-name">
-											{credit.byline.displayName}
-										</span>
-									</span>
-								))}
-								{bylines.length > 1 && (
-									<span
-										class="byline-more"
-										data-tooltip={bylines
-											.slice(1)
-											.map((c) => c.byline.displayName)
-											.join(", ")}
-										title={bylines
-											.slice(1)
-											.map((c) => c.byline.displayName)
-											.join(", ")}
-										tabindex="0"
-									>
-										+{bylines.length - 1}
-									</span>
-								)}
-							</div>
-							{(formattedDate || readingTime) && <span class="meta-dot" />}
+							<span class="post-byline-name">
+								{bylines[0].byline.displayName}
+							</span>
+							<span class="meta-dot" />
 						</>
 					)
 				}
-				{formattedDate && <time>📅 {formattedDate}</time>}
+				{formattedDate && <time>{formattedDate}</time>}
 				{formattedDate && readingTime && <span class="meta-dot" />}
-				{readingTime && <span>⏱️ {readingTime} min</span>}
+				{readingTime && <span>{readingTime} min read</span>}
 			</div>
 			<h2 class="card-title">{title}</h2>
 			{excerpt && <p class="card-excerpt">{excerpt}</p>}
-			<div class="card-actions">
-				<a href={href} class="btn btn-primary">
-					Read More →
-				</a>
-			</div>
 		</div>
 	</a>
+	<div class="card-actions">
+		<a href={href} class="btn btn-primary">
+			Read More →
+		</a>
+	</div>
 	{
 		tags && tags.length > 0 && (
-			<div class="card-tags">
-				{tags.slice(0, 2).map((tag) => (
-					<a href={`/tag/${tag.slug}`} class="card-tag">
+			<div class="post-tags">
+				{tags.slice(0, 3).map((tag) => (
+					<a href={`/tag/${tag.slug}`} class="post-tag">
 						{tag.label}
 					</a>
 				))}
@@ -111,8 +82,22 @@ const formattedDate = date
 	}
 </article>
 
-<style>
-	.post-card {
+<style is:global>
+	/*
+	 * is:global + :where() together drop this block's specificity to
+	 * (0,0,0) for every rule -- Astro's usual [data-astro-cid-*] scoping
+	 * attribute is skipped (is:global) and :where() itself always
+	 * resolves to zero specificity regardless of what's inside it. That
+	 * means a theme file's plain ".post-card" (specificity 0,1,0) always
+	 * wins outright, with no dependency on <link>/<style> load order.
+	 *
+	 * Every selector here is scoped under ".post-card" (rather than a
+	 * bare ".card-body", ".card-title", etc.) because is:global removes
+	 * Astro's per-component namespacing -- ProjectCard.astro reuses the
+	 * same class names for a different layout, so without the ".post-
+	 * card" prefix the two components' rules would collide globally.
+	 */
+	:where(.post-card) {
 		display: flex;
 		flex-direction: column;
 		background: var(--color-surface);
@@ -125,8 +110,9 @@ const formattedDate = date
 			box-shadow var(--transition-fast);
 	}
 
-	.card-link {
+	:where(.post-card .card-link) {
 		display: flex;
+		flex: 1;
 		flex-direction: column;
 		text-decoration: none;
 		color: inherit;
@@ -134,34 +120,34 @@ const formattedDate = date
 
 	/* Image sits flush with the card's rounded top edge; text content
 	   below gets its own padding via .card-body. */
-	.card-image {
-		aspect-ratio: 16 / 10;
+	:where(.post-card .card-image) {
+		aspect-ratio: 16 / 9;
 		overflow: hidden;
 		background: var(--color-bg-subtle);
 	}
 
-	.card-image img {
+	:where(.post-card .card-image img) {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
 		transition: transform 0.3s ease;
 	}
 
-	.card-link:hover .card-image img {
+	:where(.post-card .card-link:hover .card-image img) {
 		transform: scale(1.03);
 	}
 
-	.card-placeholder {
-		aspect-ratio: 16 / 10;
+	:where(.post-card .card-placeholder) {
+		aspect-ratio: 16 / 9;
 		background: var(--color-bg-subtle);
 	}
 
-	.card-body {
+	:where(.post-card .card-body) {
 		flex: 1;
-		padding: var(--spacing-6);
+		padding: var(--spacing-6) var(--spacing-6) 0;
 	}
 
-	.card-meta {
+	:where(.post-card .post-meta) {
 		display: flex;
 		align-items: center;
 		flex-wrap: wrap;
@@ -172,19 +158,24 @@ const formattedDate = date
 		margin-bottom: var(--spacing-2);
 	}
 
-	.card-meta time,
-	.card-meta span:not(.meta-dot) {
+	:where(.post-card .post-meta time),
+	:where(.post-card .post-meta span:not(.meta-dot)) {
 		white-space: nowrap;
 	}
 
-	.meta-dot {
+	:where(.post-card .meta-dot) {
 		width: 3px;
 		height: 3px;
 		border-radius: 50%;
 		background: var(--color-muted);
 	}
 
-	.card-title {
+	:where(.post-card .post-byline-name) {
+		font-weight: 500;
+		color: var(--color-text-secondary);
+	}
+
+	:where(.post-card .card-title) {
 		font-size: var(--font-size-xl);
 		font-weight: var(--font-weight-heading);
 		line-height: var(--leading-snug);
@@ -193,11 +184,11 @@ const formattedDate = date
 		transition: color var(--transition-fast);
 	}
 
-	.card-link:hover .card-title {
+	:where(.post-card .card-link:hover .card-title) {
 		color: var(--color-brand);
 	}
 
-	.card-excerpt {
+	:where(.post-card .card-excerpt) {
 		font-size: var(--font-size-base);
 		line-height: var(--leading-relaxed);
 		color: var(--color-text-secondary);
@@ -207,11 +198,11 @@ const formattedDate = date
 		overflow: hidden;
 	}
 
-	.card-actions {
-		margin-top: var(--spacing-6);
+	:where(.post-card .card-actions) {
+		padding: var(--spacing-6) var(--spacing-6) 0;
 	}
 
-	.btn {
+	:where(.post-card .btn) {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
@@ -227,34 +218,29 @@ const formattedDate = date
 			background var(--transition-fast);
 	}
 
-	.btn-primary {
-		background: var(--theme-gradient-1);
-		color: #ffffff;
+	:where(.post-card .btn-primary) {
+		background: var(--color-brand);
+		color: var(--color-on-brand);
 		border: none;
 	}
 
-	.btn-primary:hover {
-		transform: translateY(-3px);
-		box-shadow: 0 15px 30px rgba(6, 182, 212, 0.4);
+	:where(.post-card .btn-primary:hover) {
+		background: var(--color-brand-hover);
 	}
 
-	.card-tags {
+	:where(.post-card .post-tags) {
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--spacing-2);
-		padding: 0 var(--spacing-6) var(--spacing-6);
-		/* .card-body already ends in --spacing-6 of bottom padding; pull
-		   tags up so the excerpt-to-tags gap reads as --spacing-3, not a
-		   doubled gap. */
-		margin-top: calc(var(--spacing-3) - var(--spacing-6));
+		padding: var(--spacing-4) var(--spacing-6) var(--spacing-6);
 	}
 
-	.card-tag {
+	:where(.post-card .post-tag) {
 		display: inline-block;
 		padding: var(--tag-padding-y) var(--spacing-2);
 		font-size: var(--font-size-xs);
 		color: var(--color-text-secondary);
-		background: var(--color-surface);
+		background: var(--color-bg-subtle);
 		border-radius: var(--radius);
 		text-decoration: none;
 		transition:
@@ -262,66 +248,14 @@ const formattedDate = date
 			background var(--transition-fast);
 	}
 
-	.card-tag:hover {
+	:where(.post-card .post-tag:hover) {
 		color: var(--color-text);
 		background: var(--color-border);
 	}
 
-	/* Byline styles */
-	.card-bylines {
-		display: flex;
-		align-items: center;
-		gap: 2px;
-		white-space: nowrap;
-	}
-
-	.card-byline {
-		display: inline-flex;
-		align-items: center;
-		gap: var(--spacing-1);
-	}
-
-	.card-byline-avatar {
-		width: var(--avatar-size-xs);
-		height: var(--avatar-size-xs);
-		border-radius: 50%;
-		object-fit: cover;
-	}
-
-	.card-byline-name {
-		font-weight: 500;
-		color: var(--color-text-secondary);
-	}
-
-	.byline-more {
-		position: relative;
-		font-size: var(--font-size-xs);
-		color: var(--color-muted);
-		margin-left: 2px;
-		cursor: default;
-		border-radius: var(--radius);
-		outline-offset: 2px;
-	}
-
-	.byline-more:focus-visible {
-		outline: 2px solid var(--color-brand);
-	}
-
-	.byline-more[data-tooltip]:hover::after,
-	.byline-more[data-tooltip]:focus-visible::after {
-		content: attr(data-tooltip);
-		position: absolute;
-		bottom: calc(100% + 6px);
-		left: 50%;
-		transform: translateX(-50%);
-		white-space: nowrap;
-		background: var(--color-text);
-		color: var(--color-bg);
-		font-size: var(--font-size-xs);
-		font-weight: 400;
-		padding: var(--spacing-1) var(--spacing-2);
-		border-radius: var(--radius);
-		pointer-events: none;
-		z-index: 10;
+	/* When there are no tags, .card-actions is the last child and needs
+	   its own bottom padding to match .card-body's spacing rhythm. */
+	:where(.post-card:not(:has(.post-tags)) .card-actions) {
+		padding-bottom: var(--spacing-6);
 	}
 </style>

@@ -7,11 +7,12 @@ interface Props {
 	description?: string;
 	featuredImage?: MediaValue | string;
 	href: string;
-	techStack?: string[];
 	category?: string;
+	githubUrl?: string;
+	liveUrl?: string;
 }
 
-const { title, description, featuredImage, href, techStack, category } =
+const { title, description, featuredImage, href, category, githubUrl, liveUrl } =
 	Astro.props;
 
 const categoryLabels: Record<string, string> = {
@@ -38,28 +39,44 @@ const categoryLabels: Record<string, string> = {
 		}
 		<div class="card-body">
 			{category && (
-				<span class="card-category">
-					{categoryLabels[category] || category}
-				</span>
+				<div class="project-tags">
+					<span class="tag">{categoryLabels[category] ?? category}</span>
+				</div>
 			)}
 			<h2 class="card-title">{title}</h2>
 			{description && <p class="card-excerpt">{description}</p>}
-			{techStack && techStack.length > 0 && (
-				<div class="card-tech-stack">
-					{techStack.slice(0, 3).map((tech) => (
-						<span class="tech-tag">{tech}</span>
-					))}
-					{techStack.length > 3 && (
-						<span class="tech-more">+{techStack.length - 3}</span>
-					)}
-				</div>
-			)}
 		</div>
 	</a>
+	<div class="project-links">
+		<a href={liveUrl || href} class="btn btn-primary">
+			View Project →
+		</a>
+		{githubUrl && (
+			<a href={githubUrl} target="_blank" rel="noopener noreferrer" class="github-link">
+				GitHub
+			</a>
+		)}
+	</div>
 </article>
 
-<style>
-	.project-card {
+<style is:global>
+	/*
+	 * is:global + :where() together drop this block's specificity to
+	 * (0,0,0) for every rule -- Astro's usual [data-astro-cid-*] scoping
+	 * attribute is skipped (is:global) and :where() itself always
+	 * resolves to zero specificity regardless of what's inside it. That
+	 * means a theme file's plain ".project-card" (specificity 0,1,0)
+	 * always wins outright, with no dependency on <link>/<style> load
+	 * order.
+	 *
+	 * Every selector here is scoped under ".project-card" (rather than a
+	 * bare ".card-body", ".card-title", etc.) because is:global removes
+	 * Astro's per-component namespacing -- PostCard.astro reuses the
+	 * same class names for a different layout, so without the
+	 * ".project-card" prefix the two components' rules would collide
+	 * globally.
+	 */
+	:where(.project-card) {
 		display: flex;
 		flex-direction: column;
 		background: var(--color-surface);
@@ -72,7 +89,7 @@ const categoryLabels: Record<string, string> = {
 			box-shadow var(--transition-fast);
 	}
 
-	.card-link {
+	:where(.project-card .card-link) {
 		display: flex;
 		flex: 1;
 		flex-direction: column;
@@ -82,45 +99,55 @@ const categoryLabels: Record<string, string> = {
 
 	/* Image sits flush with the card's rounded top edge; text content
 	   below gets its own padding via .card-body. */
-	.card-image {
+	:where(.project-card .card-image) {
 		aspect-ratio: 16 / 9;
 		overflow: hidden;
 		background: var(--color-bg-subtle);
 	}
 
-	.card-image img {
+	:where(.project-card .card-image img) {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
 		transition: transform 0.3s ease;
 	}
 
-	.card-link:hover .card-image img {
+	:where(.project-card .card-link:hover .card-image img) {
 		transform: scale(1.03);
 	}
 
-	.card-placeholder {
+	:where(.project-card .card-placeholder) {
 		aspect-ratio: 16 / 9;
 		background: var(--color-bg-subtle);
 	}
 
-	.card-body {
+	:where(.project-card .card-body) {
 		flex: 1;
 		display: flex;
 		flex-direction: column;
 		padding: var(--spacing-6);
 	}
 
-	.card-category {
+	:where(.project-card .project-tags) {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--spacing-2);
+		margin-bottom: var(--spacing-4);
+	}
+
+	:where(.project-card .tag) {
 		display: inline-block;
+		padding: var(--spacing-1) var(--spacing-3);
 		font-size: var(--font-size-xs);
+		font-weight: 600;
 		text-transform: uppercase;
 		letter-spacing: var(--tracking-wider);
 		color: var(--color-muted);
-		margin-bottom: var(--spacing-2);
+		background: var(--color-bg-subtle);
+		border-radius: 999px;
 	}
 
-	.card-title {
+	:where(.project-card .card-title) {
 		font-size: var(--font-size-xl);
 		font-weight: var(--font-weight-heading);
 		line-height: var(--leading-snug);
@@ -129,11 +156,11 @@ const categoryLabels: Record<string, string> = {
 		transition: color var(--transition-fast);
 	}
 
-	.card-link:hover .card-title {
+	:where(.project-card .card-link:hover .card-title) {
 		color: var(--color-brand);
 	}
 
-	.card-excerpt {
+	:where(.project-card .card-excerpt) {
 		font-size: var(--font-size-base);
 		line-height: var(--leading-relaxed);
 		color: var(--color-text-secondary);
@@ -143,29 +170,54 @@ const categoryLabels: Record<string, string> = {
 		overflow: hidden;
 	}
 
-	.card-tech-stack {
+	:where(.project-card .project-links) {
 		display: flex;
-		flex-wrap: wrap;
+		justify-content: space-between;
+		align-items: center;
+		gap: var(--spacing-3);
+		margin: 0 var(--spacing-6) var(--spacing-6);
+		padding-top: var(--spacing-4);
+		border-top: 1px solid var(--color-border-subtle);
+	}
+
+	:where(.project-card .btn) {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
 		gap: var(--spacing-2);
-		margin-top: var(--spacing-4);
+		padding: var(--spacing-2) var(--spacing-4);
+		font-size: var(--font-size-sm);
+		font-weight: 700;
+		text-decoration: none;
+		border-radius: 999px;
+		transition:
+			transform var(--transition-fast),
+			box-shadow var(--transition-fast),
+			background var(--transition-fast);
 	}
 
-	.tech-tag {
-		display: inline-block;
-		padding: var(--tag-padding-y) var(--spacing-2);
-		font-size: var(--font-size-xs);
+	:where(.project-card .btn-primary) {
+		background: var(--color-brand);
+		color: var(--color-on-brand);
+		border: none;
+	}
+
+	:where(.project-card .btn-primary:hover) {
+		background: var(--color-brand-hover);
+	}
+
+	:where(.project-card .github-link) {
+		font-size: var(--font-size-sm);
 		color: var(--color-text-secondary);
-		background: var(--color-surface);
-		border-radius: var(--radius);
+		text-decoration: none;
 	}
 
-	.tech-more {
-		font-size: var(--font-size-xs);
-		color: var(--color-muted);
+	:where(.project-card .github-link:hover) {
+		color: var(--color-text);
 	}
 
 	@media (max-width: 600px) {
-		.card-title {
+		:where(.project-card .card-title) {
 			font-size: var(--font-size-lg);
 		}
 	}

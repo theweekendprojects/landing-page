@@ -160,8 +160,9 @@ const otherProjects = recentProjects.filter((p) => p.id !== project.id).slice(0,
 								description={p.data.description}
 								featuredImage={p.data.featured_image}
 								href={`/projects/${p.id}`}
-								techStack={p.data.tech_stack}
 								category={p.data.category}
+								githubUrl={p.data.github_url}
+								liveUrl={p.data.live_url}
 							/>
 						))}
 					</div>

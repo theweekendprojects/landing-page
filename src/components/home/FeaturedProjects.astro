@@ -7,8 +7,9 @@ interface ProjectItem {
 	title: string;
 	description?: string;
 	featuredImage?: MediaValue | string;
-	techStack?: string[];
 	category?: string;
+	githubUrl?: string;
+	liveUrl?: string;
 }
 
 interface Props {
@@ -39,8 +40,9 @@ const { projects, viewAllHref = "/projects" } = Astro.props;
 							description={project.description}
 							featuredImage={project.featuredImage}
 							href={`/projects/${project.id}`}
-							techStack={project.techStack}
 							category={project.category}
+							githubUrl={project.githubUrl}
+							liveUrl={project.liveUrl}
 						/>
 					</div>
 				))
@@ -60,10 +62,8 @@ const { projects, viewAllHref = "/projects" } = Astro.props;
 	}
 
 	.section-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: baseline;
-		gap: var(--spacing-4);
+		position: relative;
+		text-align: center;
 		margin-bottom: var(--spacing-12);
 		padding-bottom: var(--spacing-4);
 		border-bottom: 1px solid var(--color-border-subtle);
@@ -81,8 +81,12 @@ const { projects, viewAllHref = "/projects" } = Astro.props;
 		color: var(--color-text-secondary);
 	}
 
+	/* Positioned out of flow so it doesn't skew the centered title/
+	   subtitle block off to one side. */
 	.section-link {
-		flex-shrink: 0;
+		position: absolute;
+		right: 0;
+		bottom: var(--spacing-4);
 		font-size: var(--font-size-sm);
 		font-weight: 500;
 		color: var(--color-brand);
@@ -111,9 +115,10 @@ const { projects, viewAllHref = "/projects" } = Astro.props;
 	}
 
 	@media (max-width: 600px) {
-		.section-header {
-			flex-direction: column;
-			align-items: flex-start;
+		.section-link {
+			position: static;
+			display: inline-block;
+			margin-top: var(--spacing-2);
 		}
 
 		.projects-grid {

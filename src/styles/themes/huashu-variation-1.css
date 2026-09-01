@@ -121,7 +121,8 @@ body {
 
 .card-category,
 .tech-tag,
-.card-tag {
+.card-tag,
+.tag {
 	background: rgba(249, 115, 22, 0.1);
 	color: var(--color-brand);
 	border-radius: 20px;

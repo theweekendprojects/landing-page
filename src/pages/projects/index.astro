@@ -1,18 +1,7 @@
 ---
-import { getEmDashCollection, getTermsForEntries, getTaxonomyTerms } from "emdash";
+import { getEmDashCollection, getTaxonomyTerms } from "emdash";
 import Base from "../../layouts/Base.astro";
-import { Image } from "emdash/ui";
-import { getReadingTime } from "../../utils/reading-time";
-
-const categoryLabels: Record<string, string> = {
-	web: "Web Application",
-	mobile: "Mobile App",
-	cli: "CLI Tool",
-	library: "Library/Package",
-	api: "API/Backend",
-	design: "Design/UX",
-	other: "Other",
-};
+import ProjectCard from "../../components/ProjectCard.astro";
 
 // Get all project categories for filtering
 const categories = await getTaxonomyTerms("projects", "category");
@@ -60,49 +49,131 @@ if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
 				<p class="empty">No projects found.</p>
 			) : (
 				<div class="projects-grid">
-					{projects.map((project, index) => {
-						const techStack = project.data.tech_stack ?? [];
-						return (
-							<div class="project-card-wrapper" data-reveal style={`--reveal-delay: ${index * 0.1}s`}>
-								<article class="project-card">
-									<a href={`/projects/${project.id}`}>
-										{
-											project.data.featured_image ? (
-												<div class="card-image">
-													<Image image={project.data.featured_image} />
-												</div>
-											) : (
-												<div class="card-placeholder" />
-											)
-										}
-										<div class="card-body">
-											{project.data.category && (
-												<div class="project-tags">
-													<span class="tag">
-														{categoryLabels[project.data.category] ?? project.data.category}
-													</span>
-												</div>
-											)}
-											<h2 class="card-title">{project.data.title}</h2>
-											{project.data.description && <p class="card-excerpt">{project.data.description}</p>}
-											<div class="project-links">
-												<a href={`/projects/${project.id}`} class="btn btn-primary">
-													View Project →
-												</a>
-												{project.data.github_url && (
-													<span>GitHub</span>
-												)}
-											</div>
-										</div>
-									</a>
-								</article>
-							</div>
-						);
-					})}
+					{projects.map((project, index) => (
+						<div class="project-card-wrapper" data-reveal style={`--reveal-delay: ${index * 0.1}s`}>
+							<ProjectCard
+								title={project.data.title}
+								description={project.data.description}
+								featuredImage={project.data.featured_image}
+								href={`/projects/${project.id}`}
+								category={project.data.category}
+								githubUrl={project.data.github_url}
+								liveUrl={project.data.live_url}
+							/>
+						</div>
+					))}
 				</div>
 			)
 		}
 	</div>
 </Base>
 
-</content>
+<style>
+	.projects-page {
+		max-width: var(--wide-width);
+		margin: 0 auto;
+		padding: var(--spacing-8) var(--spacing-6) var(--spacing-16);
+	}
+
+	.page-header {
+		text-align: center;
+		margin-bottom: var(--spacing-8);
+	}
+
+	.page-title {
+		font-size: clamp(1.75rem, 4vw, var(--font-size-3xl));
+		font-weight: var(--font-weight-display);
+		letter-spacing: var(--tracking-tight);
+		margin-bottom: var(--spacing-2);
+	}
+
+	.page-description {
+		font-size: var(--font-size-lg);
+		color: var(--color-text-secondary);
+	}
+
+	.projects-filter {
+		display: flex;
+		gap: var(--spacing-2);
+		justify-content: center;
+		flex-wrap: wrap;
+		margin-bottom: var(--spacing-12);
+	}
+
+	.filter-btn {
+		padding: var(--spacing-2) var(--spacing-4);
+		font-size: var(--font-size-sm);
+		font-weight: 500;
+		color: var(--color-text-secondary);
+		background: var(--color-surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.filter-btn:hover {
+		border-color: var(--color-brand);
+		color: var(--color-brand);
+	}
+
+	.filter-btn.active {
+		background: var(--color-brand);
+		color: var(--color-on-brand);
+		border-color: var(--color-brand);
+	}
+
+	.empty {
+		text-align: center;
+		color: var(--color-muted);
+		font-size: var(--font-size-lg);
+	}
+
+	.project-card-wrapper {
+		height: 100%;
+		transition: transform 0.3s ease;
+	}
+
+	.project-card-wrapper:hover {
+		transform: translateY(-8px);
+	}
+
+	.project-card-wrapper :global(.project-card) {
+		height: 100%;
+	}
+
+	.projects-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		gap: var(--spacing-8);
+	}
+
+	@media (max-width: 900px) {
+		.projects-page {
+			padding: var(--spacing-6) var(--spacing-4) var(--spacing-12);
+		}
+
+		.page-title {
+			font-size: var(--font-size-2xl);
+		}
+
+		.projects-grid {
+			grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		}
+	}
+
+	@media (max-width: 600px) {
+		.projects-filter {
+			gap: var(--spacing-1);
+		}
+
+		.filter-btn {
+			padding: var(--spacing-2) var(--spacing-3);
+			font-size: var(--font-size-xs);
+		}
+
+		.projects-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

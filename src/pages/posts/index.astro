@@ -1,19 +1,9 @@
 ---
 import { getEmDashCollection, getTermsForEntries } from "emdash";
 import Base from "../../layouts/Base.astro";
-import { Image } from "emdash/ui";
+import PostCard from "../../components/PostCard.astro";
 import { getReadingTime } from "../../utils/reading-time";
 import { getTaxonomyTerms } from "emdash";
-
-const categoryLabels: Record<string, string> = {
-	web: "Web Application",
-	mobile: "Mobile App",
-	cli: "CLI Tool",
-	library: "Library/Package",
-	api: "API/Backend",
-	design: "Design/UX",
-	other: "Other",
-};
 
 // Get all post categories for filtering
 const categories = await getTaxonomyTerms("posts", "category");
@@ -46,13 +36,6 @@ const postsWithTags = posts.map((post) => ({
 	tags: tagsByEntry.get(post.data.id) ?? [],
 	bylines: post.data.bylines ?? [],
 }));
-
-const formatDate = (date: Date) =>
-	date.toLocaleDateString("en-US", {
-		year: "numeric",
-		month: "long",
-		day: "numeric",
-	});
 ---
 
 <Base title="All Posts" description="Browse all blog posts">
@@ -89,50 +72,16 @@ const formatDate = (date: Date) =>
 				<div class="posts-grid">
 					{postsWithTags.map(({ post, tags, bylines }, index) => (
 						<div class="post-card-wrapper" data-reveal style={`--reveal-delay: ${index * 0.1}s`}>
-							<article class="post-card">
-								<a href={`/posts/${post.id}`} class="card-link">
-									{
-										post.data.featured_image ? (
-											<div class="card-image">
-												<Image image={post.data.featured_image} />
-											</div>
-										) : (
-											<div class="card-placeholder" />
-										)
-									}
-									<div class="card-body">
-										<div class="post-meta">
-											{bylines.length > 0 && (
-												<>
-													<span class="post-byline-name">
-														{bylines[0].byline.displayName}
-													</span>
-													<span class="meta-dot" />
-												</>
-											)}
-											{post.data.publishedAt && (
-												<time>{formatDate(post.data.publishedAt)}</time>
-											)}
-											{post.data.publishedAt && <span class="meta-dot" />}
-											<span>{getReadingTime(post.data.content)} min read</span>
-										</div>
-										<h3 class="card-title">{post.data.title}</h3>
-										{post.data.excerpt && <p class="card-excerpt">{post.data.excerpt}</p>}
-										<div class="card-actions">
-											<a href={`/posts/${post.id}`} class="btn btn-primary">
-												Read More →
-											</a>
-										</div>
-										{tags.length > 0 && (
-											<div class="post-tags">
-												{tags.slice(0, 3).map((t) => (
-													<a href={`/tag/${t.slug}`} class="post-tag">{t.label}</a>
-												))}
-											</div>
-										)}
-									</div>
-								</a>
-							</article>
+							<PostCard
+								title={post.data.title}
+								excerpt={post.data.excerpt}
+								featuredImage={post.data.featured_image}
+								href={`/posts/${post.id}`}
+								date={post.data.publishedAt ?? undefined}
+								readingTime={getReadingTime(post.data.content)}
+								tags={tags.map((t) => ({ slug: t.slug, label: t.label }))}
+								bylines={bylines}
+							/>
 						</div>
 					))}
 				</div>
@@ -203,6 +152,7 @@ const formatDate = (date: Date) =>
 	}
 
 	.post-card-wrapper {
+		height: 100%;
 		transition: transform 0.3s ease;
 	}
 
@@ -210,155 +160,14 @@ const formatDate = (date: Date) =>
 		transform: translateY(-8px);
 	}
 
+	.post-card-wrapper :global(.post-card) {
+		height: 100%;
+	}
+
 	.posts-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 		gap: var(--spacing-8);
-	}
-
-	.post-card {
-		background: var(--color-surface);
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-lg);
-		overflow: hidden;
-		transition: all 0.3s ease;
-	}
-
-	.post-card:hover {
-		transform: translateY(-4px);
-		box-shadow: var(--shadow-lg);
-		border-color: var(--color-border-subtle);
-	}
-
-	.card-link {
-		display: flex;
-		flex-direction: column;
-		text-decoration: none;
-		color: inherit;
-	}
-
-	.card-image {
-		aspect-ratio: 16 / 9;
-		overflow: hidden;
-		background: var(--color-bg-subtle);
-	}
-
-	.card-image img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		transition: transform 0.4s ease;
-	}
-
-	.post-card:hover .card-image img {
-		transform: scale(1.05);
-	}
-
-	.card-placeholder {
-		aspect-ratio: 16 / 9;
-		background: linear-gradient(135deg, var(--color-bg-subtle), var(--color-surface));
-	}
-
-	.card-body {
-		padding: var(--spacing-6);
-	}
-
-	.post-meta {
-		display: flex;
-		gap: var(--spacing-3);
-		font-size: var(--font-size-sm);
-		color: var(--color-muted);
-		margin-bottom: var(--spacing-2);
-	}
-
-	.meta-dot {
-		width: 3px;
-		height: 3px;
-		border-radius: 50%;
-		background: var(--color-muted);
-	}
-
-	.post-byline-name {
-		font-weight: 500;
-		color: var(--color-text-secondary);
-	}
-
-	.card-title {
-		font-size: var(--font-size-xl);
-		font-weight: var(--font-weight-heading);
-		line-height: var(--leading-snug);
-		letter-spacing: var(--tracking-snug);
-		margin-bottom: var(--spacing-2);
-		color: var(--color-brand);
-		transition: color 0.2s;
-	}
-
-	.card-title:hover {
-		color: var(--color-brand-hover);
-	}
-
-	.card-excerpt {
-		font-size: var(--font-size-base);
-		line-height: var(--leading-relaxed);
-		color: var(--color-text-secondary);
-		display: -webkit-box;
-		-webkit-line-clamp: 2;
-		-webkit-box-orient: vertical;
-		overflow: hidden;
-	}
-
-	.card-actions {
-		margin-top: var(--spacing-6);
-	}
-
-	.btn {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		gap: var(--spacing-2);
-		padding: var(--spacing-2) var(--spacing-4);
-		font-size: var(--font-size-sm);
-		font-weight: 700;
-		text-decoration: none;
-		border-radius: 999px;
-		transition:
-			transform var(--transition-fast),
-			box-shadow var(--transition-fast),
-			background var(--transition-fast);
-	}
-
-	.btn-primary {
-		background: var(--theme-gradient-1);
-		color: #ffffff;
-		border: none;
-	}
-
-	.btn-primary:hover {
-		transform: translateY(-3px);
-		box-shadow: 0 15px 30px rgba(6, 182, 212, 0.4);
-	}
-
-	.post-tags {
-		display: flex;
-		gap: var(--spacing-2);
-		flex-wrap: wrap;
-		margin-top: var(--spacing-4);
-	}
-
-	.post-tag {
-		display: inline-block;
-		padding: var(--tag-padding-y) var(--spacing-2);
-		font-size: var(--font-size-xs);
-		color: var(--color-text-secondary);
-		background: var(--color-bg-subtle);
-		border-radius: var(--radius);
-		text-decoration: none;
-		transition: all 0.2s;
-	}
-
-	.post-tag:hover {
-		background: var(--color-brand);
-		color: var(--color-on-brand);
 	}
 
 	@media (max-width: 900px) {
@@ -383,6 +192,10 @@ const formatDate = (date: Date) =>
 		.filter-btn {
 			padding: var(--spacing-2) var(--spacing-3);
 			font-size: var(--font-size-xs);
+		}
+
+		.posts-grid {
+			grid-template-columns: 1fr;
 		}
 	}
 </style>

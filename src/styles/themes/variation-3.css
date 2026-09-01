@@ -124,7 +124,8 @@ body {
 
 .card-category,
 .tech-tag,
-.card-tag {
+.card-tag,
+.tag {
 	background: var(--color-bg-subtle);
 	color: var(--theme-accent);
 }
@@ -133,7 +134,8 @@ body {
  * The source mockup's project cards have no image (plain text cards
  * with pill tags + a "View Project ->" link), and its blog cards use a
  * gradient banner div instead of a photo. Hiding the image/placeholder
- * gets close without touching component markup.
+ * via CSS gets close without needing a separate "imageless" card
+ * variant in ProjectCard.astro/PostCard.astro.
  */
 .project-card .card-image,
 .project-card .card-placeholder {
@@ -151,27 +153,17 @@ body {
 	height: 180px;
 }
 
-.project-card .card-body::after {
-	content: "View Project →";
-	display: block;
-	margin-top: var(--spacing-4);
-	padding-top: var(--spacing-4);
-	border-top: 1px solid var(--color-border);
-	color: var(--color-brand);
-	font-weight: 600;
-	font-size: var(--font-size-sm);
-}
-
-.post-card .card-body::after {
-	content: "Read More";
-	display: inline-block;
-	margin-top: var(--spacing-4);
-	padding: var(--spacing-2) var(--spacing-4);
+/*
+ * "View Project ->" / "Read More" are real <a> elements in
+ * ProjectCard.astro/PostCard.astro (.project-links / .card-actions),
+ * matching the source mockup's markup. Style them here instead of
+ * faking them with generated content.
+ */
+.project-card .btn-primary,
+.post-card .btn-primary {
 	background: var(--color-brand);
 	color: #ffffff;
-	font-weight: 600;
-	font-size: var(--font-size-sm);
-	border-radius: var(--radius);
+	border: none;
 }
 
 .blog-section {
