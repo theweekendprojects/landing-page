@@ -10,7 +10,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "deploy": "astro build && wrangler deploy",
+    "deploy": "bash scripts/deploy.sh",
     "typecheck": "astro check",
     "theme": "node scripts/set-theme.mjs"
   },
