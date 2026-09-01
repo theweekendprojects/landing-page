@@ -130,31 +130,33 @@ body {
 	background: transparent;
 }
 
-/* Section headings get an accent underline like the source demo */
-.section-heading {
+/*
+ * Section headings get an accent underline like the source demo: a 60px
+ * gradient bar centered under the heading text.
+ *
+ * The bar is a block-level ::after so it sits in normal flow right after
+ * the heading text, instead of being absolutely positioned with a fixed
+ * offset. That keeps the gap consistent (margin-top above the bar, the
+ * heading's own margin-bottom below it) no matter how the heading wraps
+ * or how much space the following subtitle needs -- no magic numbers to
+ * keep in sync with the heading's line-height.
+ */
+.section-header .section-heading {
 	background: linear-gradient(to right, #ffffff, #94a3b8);
 	-webkit-background-clip: text;
 	background-clip: text;
 	color: transparent;
-	position: relative;
 	display: inline-block;
-	padding-bottom: var(--spacing-3);
 }
 
-.section-heading::after {
+.section-header .section-heading::after {
 	content: "";
-	position: absolute;
-	bottom: 0;
-	left: 0;
+	display: block;
 	width: 60px;
 	height: 4px;
+	margin: 1rem auto 0;
 	border-radius: 2px;
 	background: var(--theme-gradient-1);
-}
-
-.section-header--centered .section-heading::after {
-	left: 50%;
-	transform: translateX(-50%);
 }
 
 /* Feature + project + post cards: glassy with gradient top border reveal */
