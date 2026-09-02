@@ -263,7 +263,7 @@ import "../styles/theme.css";
 					const errorMessage = document.getElementById("errorMessage");
 
 					try {
-						const res = await fetch("/api/auth/signup/email", {
+						const res = await fetch("/api/auth/sign-up/email", {
 							method: "POST",
 							headers: { "Content-Type": "application/json" },
 							body: JSON.stringify({ email, password, name }),

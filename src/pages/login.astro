@@ -312,7 +312,7 @@ if (isLoggedIn) {
 					const errorMessage = document.getElementById("errorMessage");
 
 					try {
-						const res = await fetch("/api/auth/signin/email", {
+						const res = await fetch("/api/auth/sign-in/email", {
 							method: "POST",
 							headers: { "Content-Type": "application/json" },
 							body: JSON.stringify({ email, password }),
