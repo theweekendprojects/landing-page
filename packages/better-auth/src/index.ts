@@ -1,4 +1,8 @@
 import type { PluginDescriptor } from "emdash";
+import { betterAuthProvider } from "./auth-provider.js";
+import { createBetterAuth } from "./auth.js";
+import type { Kysely } from "kysely";
+import type { D1Database } from "@cloudflare/workers-types";
 
 export function betterAuthPlugin(): PluginDescriptor {
 	return {
@@ -10,3 +14,6 @@ export function betterAuthPlugin(): PluginDescriptor {
 		capabilities: ["users:read", "network:request"],
 	};
 }
+
+// Re-export for use in astro.config.mjs
+export { betterAuthProvider, createBetterAuth };
