@@ -14,3 +14,7 @@ minimumReleaseAgeExclude:
   - emdash
   - "@emdash-cms/*"
 blockExoticSubdeps: true
+
+# Link local packages
+packages:
+  - "packages/**"
