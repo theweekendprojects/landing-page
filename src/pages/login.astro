@@ -2,7 +2,7 @@
 import "../styles/tokens.css";
 import "../styles/theme.css";
 
-// Check if user is logged in
+// Check if user is logged in via Better-Auth
 const isLoggedIn = !!Astro.locals.user;
 
 if (isLoggedIn) {
@@ -217,6 +217,13 @@ if (isLoggedIn) {
 				border-color: var(--color-muted);
 				color: var(--color-text);
 			}
+
+			.error-message {
+				color: #ef4444;
+				font-size: 0.875rem;
+				text-align: center;
+				margin-top: var(--spacing-2);
+			}
 		</style>
 	</head>
 	<body>
@@ -227,7 +234,7 @@ if (isLoggedIn) {
 
 				{!isLoggedIn && (
 					<>
-						<form method="POST" class="login-form" action="/login">
+						<form method="POST" class="login-form" id="loginForm">
 							<div class="form-group">
 								<label for="email">Email</label>
 								<input
@@ -245,7 +252,7 @@ if (isLoggedIn) {
 									id="password"
 									name="password"
 									type="password"
-									placeholder="••••••••"
+									placeholder="•••••���••"
 									required
 								/>
 							</div>
@@ -253,6 +260,7 @@ if (isLoggedIn) {
 							<button type="submit" class="btn-primary">
 								Sign in
 							</button>
+							<div id="errorMessage" class="error-message"></div>
 						</form>
 
 						<hr class="divider" />
@@ -261,7 +269,7 @@ if (isLoggedIn) {
 						<button
 							type="button"
 							class="btn-social"
-							onclick={() => window.location.href = "/_emdash/api/auth/oauth/google"}
+							onclick={() => window.location.href = "/api/auth/callback/google"}
 						>
 							<svg class="google-icon" viewBox="0 0 24 24">
 								<path
@@ -283,6 +291,10 @@ if (isLoggedIn) {
 							</svg>
 							Continue with Google
 						</button>
+
+						<p class="tagline" style="margin-top: var(--spacing-6);">
+							Don't have an account? <a href="/signup" style="color: var(--color-brand);">Sign up</a>
+						</p>
 					</>
 				)}
 
@@ -292,6 +304,31 @@ if (isLoggedIn) {
 					</div>
 				)}
 			</main>
+			<script>
+				document.getElementById("loginForm").addEventListener("submit", async (e) => {
+					e.preventDefault();
+					const email = e.target.email.value;
+					const password = e.target.password.value;
+					const errorMessage = document.getElementById("errorMessage");
+
+					try {
+						const res = await fetch("/api/auth/signin/email", {
+							method: "POST",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({ email, password }),
+						});
+
+						if (res.ok) {
+							window.location.href = "/_emdash/admin";
+						} else {
+							const data = await res.json();
+							errorMessage.textContent = data.error || "Login failed";
+						}
+					} catch (err) {
+						errorMessage.textContent = "Network error. Please try again.";
+					}
+				});
+			</script>
 		</div>
 	</body>
 </html>
