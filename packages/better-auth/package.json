@@ -1,0 +1,24 @@
+{
+  "name": "@theweekendprojects/better-auth",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./sandbox": "./src/sandbox-entry.ts",
+    "./admin": "./src/admin.tsx"
+  },
+  "peerDependencies": {
+    "emdash": "^0.30.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  },
+  "dependencies": {
+    "better-auth": "^1.7.2",
+    "kysely": "^0.29.5",
+    "kysely-d1": "^0.4.0"
+  }
+}
