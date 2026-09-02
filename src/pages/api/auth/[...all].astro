@@ -1,0 +1,10 @@
+import { createBetterAuth } from "@theweekendprojects/better-auth";
+import { d1 } from "@emdash-cms/cloudflare";
+import { defineRoute } from "astro:middleware";
+
+const db = d1({ binding: "DB", session: "auto" });
+const auth = createBetterAuth(db);
+
+export const ALL = defineRoute(async (ctx) => {
+	return auth.handler(ctx.request);
+});
