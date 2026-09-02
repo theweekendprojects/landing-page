@@ -52,6 +52,14 @@ interface DB {
 
 export function createBetterAuthAdapter(db: Kysely<DB> | D1Database) {
 	const adapterFactory = createAdapterFactory({
+		config: {
+			adapterId: "emdash",
+			adapterName: "EmDash Adapter",
+			supportsJSON: false,
+			supportsDates: true,
+			supportsBooleans: true,
+			supportsNumericIds: false,
+		},
 		models: {
 			user: "users",
 			account: "oauth_accounts",
@@ -98,7 +106,8 @@ export function createBetterAuthAdapter(db: Kysely<DB> | D1Database) {
 					userId: data.user_id,
 					provider: data.provider,
 					providerAccountId: data.provider_account_id,
-					accessToken: data.password || undefined,
+					password: data.password || undefined,
+					accessToken: undefined,
 					refreshToken: undefined,
 					accessTokenExpiresAt: undefined,
 					refreshTokenExpiresAt: undefined,
@@ -112,7 +121,7 @@ export function createBetterAuthAdapter(db: Kysely<DB> | D1Database) {
 					userId: "user_id",
 					provider: "provider",
 					providerAccountId: "provider_account_id",
-					accessToken: "password",
+					password: "password",
 				},
 			},
 			Session: {
