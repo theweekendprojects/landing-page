@@ -30,14 +30,11 @@ function GoogleIcon({ className }: { className?: string }) {
 	);
 }
 
-export function LoginButton({ inviteToken }: { inviteToken?: string } = {}) {
-	const href = inviteToken
-		? `/_emdash/api/auth/oauth/google?invite=${encodeURIComponent(inviteToken)}`
-		: "/_emdash/api/auth/oauth/google";
+export function LoginButton() {
 	return (
-		<LinkButton href={href} variant="outline" className="w-full justify-center">
+		<LinkButton href="/login" variant="outline" className="w-full justify-center">
 			<GoogleIcon className="h-5 w-5" />
-			<span>Google</span>
+			<span>Email / Google</span>
 		</LinkButton>
 	);
 }
