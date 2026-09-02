@@ -9,7 +9,7 @@ export function betterAuthPlugin(): PluginDescriptor {
 		id: "better-auth",
 		version: "0.1.0",
 		format: "standard",
-		entrypoint: "better-auth/sandbox",
+		entrypoint: "@theweekendprojects/better-auth/sandbox",
 		options: {},
 		capabilities: ["users:read", "network:request"],
 	};

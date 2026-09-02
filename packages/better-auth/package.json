@@ -2,11 +2,21 @@
   "name": "@theweekendprojects/better-auth",
   "version": "0.1.0",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./src/index.ts",
+  "types": "./src/index.d.ts",
   "exports": {
-    ".": "./src/index.ts",
-    "./sandbox": "./src/sandbox-entry.ts",
+    ".": {
+      "workerd": "./src/index.ts",
+      "worker": "./src/index.ts",
+      "module": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./sandbox": {
+      "workerd": "./src/sandbox-entry.ts",
+      "worker": "./src/sandbox-entry.ts",
+      "module": "./src/sandbox-entry.ts",
+      "default": "./src/sandbox-entry.ts"
+    },
     "./admin": "./src/admin.tsx"
   },
   "peerDependencies": {
