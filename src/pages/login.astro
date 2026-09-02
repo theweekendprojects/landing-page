@@ -2,12 +2,15 @@
 import "../styles/tokens.css";
 import "../styles/theme.css";
 
-// Check if user is logged in
-const isLoggedIn = !!Astro.locals.user;
+// Import Better Auth client
+import { authClient, signIn } from "../lib/better-auth-client.js";
+import { onMount } from "solid-js";
+import { createEffect, createSignal } from "solid-js";
 
-if (isLoggedIn) {
-	Astro.redirect("/_emdash/admin");
-}
+const { isLoading, session, error, signIn: signInAction } = authClient;
+
+// Check if user is logged in
+const isLoggedIn = () => !!session()?.user;
 ---
 
 <!doctype html>
@@ -106,6 +109,15 @@ if (isLoggedIn) {
 				font-size: 0.875rem;
 			}
 
+			.auth-container .error {
+				color: #ef4444;
+				background: #fef2f2;
+				padding: var(--spacing-3);
+				border-radius: var(--border-radius);
+				margin-bottom: var(--spacing-4);
+				font-size: 0.875rem;
+			}
+
 			.login-form {
 				display: flex;
 				flex-direction: column;
@@ -155,6 +167,11 @@ if (isLoggedIn) {
 				background: var(--color-brand-hover);
 			}
 
+			.btn-primary:disabled {
+				opacity: 0.6;
+				cursor: not-allowed;
+			}
+
 			.divider {
 				margin: var(--spacing-8) 0;
 				border: none;
@@ -187,35 +204,46 @@ if (isLoggedIn) {
 				border-color: var(--color-brand);
 			}
 
+			.btn-social:disabled {
+				opacity: 0.6;
+				cursor: not-allowed;
+			}
+
 			.google-icon {
 				width: 20px;
 				height: 20px;
 			}
 
-			.logout-section {
+			.forgot-password {
 				text-align: center;
-				padding: var(--spacing-4);
+				margin-top: var(--spacing-4);
 			}
 
-			.logout-section p {
-				margin-bottom: var(--spacing-4);
-				color: var(--color-text);
+			.forgot-password a {
+				color: var(--color-brand);
+				text-decoration: none;
+				font-size: 0.875rem;
 			}
 
-			.btn-secondary {
-				padding: var(--spacing-2) var(--spacing-4);
-				background: transparent;
-				border: 1px solid var(--color-border);
-				border-radius: var(--border-radius);
+			.forgot-password a:hover {
+				text-decoration: underline;
+			}
+
+			.signup-link {
+				text-align: center;
+				margin-top: var(--spacing-4);
 				color: var(--color-text-secondary);
-				cursor: pointer;
-				transition: all 0.2s;
+				font-size: 0.875rem;
 			}
 
-			.btn-secondary:hover {
-				background: var(--color-surface);
-				border-color: var(--color-muted);
-				color: var(--color-text);
+			.signup-link a {
+				color: var(--color-brand);
+				text-decoration: none;
+				font-weight: 600;
+			}
+
+			.signup-link a:hover {
+				text-decoration: underline;
 			}
 		</style>
 	</head>
@@ -225,9 +253,23 @@ if (isLoggedIn) {
 				<h1>Login</h1>
 				<p class="tagline">Login to your account</p>
 
-				{!isLoggedIn && (
+				{error() && (
+					<div class="error">{error().message || "An error occurred"}</div>
+				)}
+
+				{!isLoading() && !isLoggedIn() && (
 					<>
-						<form method="POST" class="login-form" action="/login">
+						<form
+							method="POST"
+							class="login-form"
+							onSubmit={async (e) => {
+								e.preventDefault();
+								const formData = new FormData(e.currentTarget);
+								const email = formData.get("email") as string;
+								const password = formData.get("password") as string;
+								await signIn.email(email, { password });
+							}}
+						>
 							<div class="form-group">
 								<label for="email">Email</label>
 								<input
@@ -236,6 +278,7 @@ if (isLoggedIn) {
 									type="email"
 									placeholder="you@example.com"
 									required
+									defaultValue=""
 								/>
 							</div>
 
@@ -247,13 +290,22 @@ if (isLoggedIn) {
 									type="password"
 									placeholder="••••••••"
 									required
+									defaultValue=""
 								/>
 							</div>
 
-							<button type="submit" class="btn-primary">
+							<button
+								type="submit"
+								class="btn-primary"
+								disabled={isLoading()}
+							>
 								Sign in
 							</button>
 						</form>
+
+						<div class="forgot-password">
+							<a href="/forgot-password">Forgot password?</a>
+						</div>
 
 						<hr class="divider" />
 						<p class="or-text">Or continue with</p>
@@ -261,7 +313,8 @@ if (isLoggedIn) {
 						<button
 							type="button"
 							class="btn-social"
-							onclick={() => window.location.href = "/_emdash/api/auth/oauth/google"}
+							onClick={() => signIn.social({ provider: "google", callbackURL: "/" })}
+							disabled={isLoading()}
 						>
 							<svg class="google-icon" viewBox="0 0 24 24">
 								<path
@@ -283,11 +336,18 @@ if (isLoggedIn) {
 							</svg>
 							Continue with Google
 						</button>
+
+						<div class="signup-link">
+							Don't have an account?{" "}
+							<a href="/signup">Sign up</a>
+						</div>
 					</>
 				)}
 
-				{isLoggedIn && (
-					<div class="logout-section">
+				{isLoading() && <p>Loading...</p>}
+
+				{isLoggedIn() && (
+					<div class="signup-link">
 						<p>You are logged in. Redirecting...</p>
 					</div>
 				)}

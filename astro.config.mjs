@@ -5,6 +5,8 @@ import { formsPlugin } from "@emdash-cms/plugin-forms";
 import webhookNotifier from "@emdash-cms/plugin-webhook-notifier";
 import { defineConfig, fontProviders } from "astro/config";
 import emdash from "emdash/astro";
+import { betterAuth } from "better-auth";
+import { createEmDashKyselyInstance } from "./src/auth/better-auth-adapter.js";
 
 export default defineConfig({
 	output: "server",
