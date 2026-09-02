@@ -1,5 +1,4 @@
 import { betterAuth } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { createBetterAuthAdapter } from "./better-auth-adapter";
 import type { Kysely } from "kysely";
 import type { D1Database } from "@cloudflare/workers-types";
