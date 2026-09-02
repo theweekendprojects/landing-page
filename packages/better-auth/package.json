@@ -6,18 +6,13 @@
   "types": "./src/index.d.ts",
   "exports": {
     ".": {
-      "workerd": "./src/index.ts",
-      "worker": "./src/index.ts",
-      "module": "./src/index.ts",
+      "import": "./src/index.ts",
       "default": "./src/index.ts"
     },
-    "./sandbox": {
-      "workerd": "./src/sandbox-entry.ts",
-      "worker": "./src/sandbox-entry.ts",
-      "module": "./src/sandbox-entry.ts",
-      "default": "./src/sandbox-entry.ts"
-    },
-    "./admin": "./src/admin.tsx"
+    "./admin": {
+      "import": "./src/admin.tsx",
+      "default": "./src/admin.tsx"
+    }
   },
   "peerDependencies": {
     "emdash": "^0.30.0"
