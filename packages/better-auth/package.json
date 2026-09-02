@@ -12,6 +12,18 @@
     "./admin": {
       "import": "./src/admin.tsx",
       "default": "./src/admin.tsx"
+    },
+    "./route": {
+      "import": "./src/route.ts",
+      "default": "./src/route.ts"
+    },
+    "./auth": {
+      "import": "./src/auth.ts",
+      "default": "./src/auth.ts"
+    },
+    "./adapter": {
+      "import": "./src/emdash-adapter.ts",
+      "default": "./src/emdash-adapter.ts"
     }
   },
   "peerDependencies": {
@@ -25,6 +37,7 @@
     "@better-auth/kysely-adapter": "^1.7.2",
     "better-auth": "^1.7.2",
     "kysely": "^0.29.5",
-    "kysely-d1": "^0.4.0"
+    "kysely-d1": "^0.4.0",
+    "ulidx": "^2.4.1"
   }
 }

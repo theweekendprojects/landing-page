@@ -257,8 +257,9 @@ import "../styles/theme.css";
 			<script>
 				document.getElementById("signupForm").addEventListener("submit", async (e) => {
 					e.preventDefault();
-					const name = e.target.name.value || undefined;
 					const email = e.target.email.value;
+					// Better-Auth requires a name; fall back to the email local-part.
+					const name = e.target.name.value || email.split("@")[0];
 					const password = e.target.password.value;
 					const errorMessage = document.getElementById("errorMessage");
 
@@ -270,10 +271,11 @@ import "../styles/theme.css";
 						});
 
 						if (res.ok) {
-							window.location.href = "/_emdash/admin";
+							const params = new URLSearchParams(window.location.search);
+							window.location.href = params.get("redirect") || "/";
 						} else {
 							const data = await res.json();
-							errorMessage.textContent = data.error || "Sign up failed";
+							errorMessage.textContent = data.error || data.message || "Sign up failed";
 						}
 					} catch (err) {
 						errorMessage.textContent = "Network error. Please try again.";

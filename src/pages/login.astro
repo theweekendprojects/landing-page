@@ -2,11 +2,12 @@
 import "../styles/tokens.css";
 import "../styles/theme.css";
 
-// Check if user is logged in via Better-Auth
+// EmDash's public-route middleware populates Astro.locals.user when a session
+// cookie is present. If already signed in, send them home.
 const isLoggedIn = !!Astro.locals.user;
 
 if (isLoggedIn) {
-	Astro.redirect("/_emdash/admin");
+	return Astro.redirect("/");
 }
 ---
 
@@ -269,7 +270,7 @@ if (isLoggedIn) {
 						<button
 							type="button"
 							class="btn-social"
-							onclick={() => window.location.href = "/api/auth/callback/google"}
+							id="googleBtn"
 						>
 							<svg class="google-icon" viewBox="0 0 24 24">
 								<path
@@ -319,15 +320,43 @@ if (isLoggedIn) {
 						});
 
 						if (res.ok) {
-							window.location.href = "/_emdash/admin";
+							const params = new URLSearchParams(window.location.search);
+							window.location.href = params.get("redirect") || "/";
 						} else {
 							const data = await res.json();
-							errorMessage.textContent = data.error || "Login failed";
+							errorMessage.textContent = data.error || data.message || "Login failed";
 						}
 					} catch (err) {
 						errorMessage.textContent = "Network error. Please try again.";
 					}
 				});
+
+				// Google sign-in: ask Better-Auth for the provider authorize URL,
+				// then redirect the browser to it.
+				const googleBtn = document.getElementById("googleBtn");
+				if (googleBtn) {
+					googleBtn.addEventListener("click", async () => {
+						const errorMessage = document.getElementById("errorMessage");
+						const params = new URLSearchParams(window.location.search);
+						const callbackURL = params.get("redirect") || "/";
+						try {
+							const res = await fetch("/api/auth/sign-in/social", {
+								method: "POST",
+								headers: { "Content-Type": "application/json" },
+								body: JSON.stringify({ provider: "google", callbackURL }),
+							});
+							const data = await res.json();
+							if (res.ok && data.url) {
+								window.location.href = data.url;
+							} else {
+								errorMessage.textContent =
+									data.error || data.message || "Google sign-in is unavailable";
+							}
+						} catch (err) {
+							errorMessage.textContent = "Network error. Please try again.";
+						}
+					});
+				}
 			</script>
 		</div>
 	</body>
