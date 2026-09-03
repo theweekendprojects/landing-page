@@ -37,10 +37,6 @@
       "import": "./src/pages/auth.astro",
       "default": "./src/pages/auth.astro"
     },
-    "./pages/admin-login": {
-      "import": "./src/pages/admin-login.ts",
-      "default": "./src/pages/admin-login.ts"
-    },
     "./pages/login": {
       "import": "./src/pages/login.astro",
       "default": "./src/pages/login.astro"

@@ -91,15 +91,6 @@ export function betterAuthProvider(): AuthProviderDescriptor {
 				pattern: "/signup",
 				entrypoint: "@theweekendprojects/better-auth/pages/signup",
 			},
-			// Single login door: override EmDash's built-in admin login page
-			// (a static route out-specifies EmDash's /_emdash/admin/[...path]
-			// catch-all) and redirect it to the Better Auth sign-in page,
-			// carrying the ?redirect= param through. So admins and members use
-			// the same login screen.
-			{
-				pattern: "/_emdash/admin/login",
-				entrypoint: "@theweekendprojects/better-auth/pages/admin-login",
-			},
 		],
 		storage: BETTER_AUTH_STORAGE_CONFIG,
 	};

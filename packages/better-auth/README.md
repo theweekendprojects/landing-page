@@ -67,17 +67,17 @@ That's it — the plugin injects all of these routes for you:
 | `/auth/[...path]` | Prebuilt auth UI: `/auth/sign-in`, `/auth/sign-up`, `/auth/forgot-password`, `/auth/reset-password`, `/auth/sign-out` |
 | `/login` | Friendly alias → `/auth/sign-in` |
 | `/signup` | Friendly alias → `/auth/sign-up` |
-| `/_emdash/admin/login` | Overrides EmDash's built-in passkey login and redirects to `/auth/sign-in` (single login door), preserving `?redirect=` |
 
 Do **not** create your own `src/pages/login.astro` / `signup.astro` / `api/auth/*` — they would conflict with the injected routes.
 
-**Single login door.** EmDash normally sends unauthenticated admins to its own
-passkey login at `/_emdash/admin/login`. This plugin injects a redirect there
-to `/auth/sign-in`, so admins and members use the same Better Auth login
-screen. Because a Better Auth account *is* an EmDash user (same `users` table),
-an admin (role ≥ 50) who signs in via Better Auth gets full CMS access, and the
-`?redirect=` param carries them back to the admin page they requested. EmDash's
-native passkey login is still reachable if you remove this route.
+**Two login doors, on purpose.** EmDash's native passkey login at
+`/_emdash/admin/login` is left untouched, so existing passkey admins keep
+working. The Better Auth pages (`/auth/sign-in`, `/login`) are an additional
+email/password door. Because a Better Auth account *is* an EmDash user (same
+`users` table), an admin (role ≥ 50) can sign in through **either** door and
+get full CMS access. Don't redirect `/_emdash/admin/login` to Better Auth
+unless every admin has an email/password credential — passkey-only admins would
+be locked out.
 
 ### 2. Set the runtime secrets
 
