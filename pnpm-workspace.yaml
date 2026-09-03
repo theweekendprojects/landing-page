@@ -13,6 +13,9 @@ minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
   - emdash
   - "@emdash-cms/*"
+  # Better Auth UI (HeroUI variant) ships the plugin's sign-in/sign-up pages.
+  # Exempted from the release-age cooldown so the auth UI can be installed.
+  - "@better-auth-ui/*"
 blockExoticSubdeps: true
 
 # Link local packages

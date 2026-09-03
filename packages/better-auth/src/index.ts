@@ -72,6 +72,25 @@ export function betterAuthProvider(): AuthProviderDescriptor {
 				pattern: "/api/auth/[...all]",
 				entrypoint: "@theweekendprojects/better-auth/route",
 			},
+			// Prebuilt Better Auth UI (HeroUI) auth views, shipped with the
+			// plugin so any EmDash site gets them without hand-writing auth
+			// pages. Self-styled — they don't touch the site's theme. The
+			// catch-all under /auth serves sign-in, sign-up, forgot-password,
+			// reset-password, sign-out, etc. (Better Auth UI's default paths),
+			// so the library's own cross-links resolve. /login and /signup are
+			// friendly aliases that redirect into it.
+			{
+				pattern: "/auth/[...path]",
+				entrypoint: "@theweekendprojects/better-auth/pages/auth",
+			},
+			{
+				pattern: "/login",
+				entrypoint: "@theweekendprojects/better-auth/pages/login",
+			},
+			{
+				pattern: "/signup",
+				entrypoint: "@theweekendprojects/better-auth/pages/signup",
+			},
 		],
 		storage: BETTER_AUTH_STORAGE_CONFIG,
 	};

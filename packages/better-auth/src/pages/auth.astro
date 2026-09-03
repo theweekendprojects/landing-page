@@ -1,0 +1,46 @@
+---
+/**
+ * Plugin-shipped Better Auth UI (HeroUI) catch-all auth page.
+ *
+ * Injected at `/auth/[...path]` via the plugin's AuthProviderDescriptor.routes,
+ * so a consuming EmDash site gets the full set of Better Auth UI views for
+ * free: /auth/sign-in, /auth/sign-up, /auth/forgot-password,
+ * /auth/reset-password, /auth/sign-out, etc. Better Auth UI's own components
+ * cross-link between these paths, so keeping them under one base path (the
+ * library's default `/auth`) makes every link and flow resolve correctly.
+ *
+ * Self-styled: HeroUI's stylesheet loads only with this island, so the site's
+ * themed content pages are untouched.
+ */
+import { viewPaths } from "@better-auth-ui/core";
+import AuthView from "../ui/AuthView.tsx";
+
+const { path } = Astro.params;
+const view = path ?? "sign-in";
+
+// Only render known auth views; anything else 404s.
+const knownViews = Object.values(viewPaths.auth) as string[];
+if (!knownViews.includes(view)) {
+	return new Response("Not found", { status: 404 });
+}
+
+// If already signed in, leave the auth area (except for sign-out, which needs
+// to run while a session still exists).
+if (Astro.locals.user && view !== "sign-out") {
+	return Astro.redirect("/");
+}
+
+const redirectTo = Astro.url.searchParams.get("redirect") || "/";
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Account</title>
+	</head>
+	<body style="min-height:100vh;display:flex;align-items:center;justify-content:center;margin:0;">
+		<AuthView path={view} redirectTo={redirectTo} client:load />
+	</body>
+</html>
