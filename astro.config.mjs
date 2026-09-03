@@ -7,6 +7,7 @@ import webhookNotifier from "@emdash-cms/plugin-webhook-notifier";
 import { betterAuthProvider } from "@theweekendprojects/better-auth";
 import { defineConfig, fontProviders } from "astro/config";
 import emdash from "emdash/astro";
+import emdashSmtp from "emdash-smtp";
 
 export default defineConfig({
 	output: "server",
@@ -28,7 +29,7 @@ export default defineConfig({
 			database: d1({ binding: "DB", session: "auto" }),
 			storage: r2({ binding: "MEDIA" }),
 			authProviders: [betterAuthProvider()],
-			plugins: [formsPlugin()],
+			plugins: [formsPlugin(), emdashSmtp()],
 			sandboxed: [webhookNotifier],
 			sandboxRunner: sandbox(),
 			marketplace: "https://marketplace.emdashcms.com",
