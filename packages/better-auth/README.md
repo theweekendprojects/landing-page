@@ -97,6 +97,38 @@ wrangler secret put GOOGLE_CLIENT_SECRET
 | `BETTER_AUTH_SECRET` | Yes | Signing/encryption secret. At least 32 chars, high entropy. |
 | `GOOGLE_CLIENT_ID` | No | Enables Google sign-in when both Google vars are set. |
 | `GOOGLE_CLIENT_SECRET` | No | Google sign-in is disabled if this is missing or left as a placeholder. |
+| `BETTER_AUTH_URL` | No | Canonical public origin (e.g. `https://blog.example.com`). See below. |
+
+#### Base URL / canonical origin
+
+Verification and password-reset **emails** contain absolute links (a link opened
+later from a mail client has no "current origin", so relative URLs are
+impossible). The plugin resolves that canonical origin at request time, in
+priority order:
+
+1. **`BETTER_AUTH_URL`** (or `BETTER_AUTH_BASE_URL`) env var — an explicit
+   override. Highest priority.
+2. **Astro's `site` config** — if you set `site:` in `astro.config.mjs` (common
+   for canonical URLs / sitemaps), the plugin reuses it automatically. No extra
+   config.
+3. **The request origin** — zero-config fallback for a single-domain site.
+
+So adoption is friction-tiered: a single-domain blog needs **nothing**; a blog
+that already sets `site:` gets it **for free**; only multi-domain setups need
+the env var.
+
+> **Multi-domain / proxied deployments must set tier 1 or 2.** If your app is
+> reachable on more than one hostname (e.g. a custom domain *and* the raw
+> `*.workers.dev` URL, or behind a proxy), the request origin (tier 3) is
+> ambiguous — a request that happens to arrive on the `workers.dev` host would
+> otherwise bake that host into email links. Set `site:` in `astro.config.mjs`
+> (recommended — also fixes canonical URLs/RSS) or the `BETTER_AUTH_URL` secret.
+> The origin the request came in on is always added to `trustedOrigins`, so
+> logging in via the non-canonical host still works; only the generated links
+> are forced to the canonical origin.
+
+Client-side calls are already origin-relative (resolved from `window.location`),
+so they need none of this.
 
 #### Enabling Google sign-in
 

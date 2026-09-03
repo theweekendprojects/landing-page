@@ -37,26 +37,89 @@ const SESSION_ESTABLISHING = [
 	"/api/auth/callback/",
 ];
 
-function readEnvConfig(request: Request) {
+/**
+ * Normalize a configured base URL: trim whitespace and any trailing slash so
+ * Better Auth builds `${baseURL}/verify-email?...` cleanly (no `//`).
+ */
+function normalizeOrigin(value: string | undefined): string | undefined {
+	if (!value) return undefined;
+	const trimmed = value.trim().replace(/\/+$/, "");
+	if (!trimmed) return undefined;
+	try {
+		// Accept a full URL or a bare origin; return just the origin.
+		return new URL(trimmed).origin;
+	} catch {
+		return undefined;
+	}
+}
+
+/**
+ * Resolve the canonical public origin for the site, in priority order:
+ *
+ *   1. `BETTER_AUTH_URL` / `BETTER_AUTH_BASE_URL` env var — an explicit
+ *      override the operator sets. Highest priority; the escape hatch for
+ *      multi-domain deployments (custom domain + *.workers.dev, proxies, etc.).
+ *   2. Astro's `site` config (`context.site`) — reused automatically if the
+ *      adopting site already set `site:` in astro.config.mjs (common for
+ *      canonical URLs / sitemaps). Zero extra config for those sites.
+ *   3. The request origin — zero-config fallback that "just works" for a
+ *      single-domain site.
+ *
+ * This is what makes the plugin portable: a new blog can adopt it with no
+ * config at all (tier 3), reuse its existing `site:` (tier 2), or set one env
+ * var for anything multi-domain (tier 1).
+ *
+ * IMPORTANT: absolute URLs are unavoidable for the links Better Auth emails
+ * (a verification link opened days later from a mail client has no "current
+ * origin"), so we always resolve to an absolute origin here. Only the *source*
+ * of that origin degrades gracefully. Client-side calls remain origin-relative
+ * (see client.ts) and need none of this.
+ */
+function resolveBaseURL(request: Request, siteFromConfig: URL | undefined): string {
+	const workerEnv = env as Record<string, string | undefined>;
+	const requestOrigin = new URL(request.url).origin;
+
+	const configured =
+		normalizeOrigin(workerEnv.BETTER_AUTH_URL) ??
+		normalizeOrigin(workerEnv.BETTER_AUTH_BASE_URL) ??
+		normalizeOrigin(siteFromConfig?.href);
+
+	return configured ?? requestOrigin;
+}
+
+function readEnvConfig(request: Request, siteFromConfig: URL | undefined) {
 	const workerEnv = env as Record<string, string | undefined>;
 	const secret = workerEnv.BETTER_AUTH_SECRET ?? "insecure-dev-secret-change-me";
 	const googleId = workerEnv.GOOGLE_CLIENT_ID;
 	const googleSecret = workerEnv.GOOGLE_CLIENT_SECRET;
 	const hasGoogle =
 		!!googleId && !!googleSecret && googleSecret !== "PASTE_YOUR_CLIENT_SECRET_HERE";
-	const baseURL = new URL(request.url).origin;
+
+	// The origin this request actually arrived on (canonical domain, the
+	// *.workers.dev URL, or localhost in dev).
+	const requestOrigin = new URL(request.url).origin;
+
+	// Canonical origin used for ALL generated links (verification/reset emails,
+	// OAuth callbacks, post-auth redirects), independent of the request host.
+	const baseURL = resolveBaseURL(request, siteFromConfig);
+
+	// Trust both the canonical origin and the origin the request came in on, so
+	// requests made via the *.workers.dev URL (or localhost) aren't rejected as
+	// untrusted during CSRF / redirect validation. De-duplicated.
+	const trustedOrigins = Array.from(new Set([baseURL, requestOrigin]));
+
 	return {
 		baseURL,
 		secret,
 		google: hasGoogle ? { clientId: googleId!, clientSecret: googleSecret! } : undefined,
-		trustedOrigins: [baseURL],
+		trustedOrigins,
 	};
 }
 
 /** Endpoints whose success should tear down the EmDash session. */
 const SESSION_CLEARING = ["/api/auth/sign-out"];
 
-const handler: APIRoute = async ({ request, session }) => {
+const handler: APIRoute = async ({ request, session, site }) => {
 	const path = new URL(request.url).pathname;
 	const isSessionEstablishing = SESSION_ESTABLISHING.some((p) =>
 		p.endsWith("/") ? path.startsWith(p) : path === p,
@@ -73,7 +136,7 @@ const handler: APIRoute = async ({ request, session }) => {
 				BETTER_AUTH_STORAGE_CONFIG,
 			) as unknown as BetterAuthStorage;
 
-			const authOptions = readEnvConfig(request);
+			const authOptions = readEnvConfig(request, site);
 			// Pass the EmDash email pipeline to Better Auth for password reset
 			// and email verification emails. This plugin remains provider-agnostic
 			// — it depends only on EmDash's runtime.email, never on a specific
