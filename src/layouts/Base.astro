@@ -73,8 +73,13 @@ const pageCtx = createPublicPageContext({
 	siteName: siteTitle,
 });
 
-// Check if user is logged in (for showing admin link)
-const isLoggedIn = !!Astro.locals.user;
+// Auth state for the header. `canUseAdmin` gates the Admin link to roles that
+// can actually work in the CMS (Author 30 and up); subscribers (10) get a
+// Sign out affordance instead of a broken Admin link. Logged-out visitors get
+// Sign in / Sign up.
+const user = Astro.locals.user;
+const isLoggedIn = !!user;
+const canUseAdmin = (user?.role ?? 0) >= 30; // Role.AUTHOR
 ---
 
 <!doctype html>
@@ -135,13 +140,27 @@ const isLoggedIn = !!Astro.locals.user;
 							))
 						}
 					</div>
-					{
-						isLoggedIn && (
+					<div class="nav-auth">
+						{canUseAdmin && (
 							<a href="/_emdash/admin" class="nav-admin">
 								Admin
 							</a>
-						)
-					}
+						)}
+						{isLoggedIn ? (
+							<a href="/auth/sign-out" class="nav-auth-link">
+								Sign out
+							</a>
+						) : (
+							<>
+								<a href="/login" class="nav-auth-link">
+									Sign in
+								</a>
+								<a href="/signup" class="nav-auth-link nav-auth-cta">
+									Sign up
+								</a>
+							</>
+						)}
+					</div>
 				</div>
 			</div>
 		</header>
@@ -610,6 +629,38 @@ const isLoggedIn = !!Astro.locals.user;
 
 			.nav-admin:hover {
 				color: var(--color-text);
+			}
+
+			.nav-auth {
+				display: flex;
+				align-items: center;
+				gap: var(--spacing-4);
+				font-size: var(--font-size-sm);
+			}
+
+			.nav-auth-link {
+				text-decoration: none;
+				color: var(--color-text-secondary);
+				transition: color var(--transition-fast);
+				white-space: nowrap;
+			}
+
+			.nav-auth-link:hover {
+				color: var(--color-text);
+			}
+
+			/* "Sign up" call-to-action — the one filled affordance, using the
+			   single brand accent. */
+			.nav-auth-cta {
+				padding: 0.35em 0.9em;
+				border-radius: var(--border-radius, 8px);
+				background: var(--color-brand);
+				color: var(--color-on-brand);
+			}
+
+			.nav-auth-cta:hover {
+				background: var(--color-brand-hover);
+				color: var(--color-on-brand);
 			}
 
 			/* Search styling */

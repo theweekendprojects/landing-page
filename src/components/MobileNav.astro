@@ -4,7 +4,9 @@ import { resolveBlogSiteIdentity } from "../utils/site-identity";
 
 const menu = await getMenu("primary");
 const { siteTitle } = resolveBlogSiteIdentity(await getSiteSettings());
-const isLoggedIn = !!Astro.locals.user;
+const user = Astro.locals.user;
+const isLoggedIn = !!user;
+const canUseAdmin = (user?.role ?? 0) >= 30; // Role.AUTHOR
 ---
 
 <nav class="mobile-nav" id="mobile-nav">
@@ -22,10 +24,24 @@ const isLoggedIn = !!Astro.locals.user;
 				{item.label}
 			</a>
 		))}
-		{isLoggedIn && (
+		{canUseAdmin && (
 			<a href="/_emdash/admin" class="mobile-nav-admin">
 				Admin
 			</a>
+		)}
+		{isLoggedIn ? (
+			<a href="/auth/sign-out" class="mobile-nav-link">
+				Sign out
+			</a>
+		) : (
+			<>
+				<a href="/login" class="mobile-nav-link">
+					Sign in
+				</a>
+				<a href="/signup" class="mobile-nav-link">
+					Sign up
+				</a>
+			</>
 		)}
 	</div>
 </nav>
