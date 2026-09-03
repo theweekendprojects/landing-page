@@ -14,9 +14,14 @@
  */
 import { viewPaths } from "@better-auth-ui/core";
 import AuthView from "../ui/AuthView.tsx";
+import { configuredSocialProviders } from "../providers.ts";
 
 const { path } = Astro.params;
 const view = path ?? "sign-in";
+
+// Show a social button only for providers whose credentials are set (e.g.
+// Google appears once GOOGLE_CLIENT_ID/SECRET are configured as Worker vars).
+const socialProviders = configuredSocialProviders();
 
 // Only render known auth views; anything else 404s.
 const knownViews = Object.values(viewPaths.auth) as string[];
@@ -58,7 +63,12 @@ const redirectTo = Astro.url.searchParams.get("redirect") || "/";
 	<body
 		style="min-height:100vh;display:flex;align-items:center;justify-content:center;margin:0;background:var(--ec-auth-bg);color:var(--ec-auth-fg);"
 	>
-		<AuthView path={view} redirectTo={redirectTo} client:load />
+		<AuthView
+			path={view}
+			redirectTo={redirectTo}
+			socialProviders={socialProviders}
+			client:load
+		/>
 	</body>
 </html>
 

@@ -88,6 +88,18 @@ wrangler secret put GOOGLE_CLIENT_SECRET
 | `BETTER_AUTH_SECRET` | Yes | Signing/encryption secret. At least 32 chars, high entropy. |
 | `GOOGLE_CLIENT_ID` | No | Enables Google sign-in when both Google vars are set. |
 | `GOOGLE_CLIENT_SECRET` | No | Google sign-in is disabled if this is missing or left as a placeholder. |
+
+#### Enabling Google sign-in
+
+1. In the [Google Cloud Console](https://console.cloud.google.com/apis/credentials) create an OAuth **Web application** client.
+2. Add this **authorized redirect URI** (Better Auth's default callback path):
+   `https://<your-domain>/api/auth/callback/google`
+3. Upload the credentials as Worker secrets and redeploy:
+   ```bash
+   wrangler secret put GOOGLE_CLIENT_ID
+   wrangler secret put GOOGLE_CLIENT_SECRET
+   ```
+The auth pages detect the configured credentials at runtime and show the Google button automatically — no code change needed. If the credentials are absent (or the secret is left as a placeholder), Google is hidden and only email/password is offered.
 | `EMDASH_SITE_URL` | No | Public origin override. Defaults to the request origin. |
 
 For local development, put the same values in `.dev.vars` so `wrangler dev` picks them up.

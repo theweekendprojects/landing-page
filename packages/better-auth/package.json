@@ -29,6 +29,10 @@
       "import": "./src/client.ts",
       "default": "./src/client.ts"
     },
+    "./providers": {
+      "import": "./src/providers.ts",
+      "default": "./src/providers.ts"
+    },
     "./ui": {
       "import": "./src/ui/AuthView.tsx",
       "default": "./src/ui/AuthView.tsx"
