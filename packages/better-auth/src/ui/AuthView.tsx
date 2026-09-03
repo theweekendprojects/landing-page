@@ -4,7 +4,7 @@
  * A self-contained React island that renders Better Auth UI's prebuilt
  * authentication views (sign-in, sign-up, password recovery, etc.) styled with
  * HeroUI, laid out to match Better Auth UI's own HeroUI example: a sticky
- * header (brand + UserButton) over a centered auth card on a themed surface.
+ * header (site name + UserButton) over a centered auth card on a themed surface.
  *
  * The UserButton's dropdown carries the System / Light / Dark theme switcher
  * (via `themePlugin`), so theming lives exactly where the official demo puts
@@ -46,20 +46,6 @@ function getQueryClient(): QueryClient {
 	return browserQueryClient;
 }
 
-/** Small brand mark shown in the header (generic app glyph). */
-function BrandLogo() {
-	return (
-		<svg className="size-5" viewBox="0 0 60 45" fill="none" aria-hidden="true">
-			<path
-				fill="currentColor"
-				fillRule="evenodd"
-				clipRule="evenodd"
-				d="M0 0H15V45H0V0ZM45 0H60V45H45V0ZM20 0H40V15H20V0ZM20 30H40V45H20V30Z"
-			/>
-		</svg>
-	);
-}
-
 export interface AuthViewProps {
 	/** Better Auth UI view path, e.g. "sign-in" | "sign-up". */
 	path: string;
@@ -94,8 +80,7 @@ export default function AuthView({
 				>
 					<header className="sticky top-0 z-10 bg-background border-b">
 						<div className="py-3 px-4 md:px-6 mx-auto justify-between flex items-center">
-							<Link href="/" className="flex items-center gap-2.5 no-underline text-foreground">
-								<BrandLogo />
+							<Link href="/" className="no-underline text-foreground">
 								<h1 className="sm:text-base truncate font-semibold">{siteName}</h1>
 							</Link>
 							<UserButton size="icon" placement="bottom end" />
