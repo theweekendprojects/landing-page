@@ -109,6 +109,18 @@ export interface AuthViewProps {
 	socialProviders?: string[];
 	/** Brand name shown in the header. */
 	siteName?: string;
+	/**
+	 * Whether the server requires email verification before a session is
+	 * created (mirrors `emailAndPassword.requireEmailVerification` in auth.ts).
+	 *
+	 * The UI needs its own copy of this flag: after a successful sign-up it
+	 * only routes to the "check your email" verify page when this is true —
+	 * otherwise it sends the user straight to `redirectTo`. If this doesn't
+	 * match the server, a mandatory-verification signup would silently land on
+	 * the home page with no "verify your email" prompt. Defaults to `true` to
+	 * match the plugin's default server config.
+	 */
+	requireEmailVerification?: boolean;
 }
 
 export default function AuthView({
@@ -116,6 +128,7 @@ export default function AuthView({
 	redirectTo = "/",
 	socialProviders = [],
 	siteName = "Home",
+	requireEmailVerification = true,
 }: AuthViewProps) {
 	const queryClient = getQueryClient();
 
@@ -126,6 +139,7 @@ export default function AuthView({
 					authClient={authClient}
 					redirectTo={redirectTo}
 					socialProviders={socialProviders}
+					emailAndPassword={{ requireEmailVerification }}
 					plugins={[themePlugin({ useTheme })]}
 					navigate={({ to, replace }: { to: string; replace?: boolean }) => {
 						if (replace) window.location.replace(to);
