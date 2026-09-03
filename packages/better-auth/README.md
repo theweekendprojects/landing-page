@@ -139,16 +139,26 @@ SES, SMTP, and more) — add it to `emdash({ plugins: [...] })`, pick a provider
 in **Admin → Settings → Email**, and set that provider's key (e.g.
 `RESEND_API_KEY`) as a Worker secret.
 
-**Graceful by default.** If no provider is configured, sign-up and login still
-work — password-reset/verification emails simply aren't sent (logged, never
-thrown), so auth never breaks. In dev, EmDash's built-in console provider logs
-the emails so you can grab the link from the terminal.
+**Email verification is mandatory.** `emailAndPassword.requireEmailVerification`
+is `true`, so a new account cannot sign in until its address is confirmed. On
+sign-up a verification link is emailed; on any sign-in attempt by an unverified
+user Better Auth rejects the login (`EMAIL_NOT_VERIFIED`), the UI routes to
+`/auth/verify-email`, and — because `emailVerification.sendOnSignIn` is `true` —
+the link is re-sent so the user doesn't have to find the original email.
+Clicking the link verifies the address and (via `autoSignInAfterVerification`)
+logs them straight in. This is deliberate: it stops bot-created accounts from
+ever becoming usable. `email_verified` flips true when the link is clicked.
 
-**Verification is "soft" by default:** a verification email is sent on sign-up,
-but login is **not** blocked on it (so users — including ones you promote to
-admin — are never locked out by an email hiccup). `email_verified` flips true
-when they click the link. To make verification mandatory, set
-`emailAndPassword.requireEmailVerification: true` in `auth.ts`.
+> **Because verification is mandatory, a working email provider is required.**
+> Unlike password reset (which just fails quietly without a provider), signup is
+> a dead end if verification emails can't be delivered — users create an account
+> they can never log into. Configure an email provider before going live. In dev,
+> EmDash's built-in console provider logs the email so you can copy the link from
+> the terminal. To relax this to "soft" verification (email sent, but login not
+> blocked), set `emailAndPassword.requireEmailVerification: false` in `auth.ts`.
+
+**Graceful for password reset.** If no provider is configured, password-reset
+emails simply aren't sent (logged, never thrown) rather than crashing auth.
 
 ### No database migration required
 
@@ -204,7 +214,7 @@ So on a fresh site the correct sequence is just: register the provider, set `BET
 - **Cloudflare Workers–oriented.** Secrets come from the Worker `env`; storage uses EmDash's D1-backed plugin storage.
 - **Google sign-in** requires real credentials set as Worker secrets; it's hidden otherwise.
 - **Dependency footprint.** The prebuilt UI pulls in HeroUI v3 + several TanStack packages. The client bundle loads only on the `/auth` routes, not your content pages.
-- **Email verification / password reset** views exist under `/auth/*`, but sending emails requires an EmDash email-transport provider to be configured.
+- **Email verification is mandatory and requires a working email provider.** Sign-up creates the account but blocks login until the emailed link is clicked, so a site with no `email:deliver` provider configured leaves new users unable to log in. Configure a provider (see *Email* above) before enabling public sign-up, or set `requireEmailVerification: false` in `auth.ts` to soften it.
 
 ## Reusing on another EmDash site
 

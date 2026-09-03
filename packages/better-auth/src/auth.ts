@@ -81,7 +81,12 @@ export function createBetterAuth(
 		database: emdashAdapter(db as unknown as Kysely<{ users: never }>, storage),
 		emailAndPassword: {
 			enabled: true,
-			requireEmailVerification: false,
+			// Mandatory email verification: an unverified user cannot sign in.
+			// Better Auth rejects the sign-in with EMAIL_NOT_VERIFIED and (with
+			// sendOnSignIn below) re-sends the verification email. This blocks
+			// bot-created accounts from becoming usable until the address is
+			// confirmed.
+			requireEmailVerification: true,
 			sendResetPassword: async ({ user, url, token }, request) => {
 				// Graceful degradation: if no email pipeline is configured,
 				// log and return without throwing. The Better Auth UI will show
@@ -112,15 +117,15 @@ export function createBetterAuth(
 				}
 			},
 		},
-		// Email verification. We use the "soft" model: a verification email is
-		// sent on sign-up, but login is NOT blocked on it
-		// (requireEmailVerification stays false above). This avoids locking
-		// users out if email hiccups — important since some users get promoted
-		// to admin/author. A user's `email_verified` flips true when they click
-		// the link. To make verification mandatory instead, set
-		// `emailAndPassword.requireEmailVerification: true`.
+		// Email verification (mandatory — see requireEmailVerification above).
+		// - sendOnSignUp: email the verification link when the account is created.
+		// - sendOnSignIn: if an unverified user tries to log in, re-send the
+		//   link so they don't have to hunt for the original email.
+		// - autoSignInAfterVerification: once they click the link, they're
+		//   logged in immediately (no separate login step).
 		emailVerification: {
 			sendOnSignUp: true,
+			sendOnSignIn: true,
 			autoSignInAfterVerification: true,
 			sendVerificationEmail: async ({ user, url }) => {
 				if (!emailPipeline) {
