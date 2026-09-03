@@ -1,5 +1,6 @@
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
+import tailwindcss from "@tailwindcss/vite";
 import { d1, r2, sandbox } from "@emdash-cms/cloudflare";
 import { formsPlugin } from "@emdash-cms/plugin-forms";
 import webhookNotifier from "@emdash-cms/plugin-webhook-notifier";
@@ -10,6 +11,13 @@ import emdash from "emdash/astro";
 export default defineConfig({
 	output: "server",
 	adapter: cloudflare(),
+	// Tailwind v4 is required to compile the Better Auth UI (HeroUI) styles used
+	// by the @theweekendprojects/better-auth plugin's auth pages. Its output is
+	// scoped to the auth island (imported only there), so it doesn't affect the
+	// site's own token/theme styling.
+	vite: {
+		plugins: [tailwindcss()],
+	},
 	image: {
 		layout: "constrained",
 		responsiveStyles: true,

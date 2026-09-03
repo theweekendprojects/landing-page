@@ -16,11 +16,10 @@
  * admin, which would bounce them).
  */
 
-// Self-contained styles for the auth UI. `@better-auth-ui/heroui/styles`
-// pulls in the HeroUI component styles it needs. Imported only here, so it
-// loads only on the auth routes that render this island.
-import "@heroui/styles/css";
-import "@better-auth-ui/heroui/styles";
+// Self-contained styles for the auth UI. This entry is compiled by Tailwind
+// v4 (@tailwindcss/vite) so HeroUI's component styles are actually emitted.
+// Imported only here, so the compiled CSS loads only on the /auth routes.
+import "./auth.css";
 
 import { Auth } from "@better-auth-ui/heroui";
 import { AuthProvider } from "@better-auth-ui/heroui";

@@ -1,0 +1,32 @@
+/**
+ * Tailwind v4 entry for the Better Auth UI (HeroUI) island.
+ *
+ * HeroUI v3 ships its styles as Tailwind v4 SOURCE, not a finished stylesheet:
+ * `@heroui/styles` does `@import "tailwindcss"` plus imports of unstyled
+ * component structure that only become real rules once Tailwind compiles them
+ * against the set of classes the components actually use. A plain CSS `@import`
+ * (which is what we had) yields tokens + base reset but NO component sizing,
+ * so the card renders unstyled/broken.
+ *
+ * This file is compiled by `@tailwindcss/vite` (wired in astro.config.mjs).
+ * The `@source` directives tell Tailwind to scan the compiled HeroUI and
+ * Better Auth UI packages for class names so their utilities/components are
+ * emitted. Because it's imported only by the auth island, the resulting CSS
+ * is page-scoped to the /auth routes and never touches the site theme.
+ */
+
+@import "tailwindcss";
+
+/* HeroUI v3 layered styles (theme tokens, base reset, component structures,
+   default theme, utilities, variants). */
+@import "@heroui/styles/css";
+
+/* Better Auth UI's own component styling on top of HeroUI. */
+@import "@better-auth-ui/heroui/styles";
+
+/* Scan the component packages so Tailwind emits every utility/variant class
+   HeroUI and Better Auth UI reference at runtime. Without this, tree-shaking
+   drops classes that only appear inside the packaged JS. */
+@source "../../node_modules/@heroui/react/dist";
+@source "../../node_modules/@better-auth-ui/heroui/dist";
+@source "../../node_modules/@better-auth-ui/react/dist";
