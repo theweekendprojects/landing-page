@@ -10,6 +10,11 @@
  * auth pages are separate routes that render only this island, the site's
  * themed content pages never load these styles.
  *
+ * Theme: a light/dark/system toggle is wired via the local `useTheme` hook
+ * (no next-themes dependency). It drives both the `themePlugin` (which adds
+ * the option to Better Auth UI's post-login menus) and a standalone toggle
+ * shown on the auth pages themselves.
+ *
  * The `navigate` prop uses plain `window.location` since Astro islands have no
  * client router. `redirectTo` sends users to the site root after auth (a
  * fresh sign-up is a subscriber-role EmDash user, so we don't send them to the
@@ -21,13 +26,15 @@
 // Imported only here, so the compiled CSS loads only on the /auth routes.
 import "./auth.css";
 
-import { Auth } from "@better-auth-ui/heroui";
-import { AuthProvider } from "@better-auth-ui/heroui";
+import { Auth, AuthProvider } from "@better-auth-ui/heroui";
+import { themePlugin } from "@better-auth-ui/heroui/plugins/theme";
 import { Toast } from "@heroui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as React from "react";
 
 import { authClient } from "../client.js";
+import { ThemeToggle } from "./ThemeToggle.js";
+import { useTheme } from "./useTheme.js";
 
 // One QueryClient per island mount. Auth pages are standalone, so a simple
 // per-mount client is enough (no SSR hydration boundary needed here).
@@ -57,6 +64,7 @@ export default function AuthView({
 	socialProviders = [],
 }: AuthViewProps) {
 	const queryClient = getQueryClient();
+	const themeApi = useTheme();
 
 	return (
 		<QueryClientProvider client={queryClient}>
@@ -64,13 +72,23 @@ export default function AuthView({
 				authClient={authClient}
 				redirectTo={redirectTo}
 				socialProviders={socialProviders}
+				plugins={[themePlugin({ useTheme })]}
 				navigate={({ to, replace }: { to: string; replace?: boolean }) => {
 					if (replace) window.location.replace(to);
 					else window.location.href = to;
 				}}
 			>
-				<div style={{ display: "flex", justifyContent: "center", padding: "1.5rem" }}>
+				<div
+					style={{
+						display: "flex",
+						flexDirection: "column",
+						alignItems: "center",
+						gap: "1rem",
+						padding: "1.5rem",
+					}}
+				>
 					<Auth path={path} />
+					<ThemeToggle theme={themeApi.theme} setTheme={themeApi.setTheme} />
 				</div>
 				<Toast.Provider />
 			</AuthProvider>

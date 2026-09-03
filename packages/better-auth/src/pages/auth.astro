@@ -39,8 +39,39 @@ const redirectTo = Astro.url.searchParams.get("redirect") || "/";
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Account</title>
+		<!-- Apply the saved theme before paint to avoid a light/dark flash. -->
+		<script is:inline>
+			(() => {
+				try {
+					const stored = localStorage.getItem("ec-auth-theme") || "system";
+					const dark =
+						stored === "dark" ||
+						(stored === "system" &&
+							window.matchMedia("(prefers-color-scheme: dark)").matches);
+					const root = document.documentElement;
+					root.classList.toggle("dark", dark);
+					root.setAttribute("data-theme", dark ? "dark" : "light");
+				} catch {}
+			})();
+		</script>
 	</head>
-	<body style="min-height:100vh;display:flex;align-items:center;justify-content:center;margin:0;">
+	<body
+		style="min-height:100vh;display:flex;align-items:center;justify-content:center;margin:0;background:var(--ec-auth-bg);color:var(--ec-auth-fg);"
+	>
 		<AuthView path={view} redirectTo={redirectTo} client:load />
 	</body>
 </html>
+
+<style is:global>
+	/* Page background follows the resolved theme so the area around the card
+	   looks right in both modes. Uses HeroUI's semantic tokens. */
+	:root {
+		--ec-auth-bg: #ffffff;
+		--ec-auth-fg: #11181c;
+	}
+	:root.dark,
+	:root[data-theme="dark"] {
+		--ec-auth-bg: #0b0b0f;
+		--ec-auth-fg: #ececf1;
+	}
+</style>
