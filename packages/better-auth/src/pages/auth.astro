@@ -2,86 +2,66 @@
 /**
  * Plugin-shipped Better Auth UI (HeroUI) catch-all auth page.
  *
- * Injected at `/auth/[...path]` via the plugin's AuthProviderDescriptor.routes,
- * so a consuming EmDash site gets the full set of Better Auth UI views for
- * free: /auth/sign-in, /auth/sign-up, /auth/forgot-password,
- * /auth/reset-password, /auth/sign-out, etc. Better Auth UI's own components
- * cross-link between these paths, so keeping them under one base path (the
- * library's default `/auth`) makes every link and flow resolve correctly.
+ * Injected at `/auth/[...path]` via the plugin's AuthProviderDescriptor.routes.
+ * Serves every Better Auth UI view (sign-in, sign-up, forgot-password,
+ * reset-password, sign-out, ...). The header, layout, and theme switcher all
+ * live inside the AuthView island (they need Better Auth UI's provider
+ * context); this page is just the document shell.
  *
  * Self-styled: HeroUI's stylesheet loads only with this island, so the site's
  * themed content pages are untouched.
  */
 import { viewPaths } from "@better-auth-ui/core";
-import AuthView from "../ui/AuthView.tsx";
 import { configuredSocialProviders } from "../providers.ts";
+import AuthView from "../ui/AuthView.tsx";
 
 const { path } = Astro.params;
 const view = path ?? "sign-in";
 
-// Show a social button only for providers whose credentials are set (e.g.
-// Google appears once GOOGLE_CLIENT_ID/SECRET are configured as Worker vars).
-const socialProviders = configuredSocialProviders();
-
-// Only render known auth views; anything else 404s.
 const knownViews = Object.values(viewPaths.auth) as string[];
 if (!knownViews.includes(view)) {
 	return new Response("Not found", { status: 404 });
 }
 
-// If already signed in, leave the auth area (except for sign-out, which needs
-// to run while a session still exists).
 if (Astro.locals.user && view !== "sign-out") {
 	return Astro.redirect("/");
 }
 
 const redirectTo = Astro.url.searchParams.get("redirect") || "/";
+const siteName = "The Weekend Projects";
+// Show a social button only for providers whose credentials are actually set.
+const socialProviders = configuredSocialProviders();
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class="antialiased">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Account</title>
-		<!-- Apply the saved theme before paint to avoid a light/dark flash. -->
+		<!-- Apply the saved theme before paint to avoid a light/dark flash.
+		     Mirrors next-themes' storage key/behavior so the island hydrates
+		     into the same state. -->
 		<script is:inline>
 			(() => {
 				try {
-					const stored = localStorage.getItem("ec-auth-theme") || "system";
+					const stored = localStorage.getItem("theme") || "system";
 					const dark =
 						stored === "dark" ||
 						(stored === "system" &&
 							window.matchMedia("(prefers-color-scheme: dark)").matches);
-					const root = document.documentElement;
-					root.classList.toggle("dark", dark);
-					root.setAttribute("data-theme", dark ? "dark" : "light");
+					document.documentElement.classList.toggle("dark", dark);
 				} catch {}
 			})();
 		</script>
 	</head>
-	<body
-		style="min-height:100vh;display:flex;align-items:center;justify-content:center;margin:0;background:var(--ec-auth-bg);color:var(--ec-auth-fg);"
-	>
+	<body class="min-h-svh flex flex-col">
 		<AuthView
 			path={view}
 			redirectTo={redirectTo}
+			siteName={siteName}
 			socialProviders={socialProviders}
 			client:load
 		/>
 	</body>
 </html>
-
-<style is:global>
-	/* Page background follows the resolved theme so the area around the card
-	   looks right in both modes. Uses HeroUI's semantic tokens. */
-	:root {
-		--ec-auth-bg: #ffffff;
-		--ec-auth-fg: #11181c;
-	}
-	:root.dark,
-	:root[data-theme="dark"] {
-		--ec-auth-bg: #0b0b0f;
-		--ec-auth-fg: #ececf1;
-	}
-</style>
