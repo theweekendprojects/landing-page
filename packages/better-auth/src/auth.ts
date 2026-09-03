@@ -11,6 +11,23 @@ import type { Kysely } from "kysely";
 import { emdashAdapter, type BetterAuthStorage } from "./emdash-adapter.js";
 
 /**
+ * EmDash email pipeline interface, loosely typed to avoid importing emdash internals.
+ * Only the methods we use (send, isConfigured) are declared.
+ */
+export interface EmailPipeline {
+	send(message: { to: string; subject: string; text: string; html?: string }, source: string): Promise<void>;
+	isConfigured?(): Promise<boolean>;
+}
+
+/**
+ * Error type for when a plugin hook blocks an action (used by sendResetPassword).
+ * Not imported directly to avoid coupling to emdash internals.
+ */
+interface EmailNotConfiguredError extends Error {
+	name: "EmailNotConfiguredError";
+}
+
+/**
  * EmDash's default role levels. New self-service sign-ups get SUBSCRIBER —
  * the lowest level — so hitting /signup never grants CMS admin access. A
  * user can be promoted to a higher role later via the EmDash admin UI, at
@@ -33,6 +50,12 @@ export interface BetterAuthOptions {
 	google?: { clientId: string; clientSecret: string };
 	/** Extra trusted origins for CSRF/redirect validation. */
 	trustedOrigins?: string[];
+	/**
+	 * Optional EmDash email pipeline for sending auth emails (password reset,
+	 * email verification). When absent, password reset and email verification
+	 * are disabled gracefully (users see a friendly message).
+	 */
+	email?: EmailPipeline | null;
 }
 
 /**
@@ -41,13 +64,15 @@ export interface BetterAuthOptions {
  *
  * @param db      EmDash Kysely instance (from `locals.emdash.db`).
  * @param storage Plugin storage collections (from `getAuthProviderStorage`).
- * @param options Per-site configuration (baseURL, secret, optional Google).
+ * @param options Per-site configuration (baseURL, secret, optional Google, email pipeline).
  */
 export function createBetterAuth(
 	db: Kysely<{ users: Record<string, unknown> }>,
 	storage: BetterAuthStorage,
 	options: BetterAuthOptions,
 ) {
+	const emailPipeline = options.email || null;
+
 	return betterAuth({
 		baseURL: options.baseURL,
 		secret: options.secret,
@@ -57,6 +82,61 @@ export function createBetterAuth(
 		emailAndPassword: {
 			enabled: true,
 			requireEmailVerification: false,
+			sendResetPassword: async ({ user, url, token }, request) => {
+				// Graceful degradation: if no email pipeline is configured,
+				// log and return without throwing. The Better Auth UI will show
+				// a generic "check your email" message but the user will never
+				// receive one. This is the safest default.
+				if (!emailPipeline) {
+					console.warn(
+						`[better-auth] Password reset requested for ${user.email}, but no email provider is configured.`,
+					);
+					return;
+				}
+
+				const subject = "Reset your password";
+				const text = `Click the link below to reset your password.\n\n${url}\n\nIf you didn't request this, you can safely ignore this email.`;
+				const html = `<p>Click the link below to reset your password.</p><p><a href="${url}">${url}</a></p><p>If you didn't request this, you can safely ignore this email.</p>`;
+
+				try {
+					await emailPipeline.send({ to: user.email, subject, text, html }, "system");
+				} catch (err) {
+					// Never break auth due to email failure. Log the error for admin
+					// visibility, but return successfully so the user flow continues.
+					// The UI already shows a generic success message ("check your email"),
+					// so a silent failure is acceptable.
+					console.error(
+						`[better-auth] Failed to send password reset email to ${user.email}:`,
+						err instanceof Error ? err.message : String(err),
+					);
+				}
+			},
+			// Optional: email verification on sign-up.
+			// Commented out by default since requireEmailVerification is false.
+			// Uncomment and implement if you want to enable email verification.
+			/*
+			sendVerificationEmail: async ({ user, url, token }, request) => {
+				if (!emailPipeline) {
+					console.warn(
+						`[better-auth] Email verification requested for ${user.email}, but no email provider is configured.`,
+					);
+					return;
+				}
+
+				const subject = "Verify your email";
+				const text = `Click the link below to verify your email address.\n\n${url}\n\nIf you didn't create an account, you can safely ignore this email.`;
+				const html = `<p>Click the link below to verify your email address.</p><p><a href="${url}">${url}</a></p><p>If you didn't create an account, you can safely ignore this email.</p>`;
+
+				try {
+					await emailPipeline.send({ to: user.email, subject, text, html }, "system");
+				} catch (err) {
+					console.error(
+						`[better-auth] Failed to send verification email to ${user.email}:`,
+						err instanceof Error ? err.message : String(err),
+					);
+				}
+			},
+			*/
 		},
 		...(options.google
 			? {

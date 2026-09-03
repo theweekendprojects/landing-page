@@ -73,7 +73,14 @@ const handler: APIRoute = async ({ request, session }) => {
 				BETTER_AUTH_STORAGE_CONFIG,
 			) as unknown as BetterAuthStorage;
 
-			const auth = createBetterAuth(runtime.db, storage, readEnvConfig(request));
+			const authOptions = readEnvConfig(request);
+			// Pass the EmDash email pipeline to Better Auth for password reset
+			// and email verification emails. This plugin remains provider-agnostic
+			// — it depends only on EmDash's runtime.email, never on a specific
+			// email provider like emdash-smtp or Resend.
+			authOptions.email = runtime.email || null;
+
+			const auth = createBetterAuth(runtime.db, storage, authOptions);
 			const response = await auth.handler(request);
 
 			// Bridge a successful auth into EmDash's own Astro session.
