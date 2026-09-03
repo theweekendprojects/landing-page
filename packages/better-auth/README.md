@@ -121,6 +121,35 @@ pnpm build && wrangler deploy
 
 Then visit `/login` or `/signup`.
 
+### Email: password reset & verification
+
+Better Auth doesn't send email itself — it hands the plugin a message + link,
+and the plugin delivers it through EmDash's email pipeline (`runtime.email`).
+So these features work **only if the site has an email provider configured**:
+
+- **Password reset** (`/auth/forgot-password`) — sends a reset link.
+- **Email verification** — a verification email is sent on sign-up.
+
+The plugin is **provider-agnostic**: it never depends on a specific email
+service. It calls `runtime.email.send(..., "system")`, and whatever
+`email:deliver` provider the site registers actually sends it. To enable email
+on a site, install an EmDash email provider — e.g.
+[`emdash-smtp`](https://github.com/masonjames/emdash-smtp) (supports Resend,
+SES, SMTP, and more) — add it to `emdash({ plugins: [...] })`, pick a provider
+in **Admin → Settings → Email**, and set that provider's key (e.g.
+`RESEND_API_KEY`) as a Worker secret.
+
+**Graceful by default.** If no provider is configured, sign-up and login still
+work — password-reset/verification emails simply aren't sent (logged, never
+thrown), so auth never breaks. In dev, EmDash's built-in console provider logs
+the emails so you can grab the link from the terminal.
+
+**Verification is "soft" by default:** a verification email is sent on sign-up,
+but login is **not** blocked on it (so users — including ones you promote to
+admin — are never locked out by an email hiccup). `email_verified` flips true
+when they click the link. To make verification mandatory, set
+`emailAndPassword.requireEmailVerification: true` in `auth.ts`.
+
 ### No database migration required
 
 This plugin ships **no migration files** and you don't need to write any. It reuses tables EmDash already manages:

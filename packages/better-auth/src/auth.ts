@@ -111,32 +111,39 @@ export function createBetterAuth(
 					);
 				}
 			},
-			// Optional: email verification on sign-up.
-			// Commented out by default since requireEmailVerification is false.
-			// Uncomment and implement if you want to enable email verification.
-			/*
-			sendVerificationEmail: async ({ user, url, token }, request) => {
+		},
+		// Email verification. We use the "soft" model: a verification email is
+		// sent on sign-up, but login is NOT blocked on it
+		// (requireEmailVerification stays false above). This avoids locking
+		// users out if email hiccups — important since some users get promoted
+		// to admin/author. A user's `email_verified` flips true when they click
+		// the link. To make verification mandatory instead, set
+		// `emailAndPassword.requireEmailVerification: true`.
+		emailVerification: {
+			sendOnSignUp: true,
+			autoSignInAfterVerification: true,
+			sendVerificationEmail: async ({ user, url }) => {
 				if (!emailPipeline) {
 					console.warn(
-						`[better-auth] Email verification requested for ${user.email}, but no email provider is configured.`,
+						`[better-auth] Verification email requested for ${user.email}, but no email provider is configured.`,
 					);
 					return;
 				}
 
 				const subject = "Verify your email";
-				const text = `Click the link below to verify your email address.\n\n${url}\n\nIf you didn't create an account, you can safely ignore this email.`;
-				const html = `<p>Click the link below to verify your email address.</p><p><a href="${url}">${url}</a></p><p>If you didn't create an account, you can safely ignore this email.</p>`;
+				const text = `Confirm your email address by clicking the link below.\n\n${url}\n\nIf you didn't create an account, you can safely ignore this email.`;
+				const html = `<p>Confirm your email address by clicking the link below.</p><p><a href="${url}">${url}</a></p><p>If you didn't create an account, you can safely ignore this email.</p>`;
 
 				try {
 					await emailPipeline.send({ to: user.email, subject, text, html }, "system");
 				} catch (err) {
+					// Never break sign-up because a verification email failed.
 					console.error(
 						`[better-auth] Failed to send verification email to ${user.email}:`,
 						err instanceof Error ? err.message : String(err),
 					);
 				}
 			},
-			*/
 		},
 		...(options.google
 			? {
