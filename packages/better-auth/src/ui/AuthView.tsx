@@ -26,7 +26,7 @@ import "./auth.css";
 
 import { Auth, AuthProvider, UserButton } from "@better-auth-ui/heroui";
 import { themePlugin } from "@better-auth-ui/heroui/plugins/theme";
-import { Link, Toast } from "@heroui/react";
+import { Button, Link, Toast } from "@heroui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider, useTheme } from "next-themes";
 import * as React from "react";
@@ -44,6 +44,60 @@ function getQueryClient(): QueryClient {
 		defaultOptions: { queries: { staleTime: 5_000 } },
 	});
 	return browserQueryClient;
+}
+
+/**
+ * EmDash's brand mark (rounded square + minus). Uses `currentColor` like the
+ * social-provider icons so it inherits the button's text color and renders
+ * reliably inside a HeroUI Button's startContent slot.
+ */
+function EmDashIcon() {
+	return (
+		<svg
+			width={18}
+			height={18}
+			viewBox="0 0 24 24"
+			fill="none"
+			role="img"
+			aria-label="EmDash"
+		>
+			<rect
+				x="2.5"
+				y="2.5"
+				width="19"
+				height="19"
+				rx="5"
+				stroke="currentColor"
+				strokeWidth="2"
+			/>
+			<rect x="7" y="11" width="10" height="2" rx="1" fill="currentColor" />
+		</svg>
+	);
+}
+
+/**
+ * Cross-link to EmDash's native passkey login, styled to match Better Auth
+ * UI's own social sign-in buttons (HeroUI tertiary button, full width, icon +
+ * label). Shown only on the sign-in view. The two login doors (Better Auth
+ * email/password here, EmDash passkey at /_emdash/admin/login) can then reach
+ * each other, so passkey-only admins are never stranded. Carries the same
+ * `?redirect=` target through.
+ */
+function EmDashLoginButton({ redirectTo }: { redirectTo: string }) {
+	const href = `/_emdash/admin/login?redirect=${encodeURIComponent(redirectTo)}`;
+	// HeroUI v3's `as="a"` doesn't reliably emit a working anchor href, so we
+	// keep the Button purely for styling and navigate on press.
+	const go = () => {
+		window.location.href = href;
+	};
+	return (
+		<div className="w-full max-w-sm mt-4">
+			<Button variant="tertiary" fullWidth onPress={go} onClick={go}>
+				<EmDashIcon />
+				<span>Continue with EmDash</span>
+			</Button>
+		</div>
+	);
 }
 
 export interface AuthViewProps {
@@ -87,8 +141,9 @@ export default function AuthView({
 						</div>
 					</header>
 
-					<main className="flex-1 flex justify-center my-auto p-4 md:p-6">
+					<main className="flex-1 flex flex-col items-center my-auto p-4 md:p-6">
 						<Auth path={path} />
+						{path === "sign-in" && <EmDashLoginButton redirectTo={redirectTo} />}
 					</main>
 
 					<Toast.Provider />
