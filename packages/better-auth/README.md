@@ -177,6 +177,29 @@ So on a fresh site the correct sequence is just: register the provider, set `BET
 - **Dependency footprint.** The prebuilt UI pulls in HeroUI v3 + several TanStack packages. The client bundle loads only on the `/auth` routes, not your content pages.
 - **Email verification / password reset** views exist under `/auth/*`, but sending emails requires an EmDash email-transport provider to be configured.
 
+## Reusing on another EmDash site
+
+The plugin is designed to be site-agnostic — nothing is hardcoded to a
+particular site:
+
+- **No hardcoded URLs or brand.** The public origin is derived from the
+  request; the auth header's brand name is read from EmDash site settings
+  (`getSiteSettings().title`), falling back to "Account".
+- **No database migrations.** It reuses EmDash's `users` and `_plugin_storage`
+  tables (auto-created by EmDash core); storage indexes are created at runtime.
+- **Secrets** come from the Worker `env`, not committed code.
+
+To use it on another site: install the package, add the setup from
+[Setup](#setup) (register `betterAuthProvider()`, add `@tailwindcss/vite`, set
+`BETTER_AUTH_SECRET`), deploy.
+
+**If you rename the package** (it's currently `@theweekendprojects/better-auth`):
+the `AuthProviderDescriptor` in `src/index.ts` references the package by name in
+its route `entrypoint`s and `adminEntry` (6 references). Astro's `injectRoute`
+needs a resolvable module specifier, so these must match the package's own
+`name`. Update the `name` in `package.json` and those 6 strings in `index.ts`
+together (a find-and-replace of the old package name → new name covers it).
+
 ## License
 
 MIT

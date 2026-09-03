@@ -12,6 +12,7 @@
  * themed content pages are untouched.
  */
 import { viewPaths } from "@better-auth-ui/core";
+import { getSiteSettings } from "emdash";
 import { configuredSocialProviders } from "../providers.ts";
 import AuthView from "../ui/AuthView.tsx";
 
@@ -28,7 +29,10 @@ if (Astro.locals.user && view !== "sign-out") {
 }
 
 const redirectTo = Astro.url.searchParams.get("redirect") || "/";
-const siteName = "The Weekend Projects";
+// Brand shown in the auth header — read from EmDash site settings so the
+// plugin is site-agnostic (no hardcoded site name). Falls back generically.
+const siteSettings = await getSiteSettings().catch(() => null);
+const siteName = siteSettings?.title || "Account";
 // Show a social button only for providers whose credentials are actually set.
 const socialProviders = configuredSocialProviders();
 ---
