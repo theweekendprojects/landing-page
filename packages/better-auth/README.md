@@ -67,8 +67,17 @@ That's it — the plugin injects all of these routes for you:
 | `/auth/[...path]` | Prebuilt auth UI: `/auth/sign-in`, `/auth/sign-up`, `/auth/forgot-password`, `/auth/reset-password`, `/auth/sign-out` |
 | `/login` | Friendly alias → `/auth/sign-in` |
 | `/signup` | Friendly alias → `/auth/sign-up` |
+| `/_emdash/admin/login` | Overrides EmDash's built-in passkey login and redirects to `/auth/sign-in` (single login door), preserving `?redirect=` |
 
 Do **not** create your own `src/pages/login.astro` / `signup.astro` / `api/auth/*` — they would conflict with the injected routes.
+
+**Single login door.** EmDash normally sends unauthenticated admins to its own
+passkey login at `/_emdash/admin/login`. This plugin injects a redirect there
+to `/auth/sign-in`, so admins and members use the same Better Auth login
+screen. Because a Better Auth account *is* an EmDash user (same `users` table),
+an admin (role ≥ 50) who signs in via Better Auth gets full CMS access, and the
+`?redirect=` param carries them back to the admin page they requested. EmDash's
+native passkey login is still reachable if you remove this route.
 
 ### 2. Set the runtime secrets
 
