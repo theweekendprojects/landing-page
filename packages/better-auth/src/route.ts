@@ -22,10 +22,12 @@
 
 import type { APIRoute } from "astro";
 import { env } from "cloudflare:workers";
+import { getPluginSettings } from "emdash";
 import { withEmDashRuntime } from "emdash/middleware";
 import { getAuthProviderStorage } from "emdash/api/route-utils";
 import { createBetterAuth } from "./auth.js";
 import { BETTER_AUTH_STORAGE_CONFIG, PROVIDER_ID } from "./index.js";
+import { SETTINGS_PLUGIN_ID, resolveSettings } from "./settings.js";
 import type { BetterAuthStorage } from "./emdash-adapter.js";
 
 export const prerender = false;
@@ -136,12 +138,53 @@ const handler: APIRoute = async ({ request, session, site }) => {
 				BETTER_AUTH_STORAGE_CONFIG,
 			) as unknown as BetterAuthStorage;
 
-			const authOptions = readEnvConfig(request, site);
-			// Pass the EmDash email pipeline to Better Auth for password reset
-			// and email verification emails. This plugin remains provider-agnostic
-			// — it depends only on EmDash's runtime.email, never on a specific
-			// email provider like emdash-smtp or Resend.
-			authOptions.email = runtime.email || null;
+			// Env-derived base config (secret, Google, trusted origins, and the
+			// request/site-resolved origin).
+			const envConfig = readEnvConfig(request, site);
+
+			// Layer admin-configured settings on top of env values. Saved
+			// settings win; env is the fallback; built-in defaults fill the rest.
+			// Read failures (e.g. before the settings table exists) degrade to
+			// env-only rather than breaking auth.
+			let saved: Record<string, unknown> = {};
+			try {
+				saved = await getPluginSettings(SETTINGS_PLUGIN_ID);
+			} catch (err) {
+				console.warn(
+					"[better-auth] Could not read admin settings; using env/defaults:",
+					err instanceof Error ? err.message : String(err),
+				);
+			}
+			const settings = resolveSettings(saved, {
+				secret: envConfig.secret,
+				googleClientId: envConfig.google?.clientId,
+				googleClientSecret: envConfig.google?.clientSecret,
+				baseUrl: envConfig.baseURL,
+			});
+
+			// A saved canonical URL overrides the env/request-resolved origin.
+			// Keep the request origin trusted either way so sign-in via a
+			// non-canonical host still works.
+			const requestOrigin = new URL(request.url).origin;
+			const baseURL = settings.baseUrl ?? envConfig.baseURL;
+			const trustedOrigins = Array.from(new Set([baseURL, requestOrigin]));
+
+			const authOptions = {
+				baseURL,
+				// Fall back to the env default if somehow unset (keeps auth working
+				// in dev before any secret is configured).
+				secret: settings.secret ?? envConfig.secret,
+				google: settings.google,
+				trustedOrigins,
+				requireEmailVerification: settings.requireEmailVerification,
+				sendOnSignIn: settings.sendOnSignIn,
+				autoSignInAfterVerification: settings.autoSignInAfterVerification,
+				// Pass the EmDash email pipeline to Better Auth for password reset
+				// and email verification emails. This plugin stays provider-agnostic
+				// — it depends only on EmDash's runtime.email, never on a specific
+				// email provider like emdash-smtp or Resend.
+				email: runtime.email || null,
+			};
 
 			const auth = createBetterAuth(runtime.db, storage, authOptions);
 			const response = await auth.handler(request);

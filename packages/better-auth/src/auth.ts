@@ -51,6 +51,16 @@ export interface BetterAuthOptions {
 	/** Extra trusted origins for CSRF/redirect validation. */
 	trustedOrigins?: string[];
 	/**
+	 * Email-verification behavior. Admin-configurable (see settings.ts) and
+	 * resolved per-request in route.ts, with these defaults when unset:
+	 *   - requireEmailVerification: true  (unverified users can't sign in)
+	 *   - sendOnSignIn: true              (re-send link on blocked sign-in)
+	 *   - autoSignInAfterVerification: true
+	 */
+	requireEmailVerification?: boolean;
+	sendOnSignIn?: boolean;
+	autoSignInAfterVerification?: boolean;
+	/**
 	 * Optional EmDash email pipeline for sending auth emails (password reset,
 	 * email verification). When absent, password reset and email verification
 	 * are disabled gracefully (users see a friendly message).
@@ -73,6 +83,12 @@ export function createBetterAuth(
 ) {
 	const emailPipeline = options.email || null;
 
+	// Verification behavior — admin-configurable, defaulting to the mandatory
+	// (bot-blocking) posture when unset.
+	const requireEmailVerification = options.requireEmailVerification ?? true;
+	const sendOnSignIn = options.sendOnSignIn ?? true;
+	const autoSignInAfterVerification = options.autoSignInAfterVerification ?? true;
+
 	return betterAuth({
 		baseURL: options.baseURL,
 		secret: options.secret,
@@ -85,8 +101,8 @@ export function createBetterAuth(
 			// Better Auth rejects the sign-in with EMAIL_NOT_VERIFIED and (with
 			// sendOnSignIn below) re-sends the verification email. This blocks
 			// bot-created accounts from becoming usable until the address is
-			// confirmed.
-			requireEmailVerification: true,
+			// confirmed. Admin-configurable (defaults to true).
+			requireEmailVerification,
 			sendResetPassword: async ({ user, url, token }, request) => {
 				// Graceful degradation: if no email pipeline is configured,
 				// log and return without throwing. The Better Auth UI will show
@@ -125,8 +141,8 @@ export function createBetterAuth(
 		//   logged in immediately (no separate login step).
 		emailVerification: {
 			sendOnSignUp: true,
-			sendOnSignIn: true,
-			autoSignInAfterVerification: true,
+			sendOnSignIn,
+			autoSignInAfterVerification,
 			sendVerificationEmail: async ({ user, url }) => {
 				if (!emailPipeline) {
 					console.warn(

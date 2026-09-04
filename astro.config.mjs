@@ -4,7 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { d1, r2, sandbox } from "@emdash-cms/cloudflare";
 import { formsPlugin } from "@emdash-cms/plugin-forms";
 import webhookNotifier from "@emdash-cms/plugin-webhook-notifier";
-import { betterAuthProvider } from "@theweekendprojects/better-auth";
+import { betterAuthProvider, betterAuthSettingsPlugin } from "@theweekendprojects/better-auth";
 import { defineConfig, fontProviders } from "astro/config";
 import emdash from "emdash/astro";
 import emdashSmtp from "emdash-smtp";
@@ -36,7 +36,11 @@ export default defineConfig({
 			database: d1({ binding: "DB", session: "auto" }),
 			storage: r2({ binding: "MEDIA" }),
 			authProviders: [betterAuthProvider()],
-			plugins: [formsPlugin(), emdashSmtp()],
+			// betterAuthSettingsPlugin() adds the admin settings form for Better
+			// Auth (verification toggles, canonical URL, Google + Better Auth
+			// secrets). The auth provider reads those values at request time with
+			// env-var fallback.
+			plugins: [formsPlugin(), emdashSmtp(), betterAuthSettingsPlugin()],
 			sandboxed: [webhookNotifier],
 			sandboxRunner: sandbox(),
 			marketplace: "https://marketplace.emdashcms.com",

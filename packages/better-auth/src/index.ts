@@ -25,10 +25,20 @@
  * The public origin is derived from the request (or EMDASH_SITE_URL).
  */
 
-import type { AuthProviderDescriptor, PluginStorageConfig } from "emdash";
+import type { AuthProviderDescriptor, PluginDescriptor, PluginStorageConfig } from "emdash";
+
+import { SETTINGS_PLUGIN_ID, SETTINGS_SCHEMA } from "./settings.js";
 
 export { createBetterAuth, type BetterAuthOptions, ROLE_SUBSCRIBER } from "./auth.js";
 export { emdashAdapter, type BetterAuthStorage } from "./emdash-adapter.js";
+export {
+	SETTINGS_PLUGIN_ID,
+	SETTINGS_KEYS,
+	SETTINGS_SCHEMA,
+	SETTINGS_DEFAULTS,
+	resolveSettings,
+	type ResolvedAuthSettings,
+} from "./settings.js";
 
 /** Provider id — also the storage namespace (`auth:better-auth`). */
 export const PROVIDER_ID = "better-auth";
@@ -93,5 +103,46 @@ export function betterAuthProvider(): AuthProviderDescriptor {
 			},
 		],
 		storage: BETTER_AUTH_STORAGE_CONFIG,
+	};
+}
+
+/**
+ * Companion settings plugin for Better Auth.
+ *
+ * Better Auth registers as an `AuthProviderDescriptor` (via `betterAuthProvider()`
+ * in `authProviders: [...]`), and that path has NO admin settings surface. To
+ * make Better Auth's configuration editable from the EmDash admin UI, register
+ * THIS descriptor in `plugins: [...]` as well:
+ *
+ * @example
+ * ```ts
+ * // astro.config.mjs
+ * import { betterAuthProvider, betterAuthSettingsPlugin } from "@theweekendprojects/better-auth";
+ *
+ * emdash({
+ *   authProviders: [betterAuthProvider()],
+ *   plugins: [betterAuthSettingsPlugin()],
+ * });
+ * ```
+ *
+ * It declares a `settingsSchema` that EmDash auto-renders into a settings form
+ * (toggles for verification behavior, canonical URL, Google credentials, and
+ * the Better Auth secret). Values are persisted in EmDash plugin storage; the
+ * auth route reads them back at request time with env-var fallback (see
+ * `resolveSettings`). The plugin is otherwise inert — no hooks, no routes.
+ *
+ * SECURITY: secret fields are stored in the database (masked in the UI, not
+ * encrypted at rest), the same way `emdash-smtp` stores its API key. Leave the
+ * "Better Auth secret" field blank to keep using the `BETTER_AUTH_SECRET`
+ * Worker secret, which is the stronger option for the session signing key.
+ */
+export function betterAuthSettingsPlugin(): PluginDescriptor {
+	return {
+		id: SETTINGS_PLUGIN_ID,
+		version: "0.1.0",
+		format: "native",
+		entrypoint: "@theweekendprojects/better-auth/settings-plugin",
+		// Static, build-time-visible schema EmDash uses to render the form.
+		settingsSchema: SETTINGS_SCHEMA,
 	};
 }

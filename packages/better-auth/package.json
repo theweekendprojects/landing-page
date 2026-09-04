@@ -25,6 +25,10 @@
       "import": "./src/emdash-adapter.ts",
       "default": "./src/emdash-adapter.ts"
     },
+    "./settings-plugin": {
+      "import": "./src/settings-plugin-entry.ts",
+      "default": "./src/settings-plugin-entry.ts"
+    },
     "./client": {
       "import": "./src/client.ts",
       "default": "./src/client.ts"

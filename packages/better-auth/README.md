@@ -11,6 +11,7 @@ It registers as an EmDash `AuthProviderDescriptor`, so it plugs in with a single
 - **Light / Dark / System theme toggle** on the auth pages, persisted per visitor.
 - **Session bridging.** After sign-in/up the plugin writes EmDash's own session cookie, so the same account works for both the public site and `/_emdash/admin` (subject to role).
 - **Portable storage.** Better Auth's session/account/verification state lives in EmDash's shared plugin storage (`getAuthProviderStorage`), namespaced `auth:better-auth` — no custom tables, no migration files.
+- **Optional admin settings UI.** An opt-in companion plugin (`betterAuthSettingsPlugin()`) adds an auto-rendered EmDash admin form for the verification toggles, canonical URL, and Google / Better Auth secrets — read at request time with env-var fallback. See [Admin settings](#admin-settings-optional).
 
 ## Requirements
 
@@ -153,6 +154,64 @@ pnpm build && wrangler deploy
 
 Then visit `/login` or `/signup`.
 
+### Admin settings (optional)
+
+By default the plugin is configured entirely through Worker env vars (above).
+If you also want to tune it from the EmDash admin UI — without redeploying —
+register the **companion settings plugin** alongside the auth provider:
+
+```ts
+// astro.config.mjs
+import { betterAuthProvider, betterAuthSettingsPlugin } from "@theweekendprojects/better-auth";
+
+emdash({
+  authProviders: [betterAuthProvider()],
+  plugins: [betterAuthSettingsPlugin()], // adds the admin settings form
+});
+```
+
+Why a separate plugin? Better Auth registers as an EmDash *auth provider*, and
+that registration path has no admin-settings surface — only the full plugin
+system (`plugins: [...]`) can declare a `settingsSchema` that EmDash
+auto-renders into a form and persists. `betterAuthSettingsPlugin()` is a tiny,
+otherwise-inert native plugin whose only job is to own that form + storage. The
+auth provider reads the saved values back at request time.
+
+The form exposes:
+
+| Setting | Type | Notes |
+| --- | --- | --- |
+| Require email verification | toggle | Block unverified sign-in (default on). |
+| Re-send verification on sign-in | toggle | Re-send the link on a blocked login (default on). |
+| Auto sign-in after verification | toggle | Log in on link click (default on). |
+| Canonical site URL | url | Overrides `BETTER_AUTH_URL` / `site:` for email links. |
+| Better Auth secret | secret | Session signing key. See the security note below. |
+| Google client ID / secret | string / secret | Enables Google sign-in. |
+
+**Precedence:** a saved admin setting wins over the matching env var, which
+wins over the built-in default. Every field is optional — leave one blank and
+the env var / default is used. So the settings plugin is purely additive: with
+all fields blank it changes nothing, and the site keeps working via env vars if
+the settings can't be read.
+
+> **Security — secrets are stored in the database, not encrypted.** EmDash's
+> `secret` field type only *masks* the input in the UI; the value is persisted
+> in the `_plugin_storage` table (D1) as plaintext, the same way `emdash-smtp`
+> stores its API key. For the **Better Auth secret** specifically — the session
+> signing key — DB storage is meaningfully weaker than a Worker secret: if the
+> database leaks, sessions can be forged. **Recommended:** leave the "Better
+> Auth secret" field blank and keep `BETTER_AUTH_SECRET` as a Worker secret.
+> Use the admin field for it only if you accept that tradeoff (e.g. pending an
+> EmDash feature for encrypted-at-rest secret storage).
+
+> **Note on the post-sign-up redirect.** The auth UI decides whether to route to
+> the "verify your email" page after sign-up based on a client-side flag that
+> defaults to `true` (matching the default server config). If you turn
+> *Require email verification* **off** in the admin UI, also pass
+> `requireEmailVerification={false}` to `AuthView` (or the auth page) so the UI
+> stops sending new users to the verify page. The server remains authoritative
+> either way; this only affects the redirect.
+
 ### Email: password reset & verification
 
 Better Auth doesn't send email itself — it hands the plugin a message + link,
@@ -187,7 +246,10 @@ ever becoming usable. `email_verified` flips true when the link is clicked.
 > they can never log into. Configure an email provider before going live. In dev,
 > EmDash's built-in console provider logs the email so you can copy the link from
 > the terminal. To relax this to "soft" verification (email sent, but login not
-> blocked), set `emailAndPassword.requireEmailVerification: false` in `auth.ts`.
+> blocked), turn off *Require email verification* in the admin settings (see
+> [Admin settings](#admin-settings-optional)) — or, if you don't use the
+> settings plugin, set `emailAndPassword.requireEmailVerification: false` in
+> `auth.ts`. `true` is the default in both cases.
 
 **Graceful for password reset.** If no provider is configured, password-reset
 emails simply aren't sent (logged, never thrown) rather than crashing auth.
