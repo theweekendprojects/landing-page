@@ -60,11 +60,8 @@ export const SETTINGS_ADMIN_PAGE_PATH = "/settings";
  * callback path segment: `/api/auth/callback/<id>`).
  */
 export const SOCIAL_PROVIDERS = [
-	// `glyph` is a small emoji shown as a lightweight icon in the admin card
-	// title — the Block Kit admin surface has no image element for real brand
-	// logos, so a glyph is the closest available visual marker.
-	{ id: "google", label: "Google", envPrefix: "GOOGLE", glyph: "🔵" },
-	{ id: "github", label: "GitHub", envPrefix: "GITHUB", glyph: "🐙" },
+	{ id: "google", label: "Google", envPrefix: "GOOGLE" },
+	{ id: "github", label: "GitHub", envPrefix: "GITHUB" },
 ] as const;
 
 export type SocialProviderId = (typeof SOCIAL_PROVIDERS)[number]["id"];

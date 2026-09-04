@@ -158,11 +158,10 @@ function buildSettingsPage(
 		const enabled = hasVal(saved[idKey]) && hasVal(saved[secretKey]);
 
 		blocks.push({ type: "divider" });
-		// A banner acts as a titled card grouping each provider. The glyph is a
-		// lightweight stand-in for a brand icon (no image element in Block Kit).
+		// A banner acts as a titled card grouping each provider.
 		blocks.push({
 			type: "banner",
-			title: `${provider.glyph} ${provider.label}${enabled ? " · enabled" : ""}`,
+			title: `${provider.label}${enabled ? " · enabled" : ""}`,
 			description: `Authorized redirect URI (register this in the ${provider.label} console):\n${callbackUrl}`,
 			variant: "default",
 		});
