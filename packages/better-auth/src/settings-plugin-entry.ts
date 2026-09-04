@@ -36,6 +36,9 @@ import {
 	SETTINGS_ADMIN_PAGE_PATH,
 	SETTINGS_KEYS,
 	SETTINGS_PLUGIN_ID,
+	SOCIAL_PROVIDERS,
+	providerClientIdKey,
+	providerClientSecretKey,
 	readKvSettings,
 	writeKvSettings,
 } from "./settings.js";
@@ -43,8 +46,12 @@ import {
 // Keep in sync with the version reported by the descriptor factory.
 export const SETTINGS_PLUGIN_VERSION = "0.1.0";
 
-/** Block Kit form submit action id. */
+/** Block Kit form submit action ids. */
 const SAVE_ACTION_ID = "save_auth";
+/** One save action per social provider form, e.g. `save_social:google`. */
+function socialSaveActionId(providerId: string): string {
+	return `save_social:${providerId}`;
+}
 
 /** Minimal shape of the admin interaction payload we care about. */
 interface AdminInteraction {
@@ -76,7 +83,7 @@ function buildSettingsPage(
 		{ type: "header", text: "Better Auth" },
 		{
 			type: "context",
-			text: "Configure Better Auth without redeploying. Blank fields fall back to the matching Worker env var (BETTER_AUTH_SECRET, GOOGLE_CLIENT_ID/SECRET, BETTER_AUTH_URL), then to built-in defaults.",
+			text: "Configure Better Auth without redeploying. Blank fields fall back to the matching Worker env var (e.g. BETTER_AUTH_SECRET, BETTER_AUTH_URL, and per-provider <PROVIDER>_CLIENT_ID/SECRET), then to built-in defaults.",
 		},
 		{ type: "divider" },
 		{
@@ -118,18 +125,6 @@ function buildSettingsPage(
 					label: "Better Auth secret",
 					has_value: hasVal(saved[SETTINGS_KEYS.betterAuthSecret]),
 				},
-				{
-					type: "text_input",
-					action_id: SETTINGS_KEYS.googleClientId,
-					label: "Google client ID",
-					initial_value: str(saved[SETTINGS_KEYS.googleClientId]),
-				},
-				{
-					type: "secret_input",
-					action_id: SETTINGS_KEYS.googleClientSecret,
-					label: "Google client secret",
-					has_value: hasVal(saved[SETTINGS_KEYS.googleClientSecret]),
-				},
 			],
 			submit: { label: "Save settings", action_id: SAVE_ACTION_ID },
 		},
@@ -138,6 +133,55 @@ function buildSettingsPage(
 			text: "Security: secret fields are stored in the database (masked here, not encrypted at rest) — the same as other EmDash plugins. For the strongest posture on the session signing key, leave 'Better Auth secret' blank and keep BETTER_AUTH_SECRET as a Worker secret.",
 		},
 	];
+
+	// --- Social sign-in providers (one stacked section each) ------------------
+	// Callback/redirect URLs are built from the canonical base URL. If none is
+	// saved yet, show a {your-site} placeholder so the operator still sees the
+	// shape of the URL to register with the provider.
+	const baseForCallback = str(saved[SETTINGS_KEYS.baseUrl]).replace(/\/+$/, "");
+	const callbackBase = baseForCallback || "https://<your-site>";
+
+	blocks.push({ type: "divider" });
+	blocks.push({ type: "header", text: "Social sign-in" });
+	blocks.push({
+		type: "context",
+		text: "Enable OAuth logins by adding credentials from each provider's developer console. A provider only turns on when BOTH its client ID and secret are set (saved here, or via the matching env vars). Register the callback URL shown below with the provider.",
+	});
+
+	for (const provider of SOCIAL_PROVIDERS) {
+		const idKey = providerClientIdKey(provider.id);
+		const secretKey = providerClientSecretKey(provider.id);
+		const callbackUrl = `${callbackBase}/api/auth/callback/${provider.id}`;
+
+		blocks.push({ type: "divider" });
+		blocks.push({ type: "header", text: provider.label });
+		blocks.push({
+			type: "context",
+			text: `Authorized redirect URI (register this in the ${provider.label} console): ${callbackUrl}`,
+		});
+		blocks.push({
+			type: "form",
+			block_id: `social-${provider.id}`,
+			fields: [
+				{
+					type: "text_input",
+					action_id: idKey,
+					label: `${provider.label} client ID`,
+					initial_value: str(saved[idKey]),
+				},
+				{
+					type: "secret_input",
+					action_id: secretKey,
+					label: `${provider.label} client secret`,
+					has_value: hasVal(saved[secretKey]),
+				},
+			],
+			submit: {
+				label: `Save ${provider.label}`,
+				action_id: socialSaveActionId(provider.id),
+			},
+		});
+	}
 
 	return toast ? { blocks, toast } : { blocks };
 }
@@ -164,13 +208,24 @@ export function createPlugin() {
 						// path echoed for parity with emdash-smtp; unused (single page).
 					};
 
-					if (interaction.type === "form_submit" && interaction.action_id === SAVE_ACTION_ID) {
+					// Any of our forms submitting persists via writeKvSettings, which
+					// only touches the keys present in `values` (each form sends its
+					// own subset), so a per-provider save doesn't disturb the others.
+					const isCoreSave =
+						interaction.type === "form_submit" &&
+						interaction.action_id === SAVE_ACTION_ID;
+					const isSocialSave =
+						interaction.type === "form_submit" &&
+						typeof interaction.action_id === "string" &&
+						interaction.action_id.startsWith("save_social:");
+
+					if (isCoreSave || isSocialSave) {
 						await writeKvSettings(routeCtx.kv, interaction.values ?? {});
 						const saved = await readKvSettings(routeCtx.kv);
-						return buildSettingsPage(saved, {
-							message: "Settings saved.",
-							type: "success",
-						});
+						const label = isSocialSave
+							? `${interaction.action_id!.split(":")[1]} settings saved.`
+							: "Settings saved.";
+						return buildSettingsPage(saved, { message: label, type: "success" });
 					}
 
 					// page_load (and any other interaction) -> render current state.

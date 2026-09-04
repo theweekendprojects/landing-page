@@ -27,7 +27,12 @@ import { withEmDashRuntime } from "emdash/middleware";
 import { getAuthProviderStorage } from "emdash/api/route-utils";
 import { createBetterAuth } from "./auth.js";
 import { BETTER_AUTH_STORAGE_CONFIG, PROVIDER_ID } from "./index.js";
-import { SETTINGS_PLUGIN_ID, resolveSettings } from "./settings.js";
+import {
+	SETTINGS_PLUGIN_ID,
+	SOCIAL_PROVIDERS,
+	resolveSettings,
+	type AuthEnvFallback,
+} from "./settings.js";
 import type { BetterAuthStorage } from "./emdash-adapter.js";
 
 export const prerender = false;
@@ -92,10 +97,17 @@ function resolveBaseURL(request: Request, siteFromConfig: URL | undefined): stri
 function readEnvConfig(request: Request, siteFromConfig: URL | undefined) {
 	const workerEnv = env as Record<string, string | undefined>;
 	const secret = workerEnv.BETTER_AUTH_SECRET ?? "insecure-dev-secret-change-me";
-	const googleId = workerEnv.GOOGLE_CLIENT_ID;
-	const googleSecret = workerEnv.GOOGLE_CLIENT_SECRET;
-	const hasGoogle =
-		!!googleId && !!googleSecret && googleSecret !== "PASTE_YOUR_CLIENT_SECRET_HERE";
+
+	// Per-provider OAuth credentials from env, data-driven from SOCIAL_PROVIDERS
+	// (e.g. GOOGLE_CLIENT_ID/SECRET, GITHUB_CLIENT_ID/SECRET). Passed to
+	// resolveSettings as the env fallback; saved admin settings win per field.
+	const social: AuthEnvFallback["social"] = {};
+	for (const provider of SOCIAL_PROVIDERS) {
+		social[provider.id] = {
+			clientId: workerEnv[`${provider.envPrefix}_CLIENT_ID`],
+			clientSecret: workerEnv[`${provider.envPrefix}_CLIENT_SECRET`],
+		};
+	}
 
 	// The origin this request actually arrived on (canonical domain, the
 	// *.workers.dev URL, or localhost in dev).
@@ -113,7 +125,7 @@ function readEnvConfig(request: Request, siteFromConfig: URL | undefined) {
 	return {
 		baseURL,
 		secret,
-		google: hasGoogle ? { clientId: googleId!, clientSecret: googleSecret! } : undefined,
+		social,
 		trustedOrigins,
 	};
 }
@@ -157,9 +169,8 @@ const handler: APIRoute = async ({ request, session, site }) => {
 			}
 			const settings = resolveSettings(saved, {
 				secret: envConfig.secret,
-				googleClientId: envConfig.google?.clientId,
-				googleClientSecret: envConfig.google?.clientSecret,
 				baseUrl: envConfig.baseURL,
+				social: envConfig.social,
 			});
 
 			// A saved canonical URL overrides the env/request-resolved origin.
@@ -174,7 +185,7 @@ const handler: APIRoute = async ({ request, session, site }) => {
 				// Fall back to the env default if somehow unset (keeps auth working
 				// in dev before any secret is configured).
 				secret: settings.secret ?? envConfig.secret,
-				google: settings.google,
+				socialProviders: settings.socialProviders,
 				trustedOrigins,
 				requireEmailVerification: settings.requireEmailVerification,
 				sendOnSignIn: settings.sendOnSignIn,

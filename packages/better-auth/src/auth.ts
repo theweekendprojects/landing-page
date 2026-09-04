@@ -35,6 +35,14 @@ interface EmailNotConfiguredError extends Error {
  */
 export const ROLE_SUBSCRIBER = 10;
 
+/**
+ * OAuth social providers this plugin wires up. Better Auth supports many more
+ * (Apple, Discord, Microsoft, GitLab, X, Facebook, …); to add one, extend this
+ * union, the `SOCIAL_PROVIDERS` list in settings.ts, and the mapping in
+ * `createBetterAuth` below.
+ */
+export type SocialProviderId = "google" | "github";
+
 export interface BetterAuthOptions {
 	/**
 	 * Public origin of the site, e.g. "https://example.workers.dev".
@@ -46,8 +54,16 @@ export interface BetterAuthOptions {
 	 * secret (e.g. `env.BETTER_AUTH_SECRET`). A stable per-site value.
 	 */
 	secret: string;
-	/** Optional Google OAuth credentials. Omit to disable Google sign-in. */
-	google?: { clientId: string; clientSecret: string };
+	/**
+	 * OAuth social providers to enable, keyed by Better Auth's provider id
+	 * (`google`, `github`). Only include a provider when BOTH its clientId and
+	 * clientSecret are present; omit/leave empty to disable social sign-in.
+	 * Adding a provider later is just another key here (and a field in the
+	 * admin settings) — Better Auth supports many more natively.
+	 */
+	socialProviders?: Partial<
+		Record<SocialProviderId, { clientId: string; clientSecret: string }>
+	>;
 	/** Extra trusted origins for CSRF/redirect validation. */
 	trustedOrigins?: string[];
 	/**
@@ -88,6 +104,21 @@ export function createBetterAuth(
 	const requireEmailVerification = options.requireEmailVerification ?? true;
 	const sendOnSignIn = options.sendOnSignIn ?? true;
 	const autoSignInAfterVerification = options.autoSignInAfterVerification ?? true;
+
+	// Build Better Auth's socialProviders block from whichever providers have
+	// both credentials. Keys map 1:1 to Better Auth's native provider ids
+	// (`google`, `github`), so this is just a filtered copy. Empty when none
+	// are configured, which disables social sign-in entirely.
+	const socialProviders: Record<string, { clientId: string; clientSecret: string }> =
+		{};
+	for (const [id, creds] of Object.entries(options.socialProviders ?? {})) {
+		if (creds?.clientId && creds?.clientSecret) {
+			socialProviders[id] = {
+				clientId: creds.clientId,
+				clientSecret: creds.clientSecret,
+			};
+		}
+	}
 
 	return betterAuth({
 		baseURL: options.baseURL,
@@ -166,16 +197,7 @@ export function createBetterAuth(
 				}
 			},
 		},
-		...(options.google
-			? {
-					socialProviders: {
-						google: {
-							clientId: options.google.clientId,
-							clientSecret: options.google.clientSecret,
-						},
-					},
-				}
-			: {}),
+		...(Object.keys(socialProviders).length > 0 ? { socialProviders } : {}),
 		// Map Better-Auth's `user` model onto EmDash's `users` columns. The
 		// adapter's field-name mapping (via the factory) turns these logical
 		// field names into physical column names before any SQL is built.

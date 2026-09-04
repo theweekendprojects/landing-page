@@ -1,6 +1,6 @@
 # @theweekendprojects/better-auth
 
-Email/password (and optional Google) authentication for [EmDash](https://emdashcms.com) sites, powered by [Better Auth](https://better-auth.com) with prebuilt [Better Auth UI](https://better-auth-ui.com) (HeroUI) sign-in / sign-up pages.
+Email/password (and optional social — Google, GitHub) authentication for [EmDash](https://emdashcms.com) sites, powered by [Better Auth](https://better-auth.com) with prebuilt [Better Auth UI](https://better-auth-ui.com) (HeroUI) sign-in / sign-up pages.
 
 It registers as an EmDash `AuthProviderDescriptor`, so it plugs in with a single line and ships everything it needs — the API handler, the styled auth pages, and a light/dark/system theme toggle — with **no per-site database migrations**.
 
@@ -11,7 +11,8 @@ It registers as an EmDash `AuthProviderDescriptor`, so it plugs in with a single
 - **Light / Dark / System theme toggle** on the auth pages, persisted per visitor.
 - **Session bridging.** After sign-in/up the plugin writes EmDash's own session cookie, so the same account works for both the public site and `/_emdash/admin` (subject to role).
 - **Portable storage.** Better Auth's session/account/verification state lives in EmDash's shared plugin storage (`getAuthProviderStorage`), namespaced `auth:better-auth` — no custom tables, no migration files.
-- **Optional admin settings UI.** An opt-in companion plugin (`betterAuthSettingsPlugin()`) adds a Better Auth settings page to the EmDash admin sidebar — verification toggles, canonical URL, and Google / Better Auth secrets — read at request time with env-var fallback. See [Admin settings](#admin-settings-optional).
+- **Social sign-in (Google, GitHub).** Enabled per-provider when credentials are configured (env vars or the admin UI). Data-driven and easy to extend to more providers — see [Enabling social sign-in](#enabling-social-sign-in).
+- **Optional admin settings UI.** An opt-in companion plugin (`betterAuthSettingsPlugin()`) adds a Better Auth settings page to the EmDash admin sidebar — verification toggles, canonical URL, the Better Auth secret, and per-provider social credentials — read at request time with env-var fallback. See [Admin settings](#admin-settings-optional).
 
 ## Requirements
 
@@ -88,16 +89,18 @@ The plugin reads these from the Worker environment at request time. Set them as 
 # Required. Generate with: openssl rand -base64 32
 wrangler secret put BETTER_AUTH_SECRET
 
-# Optional — enables Google sign-in (omit for email/password only)
+# Optional — enables social sign-in (per provider; omit for email/password only)
 wrangler secret put GOOGLE_CLIENT_ID
 wrangler secret put GOOGLE_CLIENT_SECRET
+wrangler secret put GITHUB_CLIENT_ID
+wrangler secret put GITHUB_CLIENT_SECRET
 ```
 
 | Variable | Required | Notes |
 | --- | --- | --- |
 | `BETTER_AUTH_SECRET` | Yes | Signing/encryption secret. At least 32 chars, high entropy. |
-| `GOOGLE_CLIENT_ID` | No | Enables Google sign-in when both Google vars are set. |
-| `GOOGLE_CLIENT_SECRET` | No | Google sign-in is disabled if this is missing or left as a placeholder. |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | No | Enables Google sign-in when both are set (or set them in the admin UI). Disabled if either is missing or left as a placeholder. |
+| `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` | No | Enables GitHub sign-in when both are set (or via the admin UI). Same rules as Google. |
 | `BETTER_AUTH_URL` | No | Canonical public origin (e.g. `https://blog.example.com`). See below. |
 
 #### Base URL / canonical origin
@@ -131,20 +134,45 @@ the env var.
 Client-side calls are already origin-relative (resolved from `window.location`),
 so they need none of this.
 
-#### Enabling Google sign-in
+#### Enabling social sign-in
 
-1. In the [Google Cloud Console](https://console.cloud.google.com/apis/credentials) create an OAuth **Web application** client.
-2. Add this **authorized redirect URI** (Better Auth's default callback path):
-   `https://<your-domain>/api/auth/callback/google`
-3. Upload the credentials as Worker secrets and redeploy:
+Ships with **Google** and **GitHub**. Each provider turns on only when BOTH its
+client ID and secret are configured — via env vars (above) or the admin UI (see
+[Admin settings](#admin-settings-optional)). A half-configured provider (id but
+no secret, or vice versa) stays off. The auth pages show a provider's button
+automatically once it's enabled; no code change needed.
+
+For each provider you want:
+
+1. Create an OAuth app in the provider's developer console:
+   - Google — [Google Cloud Console](https://console.cloud.google.com/apis/credentials), an OAuth **Web application** client.
+   - GitHub — **Settings → Developer settings → OAuth Apps → New OAuth App**.
+2. Register the **authorized redirect / callback URL** (Better Auth's default
+   callback path — the admin settings page also shows this per provider, ready
+   to copy):
+   - Google: `https://<your-domain>/api/auth/callback/google`
+   - GitHub: `https://<your-domain>/api/auth/callback/github`
+3. Provide the credentials, either as Worker secrets:
    ```bash
    wrangler secret put GOOGLE_CLIENT_ID
    wrangler secret put GOOGLE_CLIENT_SECRET
+   # and/or
+   wrangler secret put GITHUB_CLIENT_ID
+   wrangler secret put GITHUB_CLIENT_SECRET
    ```
-The auth pages detect the configured credentials at runtime and show the Google button automatically — no code change needed. If the credentials are absent (or the secret is left as a placeholder), Google is hidden and only email/password is offered.
-| `EMDASH_SITE_URL` | No | Public origin override. Defaults to the request origin. |
+   …or by pasting them into the **Better Auth** admin settings page (per-provider
+   section, with its own Save button). Saved settings win over env vars per field.
 
-For local development, put the same values in `.dev.vars` so `wrangler dev` picks them up.
+For local development, put the same values in `.dev.vars` so `wrangler dev`
+picks them up.
+
+**Adding another provider** (Better Auth supports Apple, Discord, Microsoft,
+GitLab, Facebook, X, …): extend the `SocialProviderId` union in `auth.ts` and add
+an entry to `SOCIAL_PROVIDERS` in `settings.ts` (`{ id, label, envPrefix }`,
+where `id` is Better Auth's provider id). The admin section, kv keys, env
+fallback (`<PREFIX>_CLIENT_ID/SECRET`), and callback URL are all derived from
+that list — no other wiring needed. Facebook was intentionally left out of the
+initial set to keep it simple.
 
 ### 3. Deploy
 
@@ -201,7 +229,7 @@ The form exposes:
 | Auto sign-in after verification | toggle | Log in on link click (default on). |
 | Canonical site URL | url | Overrides `BETTER_AUTH_URL` / `site:` for email links. |
 | Better Auth secret | secret | Session signing key. See the security note below. |
-| Google client ID / secret | string / secret | Enables Google sign-in. |
+| Social sign-in (Google, GitHub) | string / secret per provider | One stacked section per provider — client ID + secret, plus the read-only callback URL to register. Its own Save button. |
 
 **Precedence:** a saved admin setting wins over the matching env var, which
 wins over the built-in default. Every field is optional — leave one blank and
@@ -219,12 +247,14 @@ the settings can't be read.
 > admin field for it only if you accept that tradeoff (e.g. pending an EmDash
 > feature for encrypted-at-rest secret storage).
 
-> **Watch out for browser autofill on the secret fields.** A password manager
-> may silently populate the "Better Auth secret" / Google fields with saved
-> credentials for the site; clicking **Save** would then persist those junk
-> values (and, for the signing key, rotate every session). Blank secret fields
-> are left untouched on save — but autofill makes them non-blank. Before saving,
-> confirm the secret fields are actually empty (or hold the value you intend).
+> **Watch out for browser autofill on the credential fields.** A password
+> manager may silently populate the "Better Auth secret" and the per-provider
+> client ID / secret fields with saved credentials for the site; clicking
+> **Save** would then persist those junk values (and, for the signing key,
+> rotate every session; for a provider, enable it with bad credentials). Blank
+> secret fields are left untouched on save — but autofill makes them non-blank.
+> Before saving any section, confirm its fields are actually empty (or hold the
+> value you intend).
 > If a wrong value gets saved, clearing it in the form won't remove it (blank =
 > "keep existing"); delete the row directly, e.g.
 > `DELETE FROM options WHERE name = 'plugin:better-auth-settings:settings:betterAuthSecret';`
@@ -331,7 +361,7 @@ So on a fresh site the correct sequence is just: register the provider, set `BET
 ## Notes & limitations
 
 - **Cloudflare Workers–oriented.** Secrets come from the Worker `env`; storage uses EmDash's D1-backed plugin storage.
-- **Google sign-in** requires real credentials set as Worker secrets; it's hidden otherwise.
+- **Social sign-in (Google, GitHub)** requires real credentials (Worker secrets or the admin UI); each provider is hidden until both its ID and secret are set.
 - **Dependency footprint.** The prebuilt UI pulls in HeroUI v3 + several TanStack packages. The client bundle loads only on the `/auth` routes, not your content pages.
 - **Email verification is mandatory and requires a working email provider.** Sign-up creates the account but blocks login until the emailed link is clicked, so a site with no `email:deliver` provider configured leaves new users unable to log in. Configure a provider (see *Email* above) before enabling public sign-up, or set `requireEmailVerification: false` in `auth.ts` to soften it.
 

@@ -50,8 +50,34 @@ export const SETTINGS_PLUGIN_ID = "better-auth-settings";
 export const SETTINGS_ADMIN_PAGE_PATH = "/settings";
 
 /**
- * Setting keys. Kept as a const object so the schema, the resolver, and any
- * callers all reference the same string literals (no typo drift).
+ * OAuth social providers this plugin exposes in the admin UI, in display
+ * order. Data-driven so adding a provider is a one-line change here (plus the
+ * `SocialProviderId` union + mapping in auth.ts). Each provider contributes two
+ * settings keys — `<id>ClientId` and `<id>ClientSecret` — and reads env
+ * fallbacks `<ENV>_CLIENT_ID` / `<ENV>_CLIENT_SECRET`.
+ *
+ * `id` must match Better Auth's native provider id (it's also the OAuth
+ * callback path segment: `/api/auth/callback/<id>`).
+ */
+export const SOCIAL_PROVIDERS = [
+	{ id: "google", label: "Google", envPrefix: "GOOGLE" },
+	{ id: "github", label: "GitHub", envPrefix: "GITHUB" },
+] as const;
+
+export type SocialProviderId = (typeof SOCIAL_PROVIDERS)[number]["id"];
+
+/** kv/setting key for a provider's client id, e.g. `googleClientId`. */
+export function providerClientIdKey(id: string): string {
+	return `${id}ClientId`;
+}
+/** kv/setting key for a provider's client secret, e.g. `googleClientSecret`. */
+export function providerClientSecretKey(id: string): string {
+	return `${id}ClientSecret`;
+}
+
+/**
+ * Non-social setting keys. Social keys are derived from SOCIAL_PROVIDERS.
+ * Kept as a const object so callers reference the same string literals.
  */
 export const SETTINGS_KEYS = {
 	requireEmailVerification: "requireEmailVerification",
@@ -59,15 +85,12 @@ export const SETTINGS_KEYS = {
 	autoSignInAfterVerification: "autoSignInAfterVerification",
 	baseUrl: "baseUrl",
 	betterAuthSecret: "betterAuthSecret",
-	googleClientId: "googleClientId",
-	googleClientSecret: "googleClientSecret",
 } as const;
 
 /**
  * Built-in defaults, applied when neither a saved setting nor an env var is
- * present. Must be applied in code: EmDash does NOT materialize
- * `settingsSchema` defaults into stored values, and `getPluginSetting`
- * returns `undefined` for unset keys.
+ * present. Must be applied in code: `getPluginSetting` returns `undefined` for
+ * unset keys.
  */
 export const SETTINGS_DEFAULTS = {
 	requireEmailVerification: true,
@@ -83,13 +106,16 @@ const BOOLEAN_KEYS = [
 ] as const;
 
 /** Secret-typed setting keys (masked in UI; preserved on save when blank). */
-const SECRET_KEYS = [
+const SECRET_KEYS: readonly string[] = [
 	SETTINGS_KEYS.betterAuthSecret,
-	SETTINGS_KEYS.googleClientSecret,
-] as const;
+	...SOCIAL_PROVIDERS.map((p) => providerClientSecretKey(p.id)),
+];
 
 /** Plain-text setting keys. */
-const TEXT_KEYS = [SETTINGS_KEYS.baseUrl, SETTINGS_KEYS.googleClientId] as const;
+const TEXT_KEYS: readonly string[] = [
+	SETTINGS_KEYS.baseUrl,
+	...SOCIAL_PROVIDERS.map((p) => providerClientIdKey(p.id)),
+];
 
 /**
  * Read every saved setting from plugin kv into a flat `{ field: value }` map.
@@ -110,29 +136,44 @@ export async function readKvSettings(kv: KVAccess): Promise<Record<string, unkno
 /**
  * Persist submitted form values to plugin kv.
  *
- * - Booleans are coerced and always written (a toggle always sends a value).
- * - Text fields: write trimmed value, or delete the key when cleared.
- * - Secret fields: only overwrite when the user typed a new value; a blank
- *   submission leaves the stored secret untouched (the masked input sends
- *   nothing when the operator didn't change it). Mirrors emdash-smtp.
+ * IMPORTANT: only keys ACTUALLY PRESENT in `values` are touched. The admin UI
+ * has multiple forms (core settings + one per social provider), and each form
+ * submits only its own fields — so a provider save must not reset the toggles
+ * or another provider's keys just because they're absent from this payload.
+ *
+ * Per key type (when present):
+ * - Booleans: coerced and written.
+ * - Text: write trimmed value, or delete the key when explicitly cleared.
+ * - Secrets: only overwrite when a new value was typed; a blank/absent secret
+ *   leaves the stored value untouched (the masked input sends nothing when the
+ *   operator didn't change it). Mirrors emdash-smtp.
  */
 export async function writeKvSettings(
 	kv: KVAccess,
 	values: Record<string, unknown>,
 ): Promise<void> {
 	for (const key of BOOLEAN_KEYS) {
+		if (!(key in values)) continue;
 		await kv.set(`settings:${key}`, coerceBool(values[key], false));
 	}
 	for (const key of TEXT_KEYS) {
+		if (!(key in values)) continue;
 		const next = trimOrUndefined(values[key]);
 		if (next !== undefined) await kv.set(`settings:${key}`, next);
 		else await kv.delete(`settings:${key}`);
 	}
 	for (const key of SECRET_KEYS) {
+		if (!(key in values)) continue;
 		const next = trimOrUndefined(values[key]);
 		// Only update when a new secret was entered; blank = keep existing.
 		if (next !== undefined) await kv.set(`settings:${key}`, next);
 	}
+}
+
+/** A single provider's resolved credentials. */
+export interface ResolvedProviderCreds {
+	clientId: string;
+	clientSecret: string;
 }
 
 /** Resolved, typed Better Auth configuration after merging all sources. */
@@ -144,16 +185,27 @@ export interface ResolvedAuthSettings {
 	baseUrl?: string;
 	/** Session signing secret, or undefined to fall back to env. */
 	secret?: string;
-	google?: { clientId: string; clientSecret: string };
+	/**
+	 * Configured social providers (only those with BOTH id + secret present),
+	 * keyed by provider id. Empty when none are configured.
+	 */
+	socialProviders: Partial<Record<SocialProviderId, ResolvedProviderCreds>>;
 }
 
 /** Raw env values the resolver may fall back to (all optional). */
 export interface AuthEnvFallback {
 	secret?: string;
-	googleClientId?: string;
-	googleClientSecret?: string;
 	baseUrl?: string;
+	/**
+	 * Per-provider env credentials, keyed by provider id, e.g.
+	 * `{ google: { clientId, clientSecret }, github: {...} }`. Assembled by the
+	 * caller from `<PREFIX>_CLIENT_ID` / `<PREFIX>_CLIENT_SECRET` env vars.
+	 */
+	social?: Partial<Record<SocialProviderId, Partial<ResolvedProviderCreds>>>;
 }
+
+/** Placeholder secret value from the template — treated as "not set". */
+const PLACEHOLDER_SECRET = "PASTE_YOUR_CLIENT_SECRET_HERE";
 
 function trimOrUndefined(value: unknown): string | undefined {
 	if (typeof value !== "string") return undefined;
@@ -181,8 +233,10 @@ function coerceBool(value: unknown, fallback: boolean): boolean {
  * single typed config. Pure and synchronous so it's trivial to unit-test; the
  * async DB read (`getPluginSettings`) happens in the caller (the auth route).
  *
- * A placeholder Google secret (the template's PASTE_YOUR_... value) is treated
- * as "not set" so Google stays hidden until real credentials exist.
+ * For each social provider, credentials resolve saved-over-env per field, and
+ * the provider is only included when BOTH resolved id and secret are present.
+ * A placeholder secret (the template's PASTE_YOUR_... value) is treated as
+ * "not set" so a provider stays disabled until real credentials exist.
  */
 export function resolveSettings(
 	saved: Record<string, unknown>,
@@ -208,20 +262,20 @@ export function resolveSettings(
 		trimOrUndefined(saved[SETTINGS_KEYS.betterAuthSecret]) ??
 		trimOrUndefined(env.secret);
 
-	const googleClientId =
-		trimOrUndefined(saved[SETTINGS_KEYS.googleClientId]) ??
-		trimOrUndefined(env.googleClientId);
-	let googleClientSecret =
-		trimOrUndefined(saved[SETTINGS_KEYS.googleClientSecret]) ??
-		trimOrUndefined(env.googleClientSecret);
-	if (googleClientSecret === "PASTE_YOUR_CLIENT_SECRET_HERE") {
-		googleClientSecret = undefined;
+	const socialProviders: Partial<Record<SocialProviderId, ResolvedProviderCreds>> = {};
+	for (const provider of SOCIAL_PROVIDERS) {
+		const envCreds = env.social?.[provider.id];
+		const clientId =
+			trimOrUndefined(saved[providerClientIdKey(provider.id)]) ??
+			trimOrUndefined(envCreds?.clientId);
+		let clientSecret =
+			trimOrUndefined(saved[providerClientSecretKey(provider.id)]) ??
+			trimOrUndefined(envCreds?.clientSecret);
+		if (clientSecret === PLACEHOLDER_SECRET) clientSecret = undefined;
+		if (clientId && clientSecret) {
+			socialProviders[provider.id] = { clientId, clientSecret };
+		}
 	}
-
-	const google =
-		googleClientId && googleClientSecret
-			? { clientId: googleClientId, clientSecret: googleClientSecret }
-			: undefined;
 
 	return {
 		requireEmailVerification,
@@ -229,6 +283,6 @@ export function resolveSettings(
 		autoSignInAfterVerification,
 		baseUrl,
 		secret,
-		google,
+		socialProviders,
 	};
 }
