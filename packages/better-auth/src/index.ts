@@ -27,14 +27,13 @@
 
 import type { AuthProviderDescriptor, PluginDescriptor, PluginStorageConfig } from "emdash";
 
-import { SETTINGS_PLUGIN_ID, SETTINGS_SCHEMA } from "./settings.js";
+import { SETTINGS_ADMIN_PAGE_PATH, SETTINGS_PLUGIN_ID } from "./settings.js";
 
 export { createBetterAuth, type BetterAuthOptions, ROLE_SUBSCRIBER } from "./auth.js";
 export { emdashAdapter, type BetterAuthStorage } from "./emdash-adapter.js";
 export {
 	SETTINGS_PLUGIN_ID,
 	SETTINGS_KEYS,
-	SETTINGS_SCHEMA,
 	SETTINGS_DEFAULTS,
 	resolveSettings,
 	type ResolvedAuthSettings,
@@ -125,11 +124,18 @@ export function betterAuthProvider(): AuthProviderDescriptor {
  * });
  * ```
  *
- * It declares a `settingsSchema` that EmDash auto-renders into a settings form
- * (toggles for verification behavior, canonical URL, Google credentials, and
- * the Better Auth secret). Values are persisted in EmDash plugin storage; the
+ * It contributes a custom admin page (its own sidebar link at
+ * `/_emdash/admin/plugins/better-auth-settings/settings`) that renders a Block
+ * Kit form — toggles for verification behavior, canonical URL, Google
+ * credentials, and the Better Auth secret. Values persist to plugin kv; the
  * auth route reads them back at request time with env-var fallback (see
- * `resolveSettings`). The plugin is otherwise inert — no hooks, no routes.
+ * `resolveSettings`).
+ *
+ * Why a custom page rather than the declarative `settingsSchema` auto-render:
+ * that form only surfaces through the admin "Plugins" manager, which is broken
+ * by a pre-existing EmDash core bug (the plugin-list endpoint 500s). The custom
+ * page has its own route and sidebar link, so it works regardless. Mirrors how
+ * `emdash-smtp` builds its provider settings page.
  *
  * SECURITY: secret fields are stored in the database (masked in the UI, not
  * encrypted at rest), the same way `emdash-smtp` stores its API key. Leave the
@@ -142,7 +148,7 @@ export function betterAuthSettingsPlugin(): PluginDescriptor {
 		version: "0.1.0",
 		format: "native",
 		entrypoint: "@theweekendprojects/better-auth/settings-plugin",
-		// Static, build-time-visible schema EmDash uses to render the form.
-		settingsSchema: SETTINGS_SCHEMA,
+		// Its own admin sidebar page (not the auto-rendered settingsSchema path).
+		adminPages: [{ path: SETTINGS_ADMIN_PAGE_PATH, label: "Better Auth", icon: "shield" }],
 	};
 }

@@ -11,7 +11,7 @@ It registers as an EmDash `AuthProviderDescriptor`, so it plugs in with a single
 - **Light / Dark / System theme toggle** on the auth pages, persisted per visitor.
 - **Session bridging.** After sign-in/up the plugin writes EmDash's own session cookie, so the same account works for both the public site and `/_emdash/admin` (subject to role).
 - **Portable storage.** Better Auth's session/account/verification state lives in EmDash's shared plugin storage (`getAuthProviderStorage`), namespaced `auth:better-auth` — no custom tables, no migration files.
-- **Optional admin settings UI.** An opt-in companion plugin (`betterAuthSettingsPlugin()`) adds an auto-rendered EmDash admin form for the verification toggles, canonical URL, and Google / Better Auth secrets — read at request time with env-var fallback. See [Admin settings](#admin-settings-optional).
+- **Optional admin settings UI.** An opt-in companion plugin (`betterAuthSettingsPlugin()`) adds a Better Auth settings page to the EmDash admin sidebar — verification toggles, canonical URL, and Google / Better Auth secrets — read at request time with env-var fallback. See [Admin settings](#admin-settings-optional).
 
 ## Requirements
 
@@ -166,16 +166,31 @@ import { betterAuthProvider, betterAuthSettingsPlugin } from "@theweekendproject
 
 emdash({
   authProviders: [betterAuthProvider()],
-  plugins: [betterAuthSettingsPlugin()], // adds the admin settings form
+  plugins: [betterAuthSettingsPlugin()], // adds a "Better Auth" admin sidebar page
 });
 ```
 
+It adds a **Better Auth** entry to the admin sidebar (under Plugins) at
+`/_emdash/admin/plugins/better-auth-settings/settings`, rendering a settings
+form. Saved values persist to the plugin's key-value store (the `options`
+table, keys `plugin:better-auth-settings:settings:<field>`); the auth provider
+reads them back at request time via `getPluginSettings(...)`.
+
 Why a separate plugin? Better Auth registers as an EmDash *auth provider*, and
 that registration path has no admin-settings surface — only the full plugin
-system (`plugins: [...]`) can declare a `settingsSchema` that EmDash
-auto-renders into a form and persists. `betterAuthSettingsPlugin()` is a tiny,
-otherwise-inert native plugin whose only job is to own that form + storage. The
-auth provider reads the saved values back at request time.
+system (`plugins: [...]`) can contribute admin UI. `betterAuthSettingsPlugin()`
+is a tiny native plugin whose only job is to own that settings page + storage.
+
+Why a custom page rather than EmDash's declarative `settingsSchema`
+auto-render? The auto-rendered form only surfaces inside the admin **Plugins
+manager** page, which loads the plugin-list endpoint first. On the EmDash
+version this was built against, that endpoint returns a 500 (a pre-existing
+core bug, unrelated to this plugin — it throws before this plugin is reached),
+so a `settingsSchema` form never displays. So the plugin renders its own page
+via `adminPages` + a `routes.admin` handler (the same mechanism `emdash-smtp`
+uses) — it gets its own sidebar link and route and doesn't touch the broken
+list endpoint. If/when that core bug is fixed, this could be simplified back to
+`settingsSchema`.
 
 The form exposes:
 
@@ -194,15 +209,25 @@ the env var / default is used. So the settings plugin is purely additive: with
 all fields blank it changes nothing, and the site keeps working via env vars if
 the settings can't be read.
 
-> **Security — secrets are stored in the database, not encrypted.** EmDash's
-> `secret` field type only *masks* the input in the UI; the value is persisted
-> in the `_plugin_storage` table (D1) as plaintext, the same way `emdash-smtp`
-> stores its API key. For the **Better Auth secret** specifically — the session
-> signing key — DB storage is meaningfully weaker than a Worker secret: if the
-> database leaks, sessions can be forged. **Recommended:** leave the "Better
-> Auth secret" field blank and keep `BETTER_AUTH_SECRET` as a Worker secret.
-> Use the admin field for it only if you accept that tradeoff (e.g. pending an
-> EmDash feature for encrypted-at-rest secret storage).
+> **Security — secrets are stored in the database, not encrypted.** The masked
+> secret field only *hides* the input in the UI; the value is persisted in the
+> `options` table (D1) as plaintext, the same way `emdash-smtp` stores its API
+> key. For the **Better Auth secret** specifically — the session signing key —
+> DB storage is meaningfully weaker than a Worker secret: if the database
+> leaks, sessions can be forged. **Recommended:** leave the "Better Auth
+> secret" field blank and keep `BETTER_AUTH_SECRET` as a Worker secret. Use the
+> admin field for it only if you accept that tradeoff (e.g. pending an EmDash
+> feature for encrypted-at-rest secret storage).
+
+> **Watch out for browser autofill on the secret fields.** A password manager
+> may silently populate the "Better Auth secret" / Google fields with saved
+> credentials for the site; clicking **Save** would then persist those junk
+> values (and, for the signing key, rotate every session). Blank secret fields
+> are left untouched on save — but autofill makes them non-blank. Before saving,
+> confirm the secret fields are actually empty (or hold the value you intend).
+> If a wrong value gets saved, clearing it in the form won't remove it (blank =
+> "keep existing"); delete the row directly, e.g.
+> `DELETE FROM options WHERE name = 'plugin:better-auth-settings:settings:betterAuthSecret';`
 
 > **Note on the post-sign-up redirect.** The auth UI decides whether to route to
 > the "verify your email" page after sign-up based on a client-side flag that

@@ -1,39 +1,53 @@
 /**
  * Better Auth admin-configurable settings.
  *
- * This module is the single source of truth for the settings that the
- * companion EmDash plugin exposes in the admin UI (auto-rendered from
- * `SETTINGS_SCHEMA`) and that the auth route reads back at request time
- * (via {@link resolveSettings}).
+ * Single source of truth for the settings the companion EmDash plugin exposes
+ * in the admin UI (a custom Block Kit page — see settings-plugin-entry.ts) and
+ * that the auth route reads back at request time (via {@link resolveSettings}).
  *
  * WHY A COMPANION PLUGIN: Better Auth registers with EmDash as an
- * `AuthProviderDescriptor`, and that registration path has NO admin settings
- * surface. Only the full plugin system (`plugins: [...]` / `definePlugin`)
- * can declare a `settingsSchema` that EmDash auto-renders into a settings
- * form and persists. So we ship a tiny second registration — a native plugin
- * whose only job is to own the settings form + storage. The auth provider then
- * reads those saved values at runtime.
+ * `AuthProviderDescriptor`, and that path has NO admin settings surface. Only
+ * the full plugin system (`plugins: [...]` / `definePlugin`) can add admin UI.
+ * So we ship a tiny second registration — a native plugin whose only job is to
+ * own the settings page + storage. The auth provider reads those saved values
+ * at runtime.
+ *
+ * WHY A CUSTOM PAGE (not `settingsSchema`): the declarative auto-rendered form
+ * only shows in the admin "Plugins" manager, which is broken by a pre-existing
+ * core bug (the plugin-list endpoint 500s). So we render our own Block Kit page
+ * via `admin.pages` + `routes.admin`, like `emdash-smtp` does — its own sidebar
+ * link + route, which sidesteps the broken list endpoint.
+ *
+ * STORAGE LAYOUT: each field is stored as its own kv key `settings:<field>`
+ * (via `ctx.kv` in the admin page). `ctx.kv` persists to the options table
+ * under `plugin:<id>:settings:<field>` — the exact prefix
+ * `getPluginSettings(<id>)` reads back — so the admin page and the auth route
+ * see the same flat `{ field: value }` map with no translation.
  *
  * PRECEDENCE: saved admin settings win over Worker env vars, which win over
  * built-in defaults. Env vars remain a working fallback so the site keeps
- * functioning before anything is saved (and so a future migration to
- * encrypted-secret env storage is easy).
+ * functioning before anything is saved.
  *
- * SECRETS TRADEOFF: values entered in the admin UI (including
- * `betterAuthSecret` and `googleClientSecret`) are stored in EmDash's
- * `_plugin_storage` table in D1 as plaintext — `type: "secret"` only masks the
- * field in the UI, it does not encrypt at rest. This is the same way
- * `emdash-smtp` stores its Resend API key. `betterAuthSecret` is the session
- * signing key; if the database leaks, sessions can be forged. This is an
- * explicit, accepted tradeoff pending an EmDash feature for encrypted secret
- * storage — until then, keeping `BETTER_AUTH_SECRET` as a Worker secret (env
- * fallback, leaving the admin field blank) remains the stronger posture.
+ * SECRETS TRADEOFF: secret values (incl. `betterAuthSecret`,
+ * `googleClientSecret`) are stored in the DB as plaintext — the masked
+ * `secret_input` field only hides them in the UI, it does not encrypt at rest.
+ * Same as how `emdash-smtp` stores its API key. `betterAuthSecret` is the
+ * session signing key; if the database leaks, sessions can be forged. Accepted
+ * tradeoff pending an EmDash feature for encrypted secrets — until then,
+ * keeping `BETTER_AUTH_SECRET` as a Worker secret (leave the admin field blank)
+ * is the stronger posture.
  */
 
-import type { SettingField } from "emdash";
+import type { KVAccess } from "emdash";
 
 /** Plugin id that owns the settings form + storage namespace. */
 export const SETTINGS_PLUGIN_ID = "better-auth-settings";
+
+/**
+ * Relative path for the settings admin page. Becomes the sidebar link
+ * `/_emdash/admin/plugins/better-auth-settings/settings`.
+ */
+export const SETTINGS_ADMIN_PAGE_PATH = "/settings";
 
 /**
  * Setting keys. Kept as a const object so the schema, the resolver, and any
@@ -61,61 +75,65 @@ export const SETTINGS_DEFAULTS = {
 	autoSignInAfterVerification: true,
 } as const;
 
+/** Boolean-typed setting keys (rendered as toggles, coerced on read). */
+const BOOLEAN_KEYS = [
+	SETTINGS_KEYS.requireEmailVerification,
+	SETTINGS_KEYS.sendOnSignIn,
+	SETTINGS_KEYS.autoSignInAfterVerification,
+] as const;
+
+/** Secret-typed setting keys (masked in UI; preserved on save when blank). */
+const SECRET_KEYS = [
+	SETTINGS_KEYS.betterAuthSecret,
+	SETTINGS_KEYS.googleClientSecret,
+] as const;
+
+/** Plain-text setting keys. */
+const TEXT_KEYS = [SETTINGS_KEYS.baseUrl, SETTINGS_KEYS.googleClientId] as const;
+
 /**
- * The admin settings form, auto-rendered by EmDash from this schema.
- *
- * `boolean` → toggle, `secret` → masked input, `url`/`string` → text inputs.
- * Descriptions are shown under each field, so we use them to warn about the
- * secret-storage tradeoff and the env-var fallback right where the operator
- * is looking.
+ * Read every saved setting from plugin kv into a flat `{ field: value }` map.
+ * Each field is its own kv key `settings:<field>`, matching the layout
+ * `getPluginSettings(SETTINGS_PLUGIN_ID)` reads (so the auth route sees the
+ * same values). Missing keys are simply absent from the map.
  */
-export const SETTINGS_SCHEMA: Record<string, SettingField> = {
-	[SETTINGS_KEYS.requireEmailVerification]: {
-		type: "boolean",
-		label: "Require email verification",
-		description:
-			"When on, a new account cannot sign in until its email is verified. Blocks bot-created accounts. Requires a working email provider (Settings → Email).",
-		default: SETTINGS_DEFAULTS.requireEmailVerification,
-	},
-	[SETTINGS_KEYS.sendOnSignIn]: {
-		type: "boolean",
-		label: "Re-send verification on sign-in",
-		description:
-			"When an unverified user tries to sign in, automatically re-send the verification link so they don't have to find the original email.",
-		default: SETTINGS_DEFAULTS.sendOnSignIn,
-	},
-	[SETTINGS_KEYS.autoSignInAfterVerification]: {
-		type: "boolean",
-		label: "Auto sign-in after verification",
-		description:
-			"When on, clicking the verification link logs the user in immediately (no separate sign-in step).",
-		default: SETTINGS_DEFAULTS.autoSignInAfterVerification,
-	},
-	[SETTINGS_KEYS.baseUrl]: {
-		type: "url",
-		label: "Canonical site URL",
-		description:
-			"Absolute origin used for links in verification / password-reset emails (e.g. https://example.com). Leave blank to use astro.config `site:` or the request origin. Overrides the BETTER_AUTH_URL env var when set.",
-		placeholder: "https://example.com",
-	},
-	[SETTINGS_KEYS.betterAuthSecret]: {
-		type: "secret",
-		label: "Better Auth secret",
-		description:
-			"Session signing key (min 32 chars). SECURITY: stored in the database, not encrypted — leave blank to keep using the BETTER_AUTH_SECRET Worker secret (recommended for the signing key).",
-	},
-	[SETTINGS_KEYS.googleClientId]: {
-		type: "string",
-		label: "Google client ID",
-		description: "Enables Google sign-in when both Google fields are set. Falls back to the GOOGLE_CLIENT_ID env var.",
-	},
-	[SETTINGS_KEYS.googleClientSecret]: {
-		type: "secret",
-		label: "Google client secret",
-		description:
-			"Stored in the database (masked in UI, not encrypted at rest). Falls back to the GOOGLE_CLIENT_SECRET env var when blank.",
-	},
-};
+export async function readKvSettings(kv: KVAccess): Promise<Record<string, unknown>> {
+	const allKeys = [...BOOLEAN_KEYS, ...SECRET_KEYS, ...TEXT_KEYS];
+	const out: Record<string, unknown> = {};
+	for (const key of allKeys) {
+		const value = await kv.get<unknown>(`settings:${key}`);
+		if (value !== null && value !== undefined) out[key] = value;
+	}
+	return out;
+}
+
+/**
+ * Persist submitted form values to plugin kv.
+ *
+ * - Booleans are coerced and always written (a toggle always sends a value).
+ * - Text fields: write trimmed value, or delete the key when cleared.
+ * - Secret fields: only overwrite when the user typed a new value; a blank
+ *   submission leaves the stored secret untouched (the masked input sends
+ *   nothing when the operator didn't change it). Mirrors emdash-smtp.
+ */
+export async function writeKvSettings(
+	kv: KVAccess,
+	values: Record<string, unknown>,
+): Promise<void> {
+	for (const key of BOOLEAN_KEYS) {
+		await kv.set(`settings:${key}`, coerceBool(values[key], false));
+	}
+	for (const key of TEXT_KEYS) {
+		const next = trimOrUndefined(values[key]);
+		if (next !== undefined) await kv.set(`settings:${key}`, next);
+		else await kv.delete(`settings:${key}`);
+	}
+	for (const key of SECRET_KEYS) {
+		const next = trimOrUndefined(values[key]);
+		// Only update when a new secret was entered; blank = keep existing.
+		if (next !== undefined) await kv.set(`settings:${key}`, next);
+	}
+}
 
 /** Resolved, typed Better Auth configuration after merging all sources. */
 export interface ResolvedAuthSettings {
