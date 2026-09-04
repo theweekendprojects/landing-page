@@ -144,20 +144,27 @@ function buildSettingsPage(
 	blocks.push({ type: "divider" });
 	blocks.push({ type: "header", text: "Social sign-in" });
 	blocks.push({
-		type: "context",
-		text: "Enable OAuth logins by adding credentials from each provider's developer console. A provider only turns on when BOTH its client ID and secret are set (saved here, or via the matching env vars). Register the callback URL shown below with the provider.",
+		type: "banner",
+		title: "How social sign-in works",
+		description:
+			"Each provider turns on only when BOTH its client ID and secret are set (here, or via the matching env vars). Register the callback URL shown on each card in that provider's developer console.",
+		variant: "default",
 	});
 
 	for (const provider of SOCIAL_PROVIDERS) {
 		const idKey = providerClientIdKey(provider.id);
 		const secretKey = providerClientSecretKey(provider.id);
 		const callbackUrl = `${callbackBase}/api/auth/callback/${provider.id}`;
+		const enabled = hasVal(saved[idKey]) && hasVal(saved[secretKey]);
 
 		blocks.push({ type: "divider" });
-		blocks.push({ type: "header", text: provider.label });
+		// A banner acts as a titled card grouping each provider. The glyph is a
+		// lightweight stand-in for a brand icon (no image element in Block Kit).
 		blocks.push({
-			type: "context",
-			text: `Authorized redirect URI (register this in the ${provider.label} console): ${callbackUrl}`,
+			type: "banner",
+			title: `${provider.glyph} ${provider.label}${enabled ? " · enabled" : ""}`,
+			description: `Authorized redirect URI (register this in the ${provider.label} console):\n${callbackUrl}`,
+			variant: "default",
 		});
 		blocks.push({
 			type: "form",
