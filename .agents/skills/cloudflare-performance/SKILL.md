@@ -1,6 +1,6 @@
 ---
 name: cloudflare-performance
-description: Make an EmDash + Astro site fast on Cloudflare Workers. Use when a page feels slow, when setting up or auditing edge caching, image optimization, CSS inlining, LCP/front-end delivery, D1/KV performance, or when diagnosing "why is this site slow" with wrangler tail, server-timing, curl, and headless-browser FCP measurement. Covers the exact gotchas these sites hit and fixed, and how to benchmark against a known-fast reference site.
+description: Make an EmDash + Astro site fast on Cloudflare Workers. Use when a page feels slow, when setting up or auditing edge caching, image optimization, CSS inlining, LCP/front-end delivery, D1/KV performance, scroll-reveal content gated behind JS, parallelizing cold-render data fetches, Workers observability setup, or measuring real Core Web Vitals (LCP/CLS/FCP) vs curl TTFB. Diagnoses "why is this site slow" with wrangler tail, server-timing, curl, and headless-browser measurement. Covers the exact gotchas these sites hit and fixed, a known-good Core Web Vitals baseline to regress against, and how to benchmark against a known-fast reference site.
 ---
 
 # Cloudflare Performance for EmDash + Astro
@@ -426,3 +426,153 @@ replica when available) rather than manually juggling both.
 - When running long-lived commands like `wrangler tail` via an agent's async terminal
   tooling, prefer a single command with `nvm use` chained via `&&` in one string — some
   terminal tools silently drop a leading `cd ...&&` prefix on compound commands.
+
+## 7. Scroll-reveal must not gate content on JS
+
+A "feels like the page waits to load everything" complaint on a list page
+(`/posts`, `/projects`) is often NOT images and NOT the edge cache — it's a
+scroll-reveal animation that starts content at `opacity: 0` and only reveals
+it once an `IntersectionObserver` runs. The HTML, text, and card layout all
+arrive fast (edge-cached), but every card sits invisible until JS boots and
+the observer fires. On a slow connection, slow JS, or JS blocked entirely,
+the grid stays blank the whole time.
+
+Symptom: `curl` shows the HTML is complete and fast, but in a browser the
+cards are blank until JS runs. Confirm by reading computed opacity right
+after load, or by loading with JS disabled:
+
+```js
+// JS disabled context in Playwright — simulates slow/blocked JS
+const ctx = await browser.newContext({ javaScriptEnabled: false });
+// ...goto the page, then:
+[...document.querySelectorAll('.post-card-wrapper')].map(el => getComputedStyle(el).opacity);
+// All "0" = content is gated behind JS. Should be "1".
+```
+
+The culprit lives in the shared layout (`Base.astro`), not the page — a
+global rule like:
+
+```css
+[data-reveal] { opacity: 0; transform: translateY(20px); transition: ...; }
+[data-reveal].is-revealed { opacity: 1; transform: none; }
+```
+
+**Fix: gate the hidden start-state behind a `.js` flag set inline in `<head>`
+before first paint.** Content renders visible by default; the fade only
+applies once JS is confirmed live. No-JS and slow-JS both show content
+immediately, and there's no flash because the class is set before paint.
+
+```html
+<!-- inline in <head>, runs before first paint -->
+<script is:inline>
+  document.documentElement.classList.add("js");
+</script>
+```
+```css
+.js [data-reveal] { opacity: 0; transform: translateY(20px); transition: ...; }
+.js [data-reveal].is-revealed { opacity: 1; transform: none; }
+```
+
+Gotcha: bump the `prefers-reduced-motion` override to the same `.js`
+specificity (`.js [data-reveal], [data-reveal] { opacity: 1; ... }`) or the
+`.js`-scoped rule (0,2,0) outranks the media-query rule (0,1,0) and
+reduced-motion visitors get the hidden-until-JS behavior back.
+
+This is a FCP/perceived-load fix, not a byte or TTFB fix — the measured win
+is "content visible at 0ms" instead of "visible only after JS boots."
+
+## 8. Parallelize independent data fetches (cold-render tail)
+
+EmDash query helpers are `await`ed one per line, which reads naturally but
+serializes independent DB round-trips. On a cold render (cache MISS, cold
+isolate) each one adds to the tail. Two hot spots on this site:
+
+- **`Base.astro`** (runs on EVERY page): `getSiteSettings()`,
+  `getMenu("primary")`, `getMenu("social")`, `getEmDashCollection("pages")`
+  were four serial awaits. None depend on each other.
+- **Detail pages** (`posts/[slug]`, `projects/[slug]`): after the entry
+  fetch (which must run first — it owns the 404 guard), `getSiteSettings()`,
+  the recent-posts/projects rail, and `resolveHero()` were serial. All three
+  are independent of each other.
+
+Fix: batch each independent group with `Promise.all`. Keep anything that
+genuinely depends on an earlier result (e.g. `getTermsForEntries` needs the
+list of other posts first) after the batch.
+
+```ts
+const [siteSettings, menu, socialMenu, pagesResult] = await Promise.all([
+  getSiteSettings(), getMenu("primary"), getMenu("social"), getEmDashCollection("pages"),
+]);
+```
+
+Caveat (measured): this helps the cold-render wall-clock, but the dominant
+cold cost is EmDash's own plugin/middleware bootstrap (17-18 D1 queries on a
+cold isolate), which site code can't trim. Real users hit the `swr` edge
+cache (~60-80ms TTFB) and never pay the cold path, so don't oversell this —
+it's a tail-latency cleanup, not a headline FCP win. Verify the `?cb=`
+cache-busted numbers are the only ones that look slow; normal navigation is
+already fast.
+
+## 9. Enable observability + keep compatibility_date current
+
+From the official `cloudflare/skills` (`workers-best-practices`): enable
+Workers Logs + Traces in `wrangler.jsonc` before production, so live errors
+and slow renders land in a searchable dashboard instead of only ephemeral
+`wrangler tail`. The top-level `enabled` alone does NOT turn on traces — set
+each sub-key.
+
+```jsonc
+"observability": {
+  "enabled": true,
+  "logs":   { "enabled": true, "head_sampling_rate": 1 },
+  "traces": { "enabled": true, "head_sampling_rate": 0.01 }
+}
+```
+
+Also keep `compatibility_date` current (bump periodically, redeploy, confirm
+key pages still 200). Stale dates miss runtime fixes; this stack only needs
+`nodejs_compat`, so bumps are low-risk but should still be smoke-tested.
+
+## 10. Measure real Core Web Vitals, not curl TTFB
+
+`curl` measures the HTML document only. "Feels fast" is Core Web Vitals
+(LCP, CLS, INP) — all client-side. Per `cloudflare/skills` `web-perf`, use a
+real browser and the Navigation/Paint/PerformanceObserver APIs. Chrome
+DevTools MCP gives the richest trace; a headless Playwright browser reading
+the timing APIs is a solid substitute when that MCP isn't installed.
+
+Install the LCP + CLS observers BEFORE navigation (`buffered: true`), load
+the page, wait ~2.5s for them to settle, then read:
+
+```js
+new PerformanceObserver(l => { for (const e of l.getEntries()) if (!e.hadRecentInput) window.__cls += e.value; })
+  .observe({ type: 'layout-shift', buffered: true });
+new PerformanceObserver(l => { const es = l.getEntries(); window.__lcp = es[es.length-1].startTime; })
+  .observe({ type: 'largest-contentful-paint', buffered: true });
+// after load + settle:
+const nav = performance.getEntriesByType('navigation')[0];
+const fcp = performance.getEntriesByType('paint').find(e => e.name === 'first-contentful-paint');
+// report nav.responseStart (TTFB), fcp.startTime, window.__lcp, window.__cls
+```
+
+Thresholds (good): TTFB <800ms, FCP <1.8s, LCP <2.5s, CLS <0.1, INP <200ms.
+
+### Known-good baseline for this site (warm, 1280×800, measured)
+
+Use this as the regression bar — if a change pushes any page past these,
+investigate before shipping.
+
+| Page            | TTFB | FCP   | LCP   | CLS | blocking CSS |
+|-----------------|------|-------|-------|-----|--------------|
+| Home `/`        | 61ms | 572ms | 572ms | 0   | 0            |
+| Posts list      | 62ms | 408ms | 792ms | 0   | 0            |
+| Projects list   | 57ms | 396ms | 580ms | 0   | 0            |
+| Post detail     | 67ms | 516ms | 552ms | 0   | 0            |
+| Project detail  | 65ms | 424ms | 1.34s | 0   | 0            |
+
+All metrics are well inside "good". `blockingStylesheets: 0` everywhere
+confirms section 3b (inline CSS) is holding. CLS 0 everywhere confirms images
+carry `width`/`height`. The project-detail LCP (1.34s, full-width hero
+transform) is the slowest LCP and still "good" — not worth chasing. Per the
+`web-perf` skill: a site this far inside the thresholds has no perf issue to
+fix; say so rather than inventing work.
