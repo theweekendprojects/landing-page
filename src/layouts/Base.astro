@@ -126,6 +126,14 @@ const canUseAdmin = (user?.role ?? 0) >= 30; // Role.AUTHOR
 				if (theme === "dark" || theme === "light") {
 					document.documentElement.classList.add(theme);
 				}
+				// Mark that JS is live. The scroll-reveal start state
+				// (opacity:0) is scoped to `.js [data-reveal]`, so without
+				// this flag — no-JS, or before this inline script runs —
+				// content renders visible immediately instead of waiting on
+				// the IntersectionObserver. Set here (inline, in <head>) so
+				// the class is present before first paint and there's no
+				// flash of already-shown content snapping back to hidden.
+				document.documentElement.classList.add("js");
 			})();
 		</script>
 	</head>
@@ -508,7 +516,14 @@ const canUseAdmin = (user?.role ?? 0) >= 30; // Role.AUTHOR
 				 * to -- this matches the timing used across all six source
 				 * mockups (0.6s cubic-bezier, ~20px translateY).
 				 */
-				[data-reveal] {
+				/*
+				 * Start hidden ONLY when JS is live (`.js` is set by the
+				 * inline head script before first paint). Without JS — or
+				 * before that script runs — content stays visible, so a slow
+				 * or blocked IntersectionObserver can never leave the grid
+				 * blank. The fade-in still plays normally once JS reveals.
+				 */
+				.js [data-reveal] {
 					opacity: 0;
 					transform: translateY(20px);
 					transition:
@@ -517,12 +532,16 @@ const canUseAdmin = (user?.role ?? 0) >= 30; // Role.AUTHOR
 					transition-delay: var(--reveal-delay, 0s);
 				}
 
-				[data-reveal].is-revealed {
+				.js [data-reveal].is-revealed {
 					opacity: 1;
 					transform: translateY(0);
 				}
 
 				@media (prefers-reduced-motion: reduce) {
+					/* Match the `.js [data-reveal]` specificity so this wins
+					   and reduced-motion visitors see content immediately,
+					   with no fade. */
+					.js [data-reveal],
 					[data-reveal] {
 						opacity: 1;
 						transform: none;

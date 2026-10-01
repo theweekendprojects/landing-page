@@ -1,4 +1,46 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
-	<rect width="32" height="32" rx="7" fill="#0066cc" />
-	<text x="16" y="23" font-family="system-ui, sans-serif" font-size="19" font-weight="700" fill="#ffffff" text-anchor="middle">W</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300" role="img" aria-label="The Weekend Projects logo">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#13304d"/>
+      <stop offset="0.55" stop-color="#0d2238"/>
+      <stop offset="1" stop-color="#091624"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#32cedd"/>
+      <stop offset="1" stop-color="#d6a52c"/>
+    </linearGradient>
+    <clipPath id="round">
+      <rect x="4" y="4" width="292" height="292" rx="44"/>
+    </clipPath>
+  </defs>
+
+  <!-- card background -->
+  <rect x="4" y="4" width="292" height="292" rx="44" fill="url(#bg)"/>
+
+  <!-- faint cyan circuit grid, clipped to the rounded card -->
+  <g clip-path="url(#round)" stroke="#32cedd" stroke-width="1" opacity="0.12">
+    <path d="M60 4V296M100 4V296M140 4V296M180 4V296M220 4V296M260 4V296"/>
+    <path d="M4 60H296M4 100H296M4 140H296M4 180H296M4 220H296M4 260H296"/>
+  </g>
+  <!-- a few brighter circuit nodes -->
+  <g fill="#32cedd" opacity="0.4">
+    <circle cx="60" cy="60" r="2.5"/>
+    <circle cx="260" cy="100" r="2.5"/>
+    <circle cx="100" cy="260" r="2.5"/>
+    <circle cx="220" cy="220" r="2.5"/>
+  </g>
+
+  <!-- inner border -->
+  <rect x="12" y="12" width="276" height="276" rx="38" fill="none" stroke="#32cedd" stroke-width="1.5" opacity="0.25"/>
+
+  <!-- wordmark: WP -->
+  <text x="138" y="178" text-anchor="middle"
+        font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif"
+        font-size="118" font-weight="800" letter-spacing="-4" fill="#ffffff">WP</text>
+
+  <!-- cyan dot accent -->
+  <circle cx="206" cy="168" r="11" fill="#32cedd"/>
+
+  <!-- gradient underline bar -->
+  <rect x="112" y="205" width="76" height="7" rx="3.5" fill="url(#accent)"/>
 </svg>
