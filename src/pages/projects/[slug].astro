@@ -10,6 +10,7 @@ import { Image, PortableText } from "emdash/ui";
 import Base from "../../layouts/Base.astro";
 import ProjectCard from "../../components/ProjectCard.astro";
 import { resolveBlogSiteIdentity } from "../../utils/site-identity";
+import { resolveHero } from "../../utils/hero-image";
 
 const slug = decodeSlug(Astro.params.slug);
 
@@ -73,6 +74,14 @@ const { entries: recentProjects } = await getEmDashCollection("projects", {
 	limit: 4,
 });
 const otherProjects = recentProjects.filter((p) => p.id !== project.id).slice(0, 3);
+
+// Resolve the LCP hero once: feeds both the <img> and the matching <Base>
+// preload link. Falls back to null (-> emdash <Image>). See utils/hero-image.ts.
+const hero = await resolveHero({
+	image: project.data.featured_image,
+	origin: Astro.url.origin,
+	layout: "full-width",
+});
 ---
 
 <Base
@@ -86,12 +95,17 @@ const otherProjects = recentProjects.filter((p) => p.id !== project.id).slice(0,
 	publishedTime={project.data.publishedAt?.toISOString() ?? null}
 	modifiedTime={project.data.updatedAt.toISOString()}
 	content={{ collection: "projects", id: project.data.id, slug }}
+	heroPreload={hero?.preload}
 >
 	<article class="project-detail">
 		{
 			project.data.featured_image && (
 				<div class="detail-hero" {...project.edit.featured_image}>
-					<Image image={project.data.featured_image} priority />
+					{hero ? (
+						<img {...hero.imgAttrs} alt="" />
+					) : (
+						<Image image={project.data.featured_image} priority />
+					)}
 				</div>
 			)
 		}

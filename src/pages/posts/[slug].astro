@@ -13,6 +13,7 @@ import Base from "../../layouts/Base.astro";
 import PostCard from "../../components/PostCard.astro";
 import { getReadingTime } from "../../utils/reading-time";
 import { resolveBlogSiteIdentity } from "../../utils/site-identity";
+import { resolveHero } from "../../utils/hero-image";
 
 const slug = decodeSlug(Astro.params.slug);
 
@@ -96,6 +97,15 @@ const publishDate =
 		month: "long",
 		day: "numeric",
 	}) ?? null;
+
+// Resolve the LCP hero once: feeds both the <img> and the matching preload link
+// (passed to <Base heroPreload>). Falls back to null (-> emdash <Image>) if the
+// image can't be resolved. See src/utils/hero-image.ts.
+const hero = await resolveHero({
+	image: post.data.featured_image,
+	origin: Astro.url.origin,
+	layout: "full-width",
+});
 ---
 
 <Base
@@ -109,13 +119,18 @@ const publishDate =
 	publishedTime={post.data.publishedAt?.toISOString() ?? null}
 	modifiedTime={post.data.updatedAt.toISOString()}
 	content={{ collection: "posts", id: post.data.id, slug }}
+	heroPreload={hero?.preload}
 >
 	<article class="article">
 		{/* Hero: Full-width featured image */}
 		{
 			post.data.featured_image && (
 				<div class="article-hero" {...post.edit.featured_image}>
-					<Image image={post.data.featured_image} priority />
+					{hero ? (
+						<img {...hero.imgAttrs} alt="" />
+					) : (
+						<Image image={post.data.featured_image} priority />
+					)}
 				</div>
 			)
 		}

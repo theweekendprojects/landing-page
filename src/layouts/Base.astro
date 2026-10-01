@@ -26,6 +26,16 @@ interface Props {
 	author?: string | null;
 	/** Pass content reference for plugin page contributions on content pages */
 	content?: { collection: string; id: string; slug?: string | null };
+	/**
+	 * Optional LCP hero-image preload. Built by resolveHero() in the page from
+	 * the SAME getImage() call that renders the hero <img>, so the preloaded
+	 * variant always matches what the browser picks (no double download).
+	 */
+	heroPreload?: {
+		href: string;
+		imagesrcset?: string;
+		imagesizes?: string;
+	} | null;
 }
 
 const {
@@ -40,6 +50,7 @@ const {
 	modifiedTime,
 	author,
 	content,
+	heroPreload,
 } = Astro.props;
 const { siteTitle, siteTagline, siteLogo } = resolveBlogSiteIdentity(await getSiteSettings());
 // If title already includes site title (from getSeoMeta), use as-is
@@ -89,6 +100,18 @@ const canUseAdmin = (user?.role ?? 0) >= 30; // Role.AUTHOR
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+		{
+			heroPreload && (
+				<link
+					rel="preload"
+					as="image"
+					href={heroPreload.href}
+					imagesrcset={heroPreload.imagesrcset}
+					imagesizes={heroPreload.imagesizes}
+					fetchpriority="high"
+				/>
+			)
+		}
 		<Font cssVariable="--font-body" preload />
 		<Font cssVariable="--font-mono" />
 		<title>{fullTitle}</title>
