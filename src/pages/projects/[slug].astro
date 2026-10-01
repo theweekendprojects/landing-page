@@ -42,7 +42,21 @@ function getImageUrl(img: unknown): string | undefined {
 	return undefined;
 }
 const featuredImageUrl = getImageUrl(project.data.featured_image);
-const { siteTitle } = resolveBlogSiteIdentity(await getSiteSettings());
+
+// Site settings, the "more projects" rail, and the LCP hero are all
+// independent of each other (and of the already-fetched entry), so fetch
+// them together instead of in series — one wall-clock wait on a cold cache
+// instead of three.
+const [siteSettings, recentProjectsResult, hero] = await Promise.all([
+	getSiteSettings(),
+	getEmDashCollection("projects", { orderBy: { published_at: "desc" }, limit: 4 }),
+	resolveHero({
+		image: project.data.featured_image,
+		origin: Astro.url.origin,
+		layout: "full-width",
+	}),
+]);
+const { siteTitle } = resolveBlogSiteIdentity(siteSettings);
 
 const seo = getSeoMeta(project, {
 	siteTitle,
@@ -68,20 +82,10 @@ const publishDate =
 		day: "numeric",
 	}) ?? null;
 
-// A few other projects for the "more projects" rail.
-const { entries: recentProjects } = await getEmDashCollection("projects", {
-	orderBy: { published_at: "desc" },
-	limit: 4,
-});
-const otherProjects = recentProjects.filter((p) => p.id !== project.id).slice(0, 3);
-
-// Resolve the LCP hero once: feeds both the <img> and the matching <Base>
-// preload link. Falls back to null (-> emdash <Image>). See utils/hero-image.ts.
-const hero = await resolveHero({
-	image: project.data.featured_image,
-	origin: Astro.url.origin,
-	layout: "full-width",
-});
+// A few other projects for the "more projects" rail (fetched above, in parallel).
+const otherProjects = recentProjectsResult.entries
+	.filter((p) => p.id !== project.id)
+	.slice(0, 3);
 ---
 
 <Base

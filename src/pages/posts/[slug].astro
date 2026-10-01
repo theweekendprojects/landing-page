@@ -51,7 +51,22 @@ function getImageUrl(img: unknown): string | undefined {
 	return undefined;
 }
 const featuredImageUrl = getImageUrl(post.data.featured_image);
-const { siteTitle } = resolveBlogSiteIdentity(await getSiteSettings());
+
+// Site settings, the recent-posts rail, and the LCP hero are independent of
+// each other and of the already-fetched entry, so fetch them together — one
+// wall-clock wait on a cold cache instead of three serial round-trips. The
+// related-posts tag batch below still runs after, since it needs the list of
+// other posts first.
+const [siteSettings, recentPostsResult, hero] = await Promise.all([
+	getSiteSettings(),
+	getEmDashCollection("posts", { orderBy: { published_at: "desc" }, limit: 4 }),
+	resolveHero({
+		image: post.data.featured_image,
+		origin: Astro.url.origin,
+		layout: "full-width",
+	}),
+]);
+const { siteTitle } = resolveBlogSiteIdentity(siteSettings);
 
 // Generate SEO meta from content
 const seo = getSeoMeta(post, {
@@ -71,12 +86,11 @@ const readingTime = getReadingTime(post.data.content);
 // no extra query needed.
 const tags = post.data.terms?.tag ?? [];
 
-// Fetch a few extra recent posts in case the current post is among them.
-const { entries: recentPosts } = await getEmDashCollection("posts", {
-	orderBy: { published_at: "desc" },
-	limit: 4,
-});
-const otherPosts = recentPosts.filter((p) => p.id !== post.id).slice(0, 3);
+// A few extra recent posts (fetched above, in parallel) in case the current
+// post is among them.
+const otherPosts = recentPostsResult.entries
+	.filter((p) => p.id !== post.id)
+	.slice(0, 3);
 
 // Single batched query for related-posts tags, rather than one
 // getEntryTerms() call per related post.
@@ -98,14 +112,6 @@ const publishDate =
 		day: "numeric",
 	}) ?? null;
 
-// Resolve the LCP hero once: feeds both the <img> and the matching preload link
-// (passed to <Base heroPreload>). Falls back to null (-> emdash <Image>) if the
-// image can't be resolved. See src/utils/hero-image.ts.
-const hero = await resolveHero({
-	image: post.data.featured_image,
-	origin: Astro.url.origin,
-	layout: "full-width",
-});
 ---
 
 <Base
