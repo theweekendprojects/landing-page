@@ -2,8 +2,17 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "landing-page",
 	"main": "./src/worker.ts",
-	"compatibility_date": "2026-02-24",
+	"compatibility_date": "2026-10-01",
 	"compatibility_flags": ["nodejs_compat"],
+	// Workers Logs + Traces. Without this, the only way to see live behaviour
+	// is `wrangler tail` (ephemeral); enabling it gives a searchable dashboard
+	// for errors, slow renders, and request traces. Logs sampled at 100%;
+	// traces at 1% to keep volume/cost down on steady traffic.
+	"observability": {
+		"enabled": true,
+		"logs": { "enabled": true, "head_sampling_rate": 1 },
+		"traces": { "enabled": true, "head_sampling_rate": 0.01 },
+	},
 	"d1_databases": [
 		{
 			"binding": "DB",
