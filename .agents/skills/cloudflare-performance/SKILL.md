@@ -195,6 +195,67 @@ whether it does depends on the Astro version — verify in the live HTML
 the known hero image. A reference EmDash site (everybittexas.com) ships exactly this: an
 `as="image"` preload of the Cloudflare-transformed WebP hero.
 
+## 3a. Browser Cache-Control for optimized images (edge ≠ browser)
+
+Enabling `cache.provider: cacheCloudflare()` + a `routeRules` `maxAge` (section 2) makes the
+Workers **edge** cache store `/_image` variants and `/_emdash/api/media/file/*` for a year —
+verify with `curl -sD- -o/dev/null <img-url> | grep cf-cache-status` → `HIT` with an `age:`.
+But on the Astro Cloudflare adapter the response that reaches the **browser** still carries
+the conservative default `cache-control: public, max-age=0, must-revalidate`
+(withastro/astro#13164, #16692 — the adapter only injects immutable `Cache-Control` for
+`/_astro/*` static assets, not for `/_image` or the CMS media route). The symptom:
+
+```bash
+curl -sD- -o/dev/null "<domain>/_image?...&f=webp" | grep -i cache-control
+# cache-control: public, max-age=0, must-revalidate   <-- browser won't cache
+```
+
+So the edge serves images fast, but **every repeat view and every client-side navigation
+re-requests each image over the network and pays a revalidation round trip**, even though
+the bytes never change. Measured on this site: 4 homepage images, ~160 KB re-fetched on every
+navigation; after the fix, `imgNetworkKB: 0` and `imgFromBrowserCache: 4/4` on repeat views,
+and a home revisit dropped from ~3.3s to ~480ms (warm).
+
+**Fix — set the header in the site's own Worker entry (`src/worker.ts`), no plugin:** wrap the
+re-exported EmDash handler's `fetch` and rewrite `Cache-Control` to
+`public, max-age=31536000, immutable` for **only** those two path shapes, **only** on
+successful GETs. Both are safe to cache immutably: media filenames are content-addressed ULIDs,
+and each `/_image` variant is keyed by its full `href+w+h+f` query, so a given URL always
+yields identical bytes.
+
+```ts
+// src/worker.ts
+import emdashWorker, { PluginBridge } from "@emdash-cms/cloudflare/worker";
+export { PluginBridge };
+
+const IMMUTABLE = "public, max-age=31536000, immutable";
+const isImg = (p: string) => p === "/_image" || p.startsWith("/_emdash/api/media/file/");
+const baseFetch = emdashWorker.fetch;
+
+export default {
+  ...emdashWorker,
+  fetch: baseFetch ? async (req, env, ctx) => {
+    const res = await baseFetch(req, env, ctx);
+    if (req.method !== "GET" || !res.ok) return res;        // never widen non-200 / non-GET
+    let p: string; try { p = new URL(req.url).pathname; } catch { return res; }
+    if (!isImg(p)) return res;                               // leave HTML + admin/API untouched
+    const headers = new Headers(res.headers);               // clone — original may be locked
+    headers.set("cache-control", IMMUTABLE);
+    return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
+  } : undefined,
+} satisfies ExportedHandler;
+```
+
+**Critical safety:** gate on `res.ok` and `method === "GET"`, and allow-list exactly the two
+image path prefixes. Do NOT broaden the match — EmDash admin/API responses are deliberately
+`private, no-store` and must stay that way; widening the cache on those would be a cache-poisoning
+/ data-leak bug. Verify after deploy that `/_emdash/admin` still has no public `Cache-Control`
+and HTML pages are still `no-cache`.
+
+This does **not** speed up the first transform of an uncached variant (that's the edge cache's
+job, section 2/3) — it only stops the browser re-fetching bytes it already has. If EmDash ever
+ships a long-lived browser `Cache-Control` on these routes itself, delete the wrapper.
+
 ## 3b. Inline all CSS (kill render-blocking stylesheets)
 
 By default Astro emits component CSS as external `<link rel="stylesheet">` files. Those
