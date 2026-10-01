@@ -195,6 +195,20 @@ whether it does depends on the Astro version — verify in the live HTML
 the known hero image. A reference EmDash site (everybittexas.com) ships exactly this: an
 `as="image"` preload of the Cloudflare-transformed WebP hero.
 
+**When you add the preload by hand, resolve the image ONCE for both the `<img>` and the
+preload — or you get a double download.** A responsive `<img>` has a `srcset`; the browser
+picks one variant. If your hand-written `<link rel="preload" as="image">` points at a
+different URL (or omits `imagesrcset`/`imagesizes`), the browser preloads one variant then
+downloads another for the `<img>` — two fetches, worse than no preload. Fix: call Astro's
+`getImage()` (the same `astro:assets` service `<Image>` uses) once in the page frontmatter,
+then feed that single result to BOTH the hero `<img>` attrs and the preload link
+(`href` + `imagesrcset` + `imagesizes` + `fetchpriority="high"`). The variants match by
+construction, so it stays a single fetch. Gotcha: pass the media object's own cached
+width/height to `getImage()` — Astro's `inferSize` (which fetches the image to read
+dimensions) fails during edge SSR. Fall back to plain `<Image>` when the image can't be
+resolved so the placeholder branch still renders. Scope it to the hero only; leave
+below-the-fold images on lazy `<Image>`.
+
 ## 3a. Browser Cache-Control for optimized images (edge ≠ browser)
 
 Enabling `cache.provider: cacheCloudflare()` + a `routeRules` `maxAge` (section 2) makes the
