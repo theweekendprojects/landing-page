@@ -479,6 +479,17 @@ replica when available) rather than manually juggling both.
 - When running long-lived commands like `wrangler tail` via an agent's async terminal
   tooling, prefer a single command with `nvm use` chained via `&&` in one string — some
   terminal tools silently drop a leading `cd ...&&` prefix on compound commands.
+- **Stale Vite cache serves OLD plugin code after you change a dependency.** When you
+  bump/repack a workspace plugin (e.g. a local `emdash-*` tarball) and rebuild, `rm -rf
+  dist .astro` is NOT enough: Vite caches the plugin's bundled modules under
+  `node_modules/.vite`, so the Worker ships the PREVIOUS version of that plugin's code
+  even though `node_modules/<plugin>/` on disk is the new one. Symptom: the installed
+  source has your fix (`grep` finds it in `node_modules/<plugin>/...`) but the deployed
+  Worker behaves like the old code (e.g. a new Set-Cookie / header never appears live).
+  Fix: clear the Vite cache too before building —
+  `rm -rf dist .astro node_modules/.vite` — then `pnpm build && wrangler deploy`.
+  Verify the behavior at the edge (e.g. `curl -sD- -o/dev/null <auth-endpoint> | grep -i
+  set-cookie`), not just that the source on disk contains the change.
 
 ## 7. Scroll-reveal must not gate content on JS
 
