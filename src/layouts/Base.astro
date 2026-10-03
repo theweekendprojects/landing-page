@@ -128,6 +128,16 @@ const pageCtx = createPublicPageContext({
 				if (theme === "dark" || theme === "light") {
 					document.documentElement.classList.add(theme);
 				}
+				// Anti-flash auth header: read the non-HttpOnly `ba_logged_in`
+				// hint cookie set by the auth plugin on login (cleared on logout)
+				// and mark the <html> element BEFORE paint. CSS keys the correct
+				// header block off this class so a logged-in user never sees the
+				// anonymous "Sign in / Sign up" flash on a cached page. The async
+				// /api/auth/get-session call (bottom of body) is still the source
+				// of truth and corrects a stale hint. The hint holds no identity.
+				if (/(^|;\s*)ba_logged_in=1(;|$)/.test(c)) {
+					document.documentElement.classList.add("is-authed");
+				}
 				// Mark that JS is live. The scroll-reveal start state
 				// (opacity:0) is scoped to `.js [data-reveal]`, so without
 				// this flag — no-JS, or before this inline script runs —
@@ -187,7 +197,11 @@ const pageCtx = createPublicPageContext({
 					  No Admin link here: Better Auth's get-session doesn't expose
 					  EmDash's numeric role, and we can't gate it correctly on the
 					  client. Admins reach the CMS directly at /_emdash/admin.
-					  Both blocks ship on every page; the inactive one is `hidden`.
+					  Which block shows is controlled ENTIRELY by the `is-authed`
+					  class on <html> (CSS below) — not by a `hidden` attribute — so
+					  the inline <head> script can flip it before paint (anti-flash)
+					  and the get-session script can correct it, both by toggling
+					  that one class.
 					*/}
 					<div class="nav-auth" data-auth-nav>
 						<div class="nav-auth-anon" data-auth-anon>
@@ -198,7 +212,7 @@ const pageCtx = createPublicPageContext({
 								Sign up
 							</a>
 						</div>
-						<div class="nav-auth-user" data-auth-user hidden>
+						<div class="nav-auth-user" data-auth-user>
 							<a href="/account" class="nav-auth-link">
 								My account
 							</a>
@@ -364,8 +378,7 @@ const pageCtx = createPublicPageContext({
 			(async () => {
 				const nav = document.querySelector("[data-auth-nav]");
 				if (!nav) return;
-				const anon = nav.querySelector<HTMLElement>("[data-auth-anon]");
-				const userBlock = nav.querySelector<HTMLElement>("[data-auth-user]");
+				const root = document.documentElement;
 				try {
 					const res = await fetch("/api/auth/get-session", {
 						credentials: "include",
@@ -373,13 +386,14 @@ const pageCtx = createPublicPageContext({
 					});
 					if (!res.ok) return;
 					const data = await res.json();
-					const user = data && data.user;
-					if (!user) return; // stay anonymous
-					// Logged in: show the user block, hide the anonymous one.
-					if (anon) anon.hidden = true;
-					if (userBlock) userBlock.hidden = false;
+					const loggedIn = !!(data && data.user);
+					// Source of truth: toggle the one class the header CSS keys off.
+					// Corrects a stale hint cookie in either direction (e.g. the
+					// hint said logged-in but the session actually expired, or the
+					// hint was missing on a browser that is in fact logged in).
+					root.classList.toggle("is-authed", loggedIn);
 				} catch {
-					// Network/parse error — leave the anonymous header as-is.
+					// Network/parse error — leave whatever the hint cookie implied.
 				}
 			})();
 
@@ -724,19 +738,23 @@ const pageCtx = createPublicPageContext({
 				font-size: var(--font-size-sm);
 			}
 
-			/* The anon/user wrappers are layout-transparent: `display: contents`
-			   drops their box so the links inside become direct flex items of
-			   .nav-auth, keeping the original gap + alignment. Toggling `hidden`
-			   on a wrapper still removes it (and its links) entirely, because
-			   `hidden` forces `display: none` which overrides `display: contents`. */
-			.nav-auth-anon,
-			.nav-auth-user {
+			/* Which auth block shows is driven purely by the `is-authed` class on
+			   <html>, set before paint by the inline head script (from the hint
+			   cookie) and corrected by the get-session script. `display: contents`
+			   makes the visible wrapper layout-transparent so its links are direct
+			   flex items of .nav-auth, keeping the original gap + alignment.
+			   Default (no class) = anonymous shown; `.is-authed` = user shown. */
+			.nav-auth-anon {
 				display: contents;
 			}
-
-			.nav-auth-anon[hidden],
-			.nav-auth-user[hidden] {
+			.nav-auth-user {
 				display: none;
+			}
+			html.is-authed .nav-auth-anon {
+				display: none;
+			}
+			html.is-authed .nav-auth-user {
+				display: contents;
 			}
 
 			.nav-auth-link {
