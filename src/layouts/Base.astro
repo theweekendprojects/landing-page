@@ -369,31 +369,48 @@ const pageCtx = createPublicPageContext({
 		</footer>
 
 		<script>
-			// --- Auth header hydration (cache-safe) -------------------------
-			// The SSR header is always the anonymous shell so the page is
-			// edge-cacheable and identical for everyone. Here we ask the server
-			// who we are and, if logged in, swap to the user block. One small
-			// uncached fetch per page load; the HTML document itself stays
-			// cached. Fails open to the anonymous view on any error.
-			(async () => {
+			// --- Auth header verification (cache-safe, cheap) ----------------
+			// The header is already painted correctly from the `ba_logged_in`
+			// hint cookie (inline <head> script → `is-authed` class), so this
+			// code only needs to CONFIRM/CORRECT that guess against the real
+			// session. To keep every page fast we avoid the network whenever the
+			// hint already matches reality in the common cases:
+			//   - no hint cookie  → treat as anonymous and DON'T fetch at all.
+			//     (A real logged-in session always sets the hint, so "no hint"
+			//     means anonymous for virtually everyone. Worst case — a browser
+			//     that somehow has a session but lost the hint — stays showing
+			//     the anonymous header until it next visits an auth route; an
+			//     acceptable, rare cosmetic miss, not a correctness bug.)
+			//   - hint present    → header is already the logged-in variant;
+			//     verify LAZILY on idle (not on the critical path) and only flip
+			//     back if the session turns out to be gone/expired.
+			// Net effect: anonymous visitors (the vast majority) make ZERO auth
+			// requests per page; logged-in visitors make one, deferred to idle.
+			(() => {
 				const nav = document.querySelector("[data-auth-nav]");
 				if (!nav) return;
 				const root = document.documentElement;
-				try {
-					const res = await fetch("/api/auth/get-session", {
-						credentials: "include",
-						headers: { accept: "application/json" },
-					});
-					if (!res.ok) return;
-					const data = await res.json();
-					const loggedIn = !!(data && data.user);
-					// Source of truth: toggle the one class the header CSS keys off.
-					// Corrects a stale hint cookie in either direction (e.g. the
-					// hint said logged-in but the session actually expired, or the
-					// hint was missing on a browser that is in fact logged in).
-					root.classList.toggle("is-authed", loggedIn);
-				} catch {
-					// Network/parse error — leave whatever the hint cookie implied.
+				const hasHint = /(^|;\s*)ba_logged_in=1(;|$)/.test(document.cookie);
+				if (!hasHint) return; // anonymous — header already correct, no fetch
+
+				const verify = async () => {
+					try {
+						const res = await fetch("/api/auth/get-session", {
+							credentials: "include",
+							headers: { accept: "application/json" },
+						});
+						if (!res.ok) return;
+						const data = await res.json();
+						root.classList.toggle("is-authed", !!(data && data.user));
+					} catch {
+						// Leave the hint-based header as-is on error.
+					}
+				};
+				// Defer off the critical path so it never delays FCP/interactivity.
+				if ("requestIdleCallback" in window) {
+					requestIdleCallback(verify, { timeout: 3000 });
+				} else {
+					setTimeout(verify, 1000);
 				}
 			})();
 
