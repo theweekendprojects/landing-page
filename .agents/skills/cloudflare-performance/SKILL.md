@@ -479,6 +479,22 @@ replica when available) rather than manually juggling both.
 - When running long-lived commands like `wrangler tail` via an agent's async terminal
   tooling, prefer a single command with `nvm use` chained via `&&` in one string — some
   terminal tools silently drop a leading `cd ...&&` prefix on compound commands.
+- **A `git push` to `main` auto-deploys and OVERWRITES your manual `wrangler deploy`.**
+  This Worker is connected to Cloudflare Workers Builds: every push to `main` triggers a
+  fresh build from git ~1-2 minutes later, and that build becomes the live version. If
+  `package.json` in git points at something the CI machine can't see (a local `file:`
+  tarball, or an unpublished version range that resolves to an OLD npm release), CI ships
+  the OLD dependency and silently replaces the good manual deploy. Symptom: "it worked
+  right after I deployed, then broke again a couple of minutes after I pushed" - and a
+  rebuild/cache clear on your machine changes nothing. Diagnose by comparing
+  `wrangler deployments list` timestamps against your `git log` push times: a deploy you
+  didn't run, ~2 minutes after each push, is CI. Fix: make git the source of truth - pin
+  the dependency to something CI can install (an exact `github:owner/repo#<commit-sha>`
+  for an unpublished plugin, or a published version), commit the lockfile, and verify
+  with a clean `git clone` + `pnpm install --frozen-lockfile` that it resolves the
+  right code. Never leave `file:/Users/...` in a committed `package.json`.
+  Always verify behavior on the live domain AFTER the auto-deploy lands, not just after
+  your own deploy.
 - **Stale Vite cache serves OLD plugin code after you change a dependency.** When you
   bump/repack a workspace plugin (e.g. a local `emdash-*` tarball) and rebuild, `rm -rf
   dist .astro` is NOT enough: Vite caches the plugin's bundled modules under
