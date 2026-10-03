@@ -391,7 +391,29 @@ const pageCtx = createPublicPageContext({
 				if (!nav) return;
 				const root = document.documentElement;
 				const hasHint = /(^|;\s*)ba_logged_in=1(;|$)/.test(document.cookie);
-				if (!hasHint) return; // anonymous — header already correct, no fetch
+				// Once per tab: a session can exist WITHOUT the hint (login made
+				// before the hint shipped, EmDash admin passkey login, or any path
+				// that bypasses the auth route). Trusting "no hint = anonymous"
+				// left those users logged in but shown "Sign in", and the sign-in
+				// page then bounced them home in a loop. So verify once per tab
+				// when there is no hint, and self-heal by writing the hint.
+				let checked = false;
+				try {
+					// Stored as a timestamp with a short life, so a login that
+					// bypasses our route (e.g. EmDash admin passkey) in the same
+					// tab is picked up within ~2 minutes instead of never.
+					const at = Number(sessionStorage.getItem("ba_checked") || 0);
+					checked = Date.now() - at < 120000;
+				} catch {
+					// storage blocked — fall through, treat as unchecked
+				}
+				if (!hasHint && checked) return; // verified anonymous this tab
+
+				const setHint = (on: boolean) => {
+					document.cookie = on
+						? "ba_logged_in=1; Path=/; Max-Age=604800; Secure; SameSite=Lax"
+						: "ba_logged_in=; Path=/; Max-Age=0; Secure; SameSite=Lax";
+				};
 
 				const verify = async () => {
 					try {
@@ -401,7 +423,16 @@ const pageCtx = createPublicPageContext({
 						});
 						if (!res.ok) return;
 						const data = await res.json();
-						root.classList.toggle("is-authed", !!(data && data.user));
+						const loggedIn = !!(data && data.user);
+						root.classList.toggle("is-authed", loggedIn);
+						// Keep the hint in step with reality (heals legacy sessions,
+						// clears a stale hint after expiry).
+						if (loggedIn !== hasHint) setHint(loggedIn);
+						try {
+							sessionStorage.setItem("ba_checked", String(Date.now()));
+						} catch {
+							// ignore
+						}
 					} catch {
 						// Leave the hint-based header as-is on error.
 					}
