@@ -724,6 +724,21 @@ const pageCtx = createPublicPageContext({
 				font-size: var(--font-size-sm);
 			}
 
+			/* The anon/user wrappers are layout-transparent: `display: contents`
+			   drops their box so the links inside become direct flex items of
+			   .nav-auth, keeping the original gap + alignment. Toggling `hidden`
+			   on a wrapper still removes it (and its links) entirely, because
+			   `hidden` forces `display: none` which overrides `display: contents`. */
+			.nav-auth-anon,
+			.nav-auth-user {
+				display: contents;
+			}
+
+			.nav-auth-anon[hidden],
+			.nav-auth-user[hidden] {
+				display: none;
+			}
+
 			.nav-auth-link {
 				text-decoration: none;
 				color: var(--color-text-secondary);

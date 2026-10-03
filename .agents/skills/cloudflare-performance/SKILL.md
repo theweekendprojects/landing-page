@@ -156,6 +156,59 @@ Cloudflare Images on *every* request (1-2s each) instead of being cached after t
 Verify: `curl -s -D - -o /dev/null <url> | grep cf-cache-status` — first hit `MISS`,
 repeat hits `HIT`.
 
+## 2a. Never bake per-user state into a cached page (the auth-header trap)
+
+The Cloudflare edge cache (section 2) keys entries by **URL only** — no `Vary`, no
+cookie awareness. So any page whose SSR output differs by *who is viewing* (a header that
+reads `Astro.locals.user` to show "Sign in" vs "My account / Sign out", a greeting, a
+cart count) will have **one** variant stored and served to everyone. Whichever request
+populates the cache first wins:
+
+- anonymous populates it → logged-in users get the "Sign in" header (and any sign-in-page
+  SSR gate `if (Astro.locals.user) redirect("/")` throws them into a loop: the auth page
+  thinks they're logged in and bounces to `/`, but cached `/` shows "Sign in", so they
+  click again — forever);
+- a logged-in request populates it → anonymous visitors get "My account / Sign out".
+
+This looks exactly like an auth/session bug and sends you debugging cookies for hours.
+It is not. **Confirm it is caching** in one shot: fetch `/` with a valid session cookie
+and check the body + `cf-cache-status`:
+
+```bash
+curl -s -b "$SESSION_JAR" -D - -o /tmp/x.html "https://<domain>/" | grep -i cf-cache-status
+grep -oE 'Sign in|My account' /tmp/x.html   # logged-in cookie but body says "Sign in" + HIT = cache poisoning
+```
+If a logged-in request returns `HIT` with the anonymous header, that's this bug.
+
+**Why the obvious fixes don't work:**
+- `Astro.cache.set(false)` in a page/middleware only stops *storing* this response; it
+  cannot stop the edge *serving* an entry it already holds — and on a HIT the Worker never
+  runs at all, so your bypass code never executes. (The `cacheCloudflare` provider is
+  header-only: it emits `Cloudflare-CDN-Cache-Control`; the serve/store is the edge's, in
+  front of the Worker, keyed by URL. There is no cookie-aware cache-key hook in the
+  provider or route-rule schema.)
+- Dropping the route from `routeRules` fixes correctness but kills the cache for everyone,
+  including anonymous visitors — the opposite of what you want.
+
+**Two fixes that actually work:**
+1. **Cache the shell, hydrate auth client-side (no dashboard, keeps full cache — preferred).**
+   Render the header *auth-agnostic* at SSR: emit both states in the DOM (anonymous shown,
+   logged-in `hidden`), never reading `Astro.locals.user`. A tiny client script calls
+   `/api/auth/get-session` and swaps blocks. The SSR HTML is then byte-identical for all
+   visitors, so it caches safely and is correct for everyone. Verify the cached `/` body is
+   identical for an anonymous vs a cookie-bearing request. (This is what this site does —
+   see `src/layouts/Base.astro`.) Note `get-session` returns Better Auth's string `role`,
+   NOT EmDash's numeric role, so you can't gate an Admin link client-side; link admins
+   straight to `/_emdash/admin` instead.
+2. **Bypass-on-cookie at the edge (needs a Cloudflare zone/dashboard).** Add a Cache Rule
+   that bypasses cache (or adds the session cookie to the cache key) when the request
+   carries your session cookie. Anonymous stays cached; logged-in always misses to the
+   Worker. This is the standard WordPress/Drupal pattern, but it lives in Cloudflare
+   config, not Astro code, and isn't available on a bare `*.workers.dev` deploy.
+
+Rule of thumb: **if the HTML changes per user, it must not be in a URL-keyed shared cache.**
+Push the per-user part to a client fetch, or bypass the cache for authenticated requests.
+
 ## 3. Image optimization actually running
 
 EmDash's `<Image>` (`emdash/ui`) delegates to Astro's configured image service
