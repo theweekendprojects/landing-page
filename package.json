@@ -29,7 +29,7 @@
     "clsx": "^2.1.1",
     "emdash": "^1.0.1",
     "emdash-ai-search": "^0.5.0",
-    "emdash-better-auth": "github:theweekendprojects/emdash-better-auth#e1f6955ab53ab23481b0cba4f1f990955b9bac09",
+    "emdash-better-auth": "github:theweekendprojects/emdash-better-auth#6385b04",
     "emdash-smtp": "^0.3.4",
     "kysely-d1": "^0.4.0",
     "lucide-react": "^1.37.0",
