@@ -51,8 +51,8 @@ importers:
         specifier: ^0.5.0
         version: 0.5.0
       emdash-better-auth:
-        specifier: github:theweekendprojects/emdash-better-auth#6385b04
-        version: https://codeload.github.com/theweekendprojects/emdash-better-auth/tar.gz/6385b04337b04ad00e09168b38d44f75c0eb8dce(993f995392bdc8593d3c981a7eec7a81)
+        specifier: github:theweekendprojects/emdash-better-auth#1f54265
+        version: https://codeload.github.com/theweekendprojects/emdash-better-auth/tar.gz/1f54265cb309d0718be8aad3c0e28e69dc918786(993f995392bdc8593d3c981a7eec7a81)
       emdash-smtp:
         specifier: ^0.3.4
         version: 0.3.4(emdash@1.0.1(@astrojs/react@6.0.5(@types/node@26.4.0)(@types/react-dom@19.2.5(@types/react@18.3.31))(@types/react@18.3.31)(esbuild@0.28.2)(jiti@2.7.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(yaml@2.9.0))(@atcute/cbor@2.3.8(@atcute/cid@2.5.0))(@atcute/cid@2.5.0)(@atcute/identity@2.0.2(@atcute/lexicons@2.1.0)(typescript@7.0.2))(@date-fns/tz@1.5.0)(@floating-ui/dom@1.8.0)(@tiptap/extensions@3.30.6(@tiptap/core@3.30.6(@tiptap/pm@3.30.6))(@tiptap/pm@3.30.6))(@types/react-dom@19.2.5(@types/react@18.3.31))(@types/react@18.3.31)(astro@7.2.10(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@26.4.0)(jiti@2.7.0)(yaml@2.9.0))(date-fns@4.4.0)(echarts@6.1.0)(prosemirror-model@1.25.11)(prosemirror-state@1.4.4)(prosemirror-view@1.42.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@7.0.2))
@@ -3426,9 +3426,9 @@ packages:
     resolution: {integrity: sha512-pNlNW5VvLuBsxMnR2MtBJw8Bggm6gHlqYNeRWcjtcH597Z2b6ZvHqDI0Se/SSCqFGwRM/ElrJ+7gsQW/QPcEaw==}
     engines: {node: '>=18.0.0'}
 
-  emdash-better-auth@https://codeload.github.com/theweekendprojects/emdash-better-auth/tar.gz/6385b04337b04ad00e09168b38d44f75c0eb8dce:
-    resolution: {gitHosted: true, integrity: sha512-3Oy/rzvqoFUDxNPUfROqo8+UGEWOgX7X5bpxXrAGNPcdb2wr7AMQzH9AeVBfQjz3hoETXYozOtHWJUXqb6wabw==, tarball: https://codeload.github.com/theweekendprojects/emdash-better-auth/tar.gz/6385b04337b04ad00e09168b38d44f75c0eb8dce}
-    version: 0.8.1
+  emdash-better-auth@https://codeload.github.com/theweekendprojects/emdash-better-auth/tar.gz/1f54265cb309d0718be8aad3c0e28e69dc918786:
+    resolution: {gitHosted: true, integrity: sha512-M8rG9Eri1GvpXOtpOoVJjYzF8i4xsRsnOJucTaRd+iZlxdRkpXsHv6H8cWYZwc9t8KaSWqR4oezbEKZf1HHm2w==, tarball: https://codeload.github.com/theweekendprojects/emdash-better-auth/tar.gz/1f54265cb309d0718be8aad3c0e28e69dc918786}
+    version: 0.9.1
     peerDependencies:
       emdash: '>=0.30.0'
       react: '>=19.2.6'
@@ -8649,7 +8649,7 @@ snapshots:
 
   emdash-ai-search@0.5.0: {}
 
-  emdash-better-auth@https://codeload.github.com/theweekendprojects/emdash-better-auth/tar.gz/6385b04337b04ad00e09168b38d44f75c0eb8dce(993f995392bdc8593d3c981a7eec7a81):
+  emdash-better-auth@https://codeload.github.com/theweekendprojects/emdash-better-auth/tar.gz/1f54265cb309d0718be8aad3c0e28e69dc918786(993f995392bdc8593d3c981a7eec7a81):
     dependencies:
       '@better-auth-ui/core': 1.7.19(84da4a7ee6dacc3fa53a5557854d57aa)
       '@better-auth-ui/heroui': 1.7.19(ff4b22a6df110f1e72c2478283910927)

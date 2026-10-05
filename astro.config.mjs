@@ -22,6 +22,10 @@ export default defineConfig({
 	// arrive on the raw *.workers.dev host.
 	site: "https://theweekendprojects.com",
 	adapter: cloudflare(),
+	// EmDash keeps the signed-in user in the Astro session. By default its cookie
+	// is a browser-session cookie (gone on every restart) while Better Auth's
+	// lasts 7 days, so users looked signed out of /account. Match the 7 days.
+	session: { cookie: { maxAge: 60 * 60 * 24 * 7 }, ttl: 60 * 60 * 24 * 7 },
 	// Inline ALL component CSS into each page's <head> instead of emitting
 	// external <link rel="stylesheet"> files. Those links are render-blocking:
 	// the browser must fetch each one before it can paint. Inlining removes
