@@ -6,12 +6,16 @@
 	"compatibility_flags": ["nodejs_compat"],
 	// Workers Logs + Traces. Without this, the only way to see live behaviour
 	// is `wrangler tail` (ephemeral); enabling it gives a searchable dashboard
-	// for errors, slow renders, and request traces. Logs sampled at 100%;
-	// traces at 1% to keep volume/cost down on steady traffic.
+	// for errors, slow renders, and request traces. Logs sampled at 100%.
+	// Traces temporarily at 100% (was 0.01) to CAPTURE the cold-load slowness:
+	// at 1% a specific slow cold request almost never lands in a trace, so you
+	// can't see the per-query D1 timing. Drop back to ~0.05-0.1 once the cold
+	// path is diagnosed and fixed, to keep trace volume/cost down on steady
+	// traffic.
 	"observability": {
 		"enabled": true,
 		"logs": { "enabled": true, "head_sampling_rate": 1 },
-		"traces": { "enabled": true, "head_sampling_rate": 0.01 },
+		"traces": { "enabled": true, "head_sampling_rate": 1 },
 	},
 	"d1_databases": [
 		{

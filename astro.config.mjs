@@ -88,7 +88,17 @@ export default defineConfig({
 	integrations: [
 		react(),
 		emdash({
-			database: d1({ binding: "DB", session: "auto" }),
+			// session: "auto" routes reads to the nearest D1 read replica. coalesce
+			// batches same-turn SELECTs into ONE round trip instead of N serial ones.
+			// The cold homepage render issues several reads (core init + projects +
+			// posts + settings + post tags); the D1 primary is in Frankfurt (EEUR,
+			// verified via served_by_region), so each uncoalesced read pays a full
+			// cross-region round trip. Coalescing collapses them, cutting cold TTFB.
+			// NOTE: coalesce only takes effect once sessions actually work at runtime
+			// AND read replication is enabled on the DB — enable it in the Cloudflare
+			// dashboard (D1 → landing-page-db → Settings → Enable read replication),
+			// otherwise every read still lands on the single Frankfurt primary.
+			database: d1({ binding: "DB", session: "auto", coalesce: true }),
 			storage: r2({ binding: "MEDIA" }),
 			// L2 object cache: caches content/config DB reads in the CACHE KV
 			// namespace so cold renders / cache misses serve ~10 queries from KV
