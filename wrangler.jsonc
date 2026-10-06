@@ -7,15 +7,15 @@
 	// Workers Logs + Traces. Without this, the only way to see live behaviour
 	// is `wrangler tail` (ephemeral); enabling it gives a searchable dashboard
 	// for errors, slow renders, and request traces. Logs sampled at 100%.
-	// Traces temporarily at 100% (was 0.01) to CAPTURE the cold-load slowness:
-	// at 1% a specific slow cold request almost never lands in a trace, so you
-	// can't see the per-query D1 timing. Drop back to ~0.05-0.1 once the cold
-	// path is diagnosed and fixed, to keep trace volume/cost down on steady
-	// traffic.
+	// Logs sampled at 100%. Traces at 5% — enough to spot intermittent slow
+	// renders on steady traffic without paying for a trace on every request.
+	// Was briefly raised to 100% to capture the cold-load D1 latency during
+	// diagnosis; reverted here to keep trace ingest volume/cost down. Bump
+	// back to 1 only for a short diagnosis window, then restore.
 	"observability": {
 		"enabled": true,
 		"logs": { "enabled": true, "head_sampling_rate": 1 },
-		"traces": { "enabled": true, "head_sampling_rate": 1 },
+		"traces": { "enabled": true, "head_sampling_rate": 0.05 },
 	},
 	"d1_databases": [
 		{

@@ -1,6 +1,6 @@
 ---
 name: cloudflare-performance
-description: Make an EmDash + Astro site fast on Cloudflare Workers. Use when a page feels slow, when setting up or auditing edge caching, image optimization, CSS inlining, LCP/front-end delivery, D1/KV performance, scroll-reveal content gated behind JS, parallelizing cold-render data fetches, Workers observability setup, or measuring real Core Web Vitals (LCP/CLS/FCP) vs curl TTFB. Diagnoses "why is this site slow" with wrangler tail, server-timing, curl, and headless-browser measurement. Covers the exact gotchas these sites hit and fixed, a known-good Core Web Vitals baseline to regress against, and how to benchmark against a known-fast reference site.
+description: Make an EmDash + Astro site fast on Cloudflare Workers. Use when a page feels slow, when setting up or auditing edge caching, image optimization, CSS inlining, LCP/front-end delivery, D1/KV performance, D1 cross-region cold-load latency (read replication, Sessions API, query coalescing, why not Smart Placement), D1 indexes/rows-read cost, scroll-reveal content gated behind JS, parallelizing cold-render data fetches, Workers observability setup (including raising trace sampling to catch rare slow requests), or measuring real Core Web Vitals (LCP/CLS/FCP) vs curl TTFB. Diagnoses "why is this site slow" with wrangler tail, server-timing, curl, and headless-browser measurement. Covers the exact gotchas these sites hit and fixed, a known-good Core Web Vitals baseline to regress against, and how to benchmark against a known-fast reference site.
 ---
 
 # Cloudflare Performance for EmDash + Astro
@@ -457,15 +457,107 @@ never touch D1 or KV — those see no change. The object cache's payoff is the i
 row-read pressure as traffic grows. Treat it as D1-offload + tail-latency, not an FCP/LCP
 win.
 
-## 6. Targeted Placement (D1 locality)
+## 6. D1 geo-latency: read replicas + Sessions + coalescing (NOT Smart Placement)
 
-Cloudflare runs a Worker near the visitor by default, but EmDash makes several D1 round
-trips per SSR request — if the Worker executes far from the D1 primary, every one of
-those round trips pays a geography tax. Add `placement.mode: "targeted"` to
-`wrangler.jsonc` with a `region`/`host`/`hostname` selector that targets the D1 primary's
-location. Don't combine this with D1 read replicas; leave EmDash's `session` at its
-default (`"disabled"`) or `"auto"` (Sessions API — routes anonymous reads to the nearest
-replica when available) rather than manually juggling both.
+The classic "4s on first load, instant on reload" complaint on a content site is almost
+always **cross-region D1 latency on the cold path**, not slow SQL. EmDash makes several D1
+round trips per cold SSR render; if the D1 primary is in one region and the visitor is in
+another, every round trip pays a geography tax. The reload is fast because it's served from
+the edge HTML cache (section 2) and never touches D1.
+
+### Prove it's I/O, not SQL, before changing anything
+
+Two cheap checks pin the root cause:
+
+```bash
+# 1. Where is the D1 primary, and is the SQL actually slow?
+source ~/.nvm/nvm.sh && nvm use 22 >/dev/null 2>&1
+npx wrangler d1 execute <db-name> --remote --json --command "SELECT 1 AS ok;" | grep -E 'served_by_region|served_by_primary|sql_duration'
+#  served_by_region: "EEUR", served_by_primary: true, sql_duration_ms: ~0.3
+#  -> SQL is sub-millisecond; the DB lives in ONE region (here Frankfurt/EEUR).
+
+# 2. wrangler tail during a cache-busted cold request — compare wallTime vs cpuTime.
+#    wallTime ~1300ms with cpuTime ~100ms means ~1200ms is pure I/O WAIT on D1,
+#    not compute. That gap IS the cross-region round-trip cost.
+```
+
+If `cpuTime` is small and `wallTime` is large, the fix is geography/round-trips, below.
+Index tuning (section 6a) and query rewrites do NOT help this — they speed SQL execution,
+which was already <1ms.
+
+### The three fixes that actually apply (all used together)
+
+1. **Enable D1 read replication** — the main lever. Replicas are eventually-consistent
+   read-only copies Cloudflare places near traffic, so anonymous reads resolve locally
+   instead of crossing to the primary. There is no wrangler subcommand in current
+   wrangler; set it via the REST API (needs a Cloudflare token/OAuth with `d1 write`):
+   ```bash
+   curl -s -X PATCH \
+     "https://api.cloudflare.com/client/v4/accounts/<ACCT>/d1/database/<DB_ID>" \
+     -H "Authorization: Bearer <CF_TOKEN>" -H "Content-Type: application/json" \
+     --data '{"read_replication":{"mode":"auto"}}'
+   #  -> "read_replication":{"mode":"auto"}, "success":true
+   ```
+   The primary does NOT move (`running_in_region` stays the original region) — replicas are
+   additive. They warm **lazily per region** as real traffic arrives: right after enabling,
+   some cold requests still fall through to the primary (~1.3s) while others hit a fresh
+   replica (~0.4s). It evens out to consistently-fast over the first hours of traffic. Don't
+   judge it on the first few cache-busted samples.
+
+2. **`session: "auto"`** in `d1({ ... })` (astro.config.mjs) — routes reads through the D1
+   Sessions API to the nearest replica, and preserves read-your-writes for authenticated
+   admins via a bookmark cookie. This is a no-op without replicas (step 1); with them it's
+   what actually sends a read to the local replica. Already the default on this template.
+
+3. **`coalesce: true`** in `d1({ ... })` — batches all same-turn `SELECT`s into ONE
+   `batch()` round trip instead of N serial ones. The cold homepage render issues several
+   independent reads (core init + projects + posts + settings + post tags); coalescing
+   collapses their round trips. Only takes effect with sessions enabled. Combine with
+   section 8 (`Promise.all`) so the queries are actually issued in the same turn to coalesce.
+   ```js
+   database: d1({ binding: "DB", session: "auto", coalesce: true }),
+   ```
+
+Measured on this site after all three: warm edge HIT ~74ms; cold hitting a replica ~0.37s;
+cold still routing to a not-yet-warm region's primary 1.3–2.2s (shrinking as replicas spread).
+
+### Do NOT use Smart / Targeted Placement with read replicas
+
+`placement: { mode: "smart" }` moves the Worker to run near its *backend* instead of near
+the *visitor*. That's for a worker whose backend is a **single fixed location** it round-trips
+to a lot. The moment you enable read replication (step 1), that's no longer true — the whole
+point of replicas is to serve reads near the visitor. Pinning the Worker near the primary
+would **defeat the replicas** (every visitor routes to the primary's region first) AND slow
+the edge-cache fill + static-asset serving for everyone far from that region. The two
+strategies are mutually exclusive; for a read-heavy public content site, **replication is the
+right one** and Smart Placement is the wrong one. (An earlier version of this skill
+recommended targeted placement — that predated enabling replication and is superseded.)
+
+## 6a. Indexes and rows-read (cost, not the geo-latency fix)
+
+Indexes do NOT fix cross-region latency (section 6) — they speed SQL execution and, on D1
+specifically, cut **cost**: D1 bills by *rows read* (every row SQLite scans, not rows
+returned), so a full table scan on a big table is billed for the whole table. An index lets
+D1 jump to matching rows. Apply only when a query scans a large table:
+
+- Index columns used in `WHERE`, `JOIN ... ON`, and multi-column filters (and `ORDER BY`
+  columns like `published_at`). Multi-column index `(a, b)` is only used when the query
+  filters on `a` (the leftmost column), optionally plus `b`.
+- Check a query with `EXPLAIN QUERY PLAN <sql>`: `SCAN` = full scan (bad), `SEARCH ... USING
+  INDEX` = good. Run `PRAGMA optimize` after creating indexes.
+- Create indexes ONCE via D1 migrations, never on the request hot path (building an index
+  writes a row per indexed row, billed at the higher write rate).
+
+**But: don't hand-add indexes to EmDash's own tables.** EmDash ships and owns its schema
+(80+ tables) through its own migrations; a manual index can conflict with a future migration.
+If a specific EmDash query shows a `SCAN` on a large table, that's an upstream fix, not
+site-code surgery.
+
+**Prisma Optimize — not applicable here, don't reach for it.** It only works through Prisma
+Client (this stack uses EmDash's Kysely-based D1 dialect, no Prisma), and Prisma has since
+sunset Optimize in favor of Query Insights that's built into Prisma Postgres only — not D1.
+Adding Prisma purely for indexing advice is a whole ORM + dependency for zero gain, and it
+still wouldn't touch the geo-latency that's the actual cold-load cost.
 
 ## Local dev limitations (don't waste time debugging these as "bugs")
 
@@ -608,6 +700,17 @@ each sub-key.
   "traces": { "enabled": true, "head_sampling_rate": 0.01 }
 }
 ```
+
+**Temporarily raise trace sampling to CATCH a rare slow cold request.** At
+`traces.head_sampling_rate: 0.01` (1%) a specific slow cold request almost never lands in a
+trace, so you can't see its per-query D1 timing in the dashboard. When actively diagnosing,
+bump it to `1` (100%), redeploy, reproduce, read the trace — then **put it back to a low
+value (~0.05) and redeploy when done.** Workers Logs/Traces bill per event ingested beyond
+the free tier, so 100% trace sampling left on steady traffic costs money. Treat the bump as a
+diagnosis window, not a permanent setting — and leave a reminder to revert it, because it's
+easy to forget while chasing the actual bug. (`wrangler tail` is the zero-cost alternative for
+live, hands-on reproduction; dashboard traces are for catching intermittent cases after the
+fact.)
 
 Also keep `compatibility_date` current (bump periodically, redeploy, confirm
 key pages still 200). Stale dates miss runtime fixes; this stack only needs
