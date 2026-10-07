@@ -45,14 +45,19 @@ export default defineConfig({
 		provider: cacheCloudflare(),
 	},
 	routeRules: {
-		"/": { maxAge: 300, swr: 86400 },
-		"/posts": { maxAge: 300, swr: 86400 },
-		"/posts/**": { maxAge: 300, swr: 86400 },
-		"/projects": { maxAge: 300, swr: 86400 },
-		"/projects/**": { maxAge: 300, swr: 86400 },
-		"/pages/**": { maxAge: 300, swr: 86400 },
-		"/category/**": { maxAge: 300, swr: 86400 },
-		"/tag/**": { maxAge: 300, swr: 86400 },
+		// maxAge raised 300 -> 3600 (1h). EmDash purges these pages by Cache-Tag on
+		// publish (worker wires onPublished -> provider.invalidate -> cache.purge),
+		// so a longer TTL does NOT serve stale content after edits -- it only keeps
+		// pages edge-warm 12x longer between publishes, so far fewer visitors hit the
+		// cold ~27-query D1 render. swr keeps serving instantly while revalidating.
+		"/": { maxAge: 3600, swr: 86400 },
+		"/posts": { maxAge: 3600, swr: 86400 },
+		"/posts/**": { maxAge: 3600, swr: 86400 },
+		"/projects": { maxAge: 3600, swr: 86400 },
+		"/projects/**": { maxAge: 3600, swr: 86400 },
+		"/pages/**": { maxAge: 3600, swr: 86400 },
+		"/category/**": { maxAge: 3600, swr: 86400 },
+		"/tag/**": { maxAge: 3600, swr: 86400 },
 		// CMS media files are content-addressed (immutable ULID filenames) --
 		// safe to cache for a year. Without an explicit rule here, enabling
 		// `cache.provider` overrides this route's own Cache-Control with
