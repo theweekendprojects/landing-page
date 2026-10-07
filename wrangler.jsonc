@@ -60,17 +60,8 @@
 			"binding": "LOADER",
 		},
 	],
-	// Drives scheduled publishing, plugin cron, and maintenance (see src/worker.ts).
-	// Every 5 min, not every minute: EmDash's per-tick maintenance includes
-	// cleanup404Log(), a `DELETE ... WHERE id NOT IN (SELECT ... LIMIT 10000)`
-	// read-amplifying prune of _emdash_404_log that scans the table every run and
-	// (verified via `wrangler d1 insights`) accounted for ~99% of this DB's D1
-	// rows-read even though the log holds <1k rows and nothing gets deleted.
-	// */5 cuts those wasted runs 5x. Trade-off: scheduled content publishes up to
-	// ~5 min late instead of ~1 min. Fine for a blog. The real fix is upstream
-	// (EmDash should guard the prune with a cheap count or run it less often) —
-	// tracked separately; this is the site-side mitigation.
+	// Drives scheduled publishing, plugin cron, and maintenance (see src/worker.ts)
 	"triggers": {
-		"crons": ["*/5 * * * *"],
+		"crons": ["* * * * *"],
 	},
 }
