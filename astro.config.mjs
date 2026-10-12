@@ -6,6 +6,7 @@ import { d1, r2, sandbox, kvCache } from "@emdash-cms/cloudflare";
 import { formsPlugin } from "@emdash-cms/plugin-forms";
 import webhookNotifier from "@emdash-cms/plugin-webhook-notifier";
 import { betterAuthProvider, betterAuthSettingsPlugin } from "emdash-better-auth";
+import { betterAuthAccess } from "emdash-better-auth/access-integration";
 import { seoPlugin } from "@jdevalk/emdash-plugin-seo";
 import aiSearch from "emdash-ai-search";
 import { defineConfig, fontProviders } from "astro/config";
@@ -127,6 +128,9 @@ export default defineConfig({
 			sandboxRunner: sandbox(),
 			marketplace: "https://marketplace.emdashcms.com",
 		}),
+		// Members-only / premium posts and pages (needs the "Who can read this" field, see Admin -> Better Auth).
+		// Entries without that field stay public. List it after emdash().
+		betterAuthAccess(),
 	],
 	fonts: [
 		{
