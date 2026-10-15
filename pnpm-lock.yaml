@@ -51,8 +51,8 @@ importers:
         specifier: ^0.5.0
         version: 0.5.0
       emdash-better-auth:
-        specifier: ^0.13.0
-        version: 0.13.0(2eab2614793d770f3591ccedefaebc6e)
+        specifier: ^0.13.1
+        version: 0.13.1(2eab2614793d770f3591ccedefaebc6e)
       emdash-smtp:
         specifier: ^0.3.4
         version: 0.3.4(emdash@1.2.0(@astrojs/react@6.0.5(@types/node@26.4.0)(@types/react-dom@19.2.5(@types/react@18.3.31))(@types/react@18.3.31)(esbuild@0.28.2)(jiti@2.7.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(yaml@2.9.0))(@atcute/cbor@2.3.8(@atcute/cid@2.5.0))(@atcute/cid@2.5.0)(@atcute/identity@2.0.2(@atcute/lexicons@2.1.1)(typescript@7.0.2))(@date-fns/tz@1.5.0)(@floating-ui/dom@1.8.0)(@tiptap/extensions@3.31.4(@tiptap/core@3.31.4(@tiptap/pm@3.31.4))(@tiptap/pm@3.31.4))(@types/react-dom@19.2.5(@types/react@18.3.31))(@types/react@18.3.31)(astro@7.2.10(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@26.4.0)(jiti@2.7.0)(yaml@2.9.0))(date-fns@4.4.0)(echarts@6.1.0)(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@7.0.2))
@@ -3805,8 +3805,8 @@ packages:
     resolution: {integrity: sha512-pNlNW5VvLuBsxMnR2MtBJw8Bggm6gHlqYNeRWcjtcH597Z2b6ZvHqDI0Se/SSCqFGwRM/ElrJ+7gsQW/QPcEaw==}
     engines: {node: '>=18.0.0'}
 
-  emdash-better-auth@0.13.0:
-    resolution: {integrity: sha512-986q3ffqEYDP1i3uPiUTH8eQJRe5fCTEvpsEGwNja+fAOPmDheaBUjWJoO7R/9M2ePHiQlb4f6MDNbzZYAtpRA==}
+  emdash-better-auth@0.13.1:
+    resolution: {integrity: sha512-2LcJj5hOXiKiESpclhmrjTqlDOhdxWLQUUed5sKpRVGeb3GTqQfyVsr+TGnzhpEwroWQPJO+b/RqmfohAWqB0g==}
     peerDependencies:
       emdash: '>=0.30.0'
       react: '>=19.2.6'
@@ -6268,7 +6268,7 @@ snapshots:
       '@better-auth/passkey': 1.7.2(@better-auth/core@1.7.2(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@cloudflare/workers-types@4.20260702.1)(better-call@1.4.0(zod@4.5.4))(jose@6.2.10)(kysely@0.29.5)(nanostores@1.5.2))(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(better-auth@1.7.2(@cloudflare/workers-types@4.20260702.1)(better-sqlite3@12.11.1)(pg@8.23.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(solid-js@1.9.15)(vue@3.5.42(typescript@7.0.2)))(better-call@1.4.0(zod@4.5.4))(nanostores@1.5.2)
       '@better-auth/stripe': 1.7.7(@better-auth/core@1.7.2(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@cloudflare/workers-types@4.20260702.1)(better-call@1.4.0(zod@4.5.4))(jose@6.2.10)(kysely@0.29.5)(nanostores@1.5.2))(better-auth@1.7.2(@cloudflare/workers-types@4.20260702.1)(better-sqlite3@12.11.1)(pg@8.23.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(solid-js@1.9.15)(vue@3.5.42(typescript@7.0.2)))(better-call@1.4.0(zod@4.5.4))(stripe@22.6.2(@types/node@26.4.0))
 
-  '@better-auth-ui/heroui@1.7.19(9d60ae170d0171ff6e7d832883a2a7fe)':
+  '@better-auth-ui/heroui@1.7.19(336a96dbf4580eb2a0d21cd91279ccdd)':
     dependencies:
       '@better-auth-ui/core': 1.7.19(84da4a7ee6dacc3fa53a5557854d57aa)
       '@better-auth-ui/react': 1.7.19(7b4ba8e72098d54003eb504317feac64)
@@ -9720,10 +9720,10 @@ snapshots:
 
   emdash-ai-search@0.5.0: {}
 
-  emdash-better-auth@0.13.0(2eab2614793d770f3591ccedefaebc6e):
+  emdash-better-auth@0.13.1(2eab2614793d770f3591ccedefaebc6e):
     dependencies:
       '@better-auth-ui/core': 1.7.19(84da4a7ee6dacc3fa53a5557854d57aa)
-      '@better-auth-ui/heroui': 1.7.19(9d60ae170d0171ff6e7d832883a2a7fe)
+      '@better-auth-ui/heroui': 1.7.19(336a96dbf4580eb2a0d21cd91279ccdd)
       '@better-auth-ui/react': 1.7.19(7b4ba8e72098d54003eb504317feac64)
       '@better-auth/api-key': 1.7.2(@better-auth/core@1.7.2(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@cloudflare/workers-types@4.20260702.1)(better-call@1.4.0(zod@4.5.4))(jose@6.2.10)(kysely@0.29.5)(nanostores@1.5.2))(@better-auth/utils@0.4.2)(better-auth@1.7.2(@cloudflare/workers-types@4.20260702.1)(better-sqlite3@12.11.1)(pg@8.23.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(solid-js@1.9.15)(vue@3.5.42(typescript@7.0.2)))(better-call@1.4.0(zod@4.5.4))
       '@better-auth/kysely-adapter': 1.7.2(@better-auth/core@1.7.2(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@cloudflare/workers-types@4.20260702.1)(better-call@1.4.0(zod@4.5.4))(jose@6.2.10)(kysely@0.29.5)(nanostores@1.5.2))(@better-auth/utils@0.4.2)(kysely@0.29.5)
