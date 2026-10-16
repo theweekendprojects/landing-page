@@ -21,4 +21,6 @@ minimumReleaseAgeExclude:
   - emdash-better-auth
   # First-party AI search plugin (we publish it); same rationale as above.
   - emdash-ai-search
+  # First-party privacy / consent plugin (we publish it); same rationale.
+  - emdash-privacy
 blockExoticSubdeps: true

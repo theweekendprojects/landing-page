@@ -9,6 +9,7 @@ import { betterAuthProvider, betterAuthSettingsPlugin } from "emdash-better-auth
 import { betterAuthAccess } from "emdash-better-auth/access-integration";
 import { seoPlugin } from "@jdevalk/emdash-plugin-seo";
 import aiSearch from "emdash-ai-search";
+import { privacyPlugin } from "emdash-privacy";
 import { defineConfig, fontProviders } from "astro/config";
 import emdash from "emdash/astro";
 import emdashSmtp from "emdash-smtp";
@@ -123,7 +124,7 @@ export default defineConfig({
 			// Search (the "easy path"), which needs the AI_SEARCH + R2 bindings in
 			// wrangler.jsonc. Non-secret settings (instance/bucket/collections) are
 			// set in Admin → Plugins → AI Search; no API token is stored.
-			plugins: [formsPlugin(), emdashSmtp(), betterAuthSettingsPlugin(), seoPlugin(), aiSearch()],
+			plugins: [formsPlugin(), emdashSmtp(), betterAuthSettingsPlugin(), seoPlugin(), aiSearch(), privacyPlugin()],
 			sandboxed: [webhookNotifier],
 			sandboxRunner: sandbox(),
 			marketplace: "https://marketplace.emdashcms.com",
