@@ -95,6 +95,13 @@ export default defineConfig({
 	integrations: [
 		react(),
 		emdash({
+			// Canonical public origin for EmDash itself. Astro's top-level `site:`
+			// does NOT reach EmDash — it resolves media/file URLs from this option,
+			// then env, then the LIVE request origin. Behind Cloudflare's TLS
+			// termination the internal request is http://, so without this the
+			// homepage images came out as http://theweekendprojects.com/... and the
+			// https page blocked them as mixed content. Pin the https origin here.
+			siteUrl: "https://theweekendprojects.com",
 			// session: "auto" routes reads to the nearest D1 read replica. coalesce
 			// batches same-turn SELECTs into ONE round trip instead of N serial ones.
 			// The cold homepage render issues several reads (core init + projects +
