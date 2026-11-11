@@ -4,12 +4,12 @@ import { getEmDashEntry, decodeSlug, getSeoMeta, getSiteSettings } from "emdash"
 import { PortableText } from "emdash/ui";
 import { EmVBPage, resolveEmVBPage } from "@perkyzz/emvb/astro";
 import Base from "../../layouts/Base.astro";
+import DaisyStyles from "../../components/DaisyStyles.astro";
 import { resolveBlogSiteIdentity } from "../../utils/site-identity";
 // Register the daisyUI provider in the SAME render graph as EmVBPage, so provider nodes render
-// on the public page instead of falling back to "Unknown provider".
+// on the public page instead of falling back to "Unknown provider". JS only (no CSS) — the
+// stylesheet ships via <DaisyStyles/> below, only on EmVB pages.
 import "@perkyzz/emvb-daisyui";
-// Tailwind + daisyUI for EmVB provider elements, bundled by Astro (imported, not a <link>).
-import "../../styles/emvb-daisyui.css";
 
 const slug = decodeSlug(Astro.params.slug);
 
@@ -54,7 +54,10 @@ const seo = getSeoMeta(page, {
 >
 	{
 		emvb ? (
-			<EmVBPage page={emvb} />
+			<>
+				<DaisyStyles />
+				<EmVBPage page={emvb} />
+			</>
 		) : (
 			<article class="page-article">
 				<header class="page-header">
