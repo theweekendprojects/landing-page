@@ -5,6 +5,9 @@ import { PortableText } from "emdash/ui";
 import { EmVBPage, resolveEmVBPage } from "@perkyzz/emvb/astro";
 import Base from "../../layouts/Base.astro";
 import { resolveBlogSiteIdentity } from "../../utils/site-identity";
+// Register the daisyUI provider in the SAME render graph as EmVBPage, so provider nodes render
+// on the public page instead of falling back to "Unknown provider".
+import "@perkyzz/emvb-daisyui";
 // Tailwind + daisyUI for EmVB provider elements, bundled by Astro (imported, not a <link>).
 import "../../styles/emvb-daisyui.css";
 
