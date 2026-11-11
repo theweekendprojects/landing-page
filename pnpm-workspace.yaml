@@ -24,3 +24,12 @@ minimumReleaseAgeExclude:
   # First-party privacy / consent plugin (we publish it); same rationale.
   - emdash-privacy
 blockExoticSubdeps: true
+
+# EmVB (our fork) is consumed from the local checkout for CF testing. Its packages depend on each
+# other via `workspace:*`, which only resolves inside EmVB's own workspace; force them to the
+# local source dirs here so the landing page can install them without that workspace.
+overrides:
+  "@perkyzz/emvb": "file:../EmVB/packages/emvb"
+  "@perkyzz/emvb-provider-api": "file:../EmVB/packages/emvb-provider-api"
+  "@perkyzz/emvb-daisyui": "file:../EmVB/packages/emvb-daisyui"
+  "@perkyzz/emvb-icons": "file:../EmVB/packages/emvb-icons"

@@ -1,8 +1,12 @@
 ---
+import { getImage } from "astro:assets";
 import { getEmDashEntry, decodeSlug, getSeoMeta, getSiteSettings } from "emdash";
 import { PortableText } from "emdash/ui";
+import { EmVBPage, resolveEmVBPage } from "@perkyzz/emvb/astro";
 import Base from "../../layouts/Base.astro";
 import { resolveBlogSiteIdentity } from "../../utils/site-identity";
+// Tailwind + daisyUI for EmVB provider elements, bundled by Astro (imported, not a <link>).
+import "../../styles/emvb-daisyui.css";
 
 const slug = decodeSlug(Astro.params.slug);
 
@@ -10,13 +14,20 @@ if (!slug) {
 	return Astro.redirect("/404");
 }
 
-const { entry: page, cacheHint } = await getEmDashEntry("pages", slug);
+// An EmVB visual page for this slug wins over the collection's PortableText content (R-030).
+const emvb =
+	(await resolveEmVBPage(Astro, { getImage })) ??
+	(await resolveEmVBPage(Astro, { collection: "pages", field: "canvas", getImage }));
+const { entry: collectionPage, cacheHint } = emvb
+	? { entry: null, cacheHint: undefined }
+	: await getEmDashEntry("pages", slug);
+const page = emvb?.entry ?? collectionPage;
 
 if (!page) {
 	return Astro.redirect("/404");
 }
 
-if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+if (!emvb && cacheHint && Astro.cache?.enabled) Astro.cache.set(cacheHint);
 
 const { siteTitle, siteTagline } = resolveBlogSiteIdentity(await getSiteSettings());
 
@@ -38,15 +49,21 @@ const seo = getSeoMeta(page, {
 	robots={seo.robots}
 	content={{ collection: "pages", id: page.data.id, slug }}
 >
-	<article class="page-article">
-		<header class="page-header">
-			<h1 class="page-title" {...page.edit.title}>{page.data.title}</h1>
-		</header>
+	{
+		emvb ? (
+			<EmVBPage page={emvb} />
+		) : (
+			<article class="page-article">
+				<header class="page-header">
+					<h1 class="page-title" {...page.edit.title}>{page.data.title}</h1>
+				</header>
 
-		<div class="page-content">
-			<PortableText value={page.data.content} />
-		</div>
-	</article>
+				<div class="page-content">
+					<PortableText value={page.data.content} />
+				</div>
+			</article>
+		)
+	}
 </Base>
 
 <style>

@@ -4,6 +4,12 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  '@perkyzz/emvb': file:../EmVB/packages/emvb
+  '@perkyzz/emvb-provider-api': file:../EmVB/packages/emvb-provider-api
+  '@perkyzz/emvb-daisyui': file:../EmVB/packages/emvb-daisyui
+  '@perkyzz/emvb-icons': file:../EmVB/packages/emvb-icons
+
 importers:
 
   .:
@@ -29,6 +35,18 @@ importers:
       '@modelcontextprotocol/sdk':
         specifier: ^1.30.0
         version: 1.30.0(zod@4.5.4)
+      '@perkyzz/emvb':
+        specifier: file:../EmVB/packages/emvb
+        version: file:../EmVB/packages/emvb(f188c7fd5010fd2ef6f389bc858784fc)
+      '@perkyzz/emvb-daisyui':
+        specifier: file:../EmVB/packages/emvb-daisyui
+        version: file:../EmVB/packages/emvb-daisyui(daisyui@5.7.50)(tailwindcss@4.3.3)
+      '@perkyzz/emvb-icons':
+        specifier: file:../EmVB/packages/emvb-icons
+        version: file:../EmVB/packages/emvb-icons
+      '@perkyzz/emvb-provider-api':
+        specifier: file:../EmVB/packages/emvb-provider-api
+        version: file:../EmVB/packages/emvb-provider-api
       '@tailwindcss/container-queries':
         specifier: ^0.1.1
         version: 0.1.1(tailwindcss@4.3.3)
@@ -44,6 +62,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      daisyui:
+        specifier: 5.7.50
+        version: 5.7.50
       emdash:
         specifier: ^1.2.0
         version: 1.2.0(@astrojs/react@6.0.5(@types/node@26.4.0)(@types/react-dom@19.2.5(@types/react@18.3.31))(@types/react@18.3.31)(esbuild@0.28.2)(jiti@2.7.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(yaml@2.9.0))(@atcute/cbor@2.3.8(@atcute/cid@2.5.0))(@atcute/cid@2.5.0)(@atcute/identity@2.0.2(@atcute/lexicons@2.1.1)(typescript@7.0.2))(@date-fns/tz@1.5.0)(@floating-ui/dom@1.8.0)(@tiptap/extensions@3.31.4(@tiptap/core@3.31.4(@tiptap/pm@3.31.4))(@tiptap/pm@3.31.4))(@types/react-dom@19.2.5(@types/react@18.3.31))(@types/react@18.3.31)(astro@7.2.10(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@26.4.0)(jiti@2.7.0)(yaml@2.9.0))(date-fns@4.4.0)(echarts@6.1.0)(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@7.0.2)
@@ -2012,6 +2033,32 @@ packages:
     resolution: {integrity: sha512-C2Xj8FZ0uHWeCXXqX5B4/gVFQmtSkiuOolzAgutjTfseNOHT3pUjljDZsTSxXFGgio54bCzVFqmEOUrIVk8RDA==}
     engines: {node: '>=20.0.0'}
 
+  '@perkyzz/emvb-daisyui@file:../EmVB/packages/emvb-daisyui':
+    resolution: {directory: ../EmVB/packages/emvb-daisyui, type: directory}
+    peerDependencies:
+      daisyui: 5.7.50
+      tailwindcss: 4.1.17
+
+  '@perkyzz/emvb-icons@file:../EmVB/packages/emvb-icons':
+    resolution: {directory: ../EmVB/packages/emvb-icons, type: directory}
+
+  '@perkyzz/emvb-provider-api@file:../EmVB/packages/emvb-provider-api':
+    resolution: {directory: ../EmVB/packages/emvb-provider-api, type: directory}
+
+  '@perkyzz/emvb@file:../EmVB/packages/emvb':
+    resolution: {directory: ../EmVB/packages/emvb, type: directory}
+    peerDependencies:
+      '@cloudflare/kumo': 2.6.0
+      '@emdash-cms/plugin-forms': ^0.2.9
+      '@phosphor-icons/react': ^2.1.10
+      astro: ^7.0.0
+      emdash: ^1.0.0
+      react: ^19.0.0
+      react-dom: ^19.0.0
+    peerDependenciesMeta:
+      '@emdash-cms/plugin-forms':
+        optional: true
+
   '@phosphor-icons/react@2.1.10':
     resolution: {integrity: sha512-vt8Tvq8GLjheAZZYa+YG/pW7HDbov8El/MANW8pOAz4eGxrwhnbfrQZq0Cp4q8zBEu8NIhHdnr+r8thnfRSNYA==}
     engines: {node: '>=10'}
@@ -3707,6 +3754,9 @@ packages:
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
 
+  daisyui@5.7.50:
+    resolution: {integrity: sha512-+/LRqnTCoc7s/bJEKKwtJSwzeXCVdAmRdNmZeZzgHCaQ9PJyl7j+2V2U32GQDMyD+VDkP9e/+JGoC72Y1hLk7w==}
+
   data-uri-to-buffer@4.0.1:
     resolution: {integrity: sha512-0R9ikRb668HB7QDxT1vkpuUBtqc53YyAwMwGeUFKRojY/NWKvdZ+9UYtRfGmhqNbRkTSVpMbmyhXipFFv2cb/A==}
     engines: {node: '>= 12'}
@@ -4034,6 +4084,9 @@ packages:
   fetch-blob@3.2.0:
     resolution: {integrity: sha512-7yAQpD2UMJzLi1Dqv7qFYnPbaPx7ZfFK6PiIxQ4PfkGPyNyl2Ugx+a/umUonmKqjhM4DnfbMvdX6otXq83soQQ==}
     engines: {node: ^12.20 || >= 14.13}
+
+  fflate@0.8.3:
+    resolution: {integrity: sha512-tbZNuJrLwGUp3zshBtdy4W+ORxZuIh8a5ilyIEQDC5rY1f3U20JMry0Ll3WBzU58EZKsEuJFXhb5gwv8CsPvgA==}
 
   file-uri-to-path@1.0.0:
     resolution: {integrity: sha512-0Zt+s3L7Vf1biwWZ29aARiVYLx7iMGnEUl9x33fbB/j3jR81u/O2LbqK+Bm1CDSNDKVtJ/YjwY7TUd5SkeLQLw==}
@@ -4787,6 +4840,14 @@ packages:
 
   pgpass@1.0.5:
     resolution: {integrity: sha512-FdW9r/jQZhSeohs1Z3sI1yxFQNFvMcnmfuj4WBMUTxOrAyLMaTcE1aAMBiTlbMNaXvBCQuVi0R7hd8udDSP7ug==}
+
+  photocn@0.1.2:
+    resolution: {integrity: sha512-Ko/jisCHKXE0r0k1F28IYZL+eFkE2N1MPsBUGSWMTf3gtXqzR+pUR0nbAzgDfI4fqNoxLaPQR2nGEhwsU5mdSw==}
+    peerDependencies:
+      react: '>=18'
+    peerDependenciesMeta:
+      react:
+        optional: true
 
   piccolore@0.1.3:
     resolution: {integrity: sha512-o8bTeDWjE086iwKrROaDf31K0qC/BENdm15/uH9usSC/uZjJOKb2YGiVHfLY4GhwsERiPI1jmwI2XrA7ACOxVw==}
@@ -6303,7 +6364,7 @@ snapshots:
       '@better-auth/passkey': 1.7.2(@better-auth/core@1.7.2(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@cloudflare/workers-types@4.20260702.1)(better-call@1.4.0(zod@4.5.4))(jose@6.2.10)(kysely@0.29.5)(nanostores@1.5.2))(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(better-auth@1.7.2(@cloudflare/workers-types@4.20260702.1)(better-sqlite3@12.11.1)(pg@8.23.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(solid-js@1.9.15)(vue@3.5.42(typescript@7.0.2)))(better-call@1.4.0(zod@4.5.4))(nanostores@1.5.2)
       '@better-auth/stripe': 1.7.7(@better-auth/core@1.7.2(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@cloudflare/workers-types@4.20260702.1)(better-call@1.4.0(zod@4.5.4))(jose@6.2.10)(kysely@0.29.5)(nanostores@1.5.2))(better-auth@1.7.2(@cloudflare/workers-types@4.20260702.1)(better-sqlite3@12.11.1)(pg@8.23.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(solid-js@1.9.15)(vue@3.5.42(typescript@7.0.2)))(better-call@1.4.0(zod@4.5.4))(stripe@22.6.2(@types/node@26.4.0))
 
-  '@better-auth-ui/heroui@1.7.19(336a96dbf4580eb2a0d21cd91279ccdd)':
+  '@better-auth-ui/heroui@1.7.19(9d60ae170d0171ff6e7d832883a2a7fe)':
     dependencies:
       '@better-auth-ui/core': 1.7.19(84da4a7ee6dacc3fa53a5557854d57aa)
       '@better-auth-ui/react': 1.7.19(7b4ba8e72098d54003eb504317feac64)
@@ -7938,6 +7999,31 @@ snapshots:
       reflect-metadata: 0.2.2
       tslib: 2.8.1
       tsyringe: 4.10.0
+
+  '@perkyzz/emvb-daisyui@file:../EmVB/packages/emvb-daisyui(daisyui@5.7.50)(tailwindcss@4.3.3)':
+    dependencies:
+      '@perkyzz/emvb-provider-api': file:../EmVB/packages/emvb-provider-api
+      daisyui: 5.7.50
+      tailwindcss: 4.3.3
+
+  '@perkyzz/emvb-icons@file:../EmVB/packages/emvb-icons': {}
+
+  '@perkyzz/emvb-provider-api@file:../EmVB/packages/emvb-provider-api': {}
+
+  '@perkyzz/emvb@file:../EmVB/packages/emvb(f188c7fd5010fd2ef6f389bc858784fc)':
+    dependencies:
+      '@cloudflare/kumo': 2.6.0(@date-fns/tz@1.5.0)(@phosphor-icons/react@2.1.10(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@types/react@18.3.31)(date-fns@4.4.0)(echarts@6.1.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(zod@4.5.4)
+      '@perkyzz/emvb-icons': file:../EmVB/packages/emvb-icons
+      '@perkyzz/emvb-provider-api': file:../EmVB/packages/emvb-provider-api
+      '@phosphor-icons/react': 2.1.10(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      astro: 7.2.10(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@26.4.0)(jiti@2.7.0)(yaml@2.9.0)
+      emdash: 1.2.0(@astrojs/react@6.0.5(@types/node@26.4.0)(@types/react-dom@19.2.5(@types/react@18.3.31))(@types/react@18.3.31)(esbuild@0.28.2)(jiti@2.7.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(yaml@2.9.0))(@atcute/cbor@2.3.8(@atcute/cid@2.5.0))(@atcute/cid@2.5.0)(@atcute/identity@2.0.2(@atcute/lexicons@2.1.1)(typescript@7.0.2))(@date-fns/tz@1.5.0)(@floating-ui/dom@1.8.0)(@tiptap/extensions@3.31.4(@tiptap/core@3.31.4(@tiptap/pm@3.31.4))(@tiptap/pm@3.31.4))(@types/react-dom@19.2.5(@types/react@18.3.31))(@types/react@18.3.31)(astro@7.2.10(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@26.4.0)(jiti@2.7.0)(yaml@2.9.0))(date-fns@4.4.0)(echarts@6.1.0)(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@7.0.2)
+      photocn: 0.1.2(react@19.2.8)
+      react: 19.2.8
+      react-dom: 19.2.8(react@19.2.8)
+      zod: 4.5.4
+    optionalDependencies:
+      '@emdash-cms/plugin-forms': 0.2.9(349f9d491565390c55d4f9a5ff1c6d6b)
 
   '@phosphor-icons/react@2.1.10(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
@@ -9694,6 +9780,8 @@ snapshots:
 
   csstype@3.2.3: {}
 
+  daisyui@5.7.50: {}
+
   data-uri-to-buffer@4.0.1:
     optional: true
 
@@ -9811,7 +9899,7 @@ snapshots:
   emdash-better-auth@0.14.1(2eab2614793d770f3591ccedefaebc6e):
     dependencies:
       '@better-auth-ui/core': 1.7.19(84da4a7ee6dacc3fa53a5557854d57aa)
-      '@better-auth-ui/heroui': 1.7.19(336a96dbf4580eb2a0d21cd91279ccdd)
+      '@better-auth-ui/heroui': 1.7.19(9d60ae170d0171ff6e7d832883a2a7fe)
       '@better-auth-ui/react': 1.7.19(7b4ba8e72098d54003eb504317feac64)
       '@better-auth/api-key': 1.7.2(@better-auth/core@1.7.2(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@cloudflare/workers-types@4.20260702.1)(better-call@1.4.0(zod@4.5.4))(jose@6.2.10)(kysely@0.29.5)(nanostores@1.5.2))(@better-auth/utils@0.4.2)(better-auth@1.7.2(@cloudflare/workers-types@4.20260702.1)(better-sqlite3@12.11.1)(pg@8.23.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(solid-js@1.9.15)(vue@3.5.42(typescript@7.0.2)))(better-call@1.4.0(zod@4.5.4))
       '@better-auth/kysely-adapter': 1.7.2(@better-auth/core@1.7.2(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(@cloudflare/workers-types@4.20260702.1)(better-call@1.4.0(zod@4.5.4))(jose@6.2.10)(kysely@0.29.5)(nanostores@1.5.2))(@better-auth/utils@0.4.2)(kysely@0.29.5)
@@ -10284,6 +10372,8 @@ snapshots:
       node-domexception: 1.0.0
       web-streams-polyfill: 3.3.3
     optional: true
+
+  fflate@0.8.3: {}
 
   file-uri-to-path@1.0.0:
     optional: true
@@ -10949,6 +11039,12 @@ snapshots:
     dependencies:
       split2: 4.2.0
     optional: true
+
+  photocn@0.1.2(react@19.2.8):
+    dependencies:
+      fflate: 0.8.3
+    optionalDependencies:
+      react: 19.2.8
 
   piccolore@0.1.3: {}
 

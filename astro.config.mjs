@@ -6,6 +6,7 @@ import { d1, r2, sandbox, kvCache } from "@emdash-cms/cloudflare";
 import { formsPlugin } from "@emdash-cms/plugin-forms";
 import webhookNotifier from "@emdash-cms/plugin-webhook-notifier";
 import { betterAuthProvider, betterAuthSettingsPlugin } from "emdash-better-auth";
+import { emvb } from "@perkyzz/emvb";
 import { betterAuthAccess } from "emdash-better-auth/access-integration";
 import { seoPlugin } from "@jdevalk/emdash-plugin-seo";
 import aiSearch from "emdash-ai-search";
@@ -131,7 +132,13 @@ export default defineConfig({
 			// Search (the "easy path"), which needs the AI_SEARCH + R2 bindings in
 			// wrangler.jsonc. Non-secret settings (instance/bucket/collections) are
 			// set in Admin → Plugins → AI Search; no API token is stored.
-			plugins: [formsPlugin(), emdashSmtp(), betterAuthSettingsPlugin(), seoPlugin(), aiSearch(), privacyPlugin()],
+			plugins: [formsPlugin(), emdashSmtp(), betterAuthSettingsPlugin(), seoPlugin(), aiSearch(), privacyPlugin(), emvb({
+				canvasCollections: ["pages"],
+				// Register the daisyUI provider: server (render) via `providers`, browser editor via
+				// the `adminEntry` wrapper that imports it.
+				providers: ["@perkyzz/emvb-daisyui"],
+				adminEntry: "/src/emvb-admin.ts",
+			})],
 			sandboxed: [webhookNotifier],
 			sandboxRunner: sandbox(),
 			marketplace: "https://marketplace.emdashcms.com",

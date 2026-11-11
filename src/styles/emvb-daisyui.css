@@ -1,0 +1,14 @@
+/* Tailwind + daisyUI for EmVB provider pages, compiled by @tailwindcss/vite. @source lines keep
+   the daisyUI provider's build output + generated safelist so every allowlisted class ships even
+   though the class strings only appear at runtime in VNode attrs. Imported by the EmVB page route. */
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes:
+    light --default,
+    dark --prefersdark,
+    corporate,
+    business,
+    cupcake;
+}
+@source "../../node_modules/@perkyzz/emvb-daisyui/src/**/*.{ts,tsx}";
+@source "../../node_modules/@perkyzz/emvb-daisyui/generated/safelist.css";
