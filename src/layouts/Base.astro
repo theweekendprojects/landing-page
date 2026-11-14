@@ -127,6 +127,8 @@ const pageCtx = createPublicPageContext({
 				var theme = i >= 0 ? c.slice(i + 6).split(";")[0] : null;
 				if (theme === "dark" || theme === "light") {
 					document.documentElement.classList.add(theme);
+					// Mirror to daisyUI (EmVB components) so they match the site's mode before paint.
+					document.documentElement.setAttribute("data-theme", theme);
 				}
 				// Anti-flash auth header: read the non-HttpOnly `ba_logged_in`
 				// hint cookie set by the auth plugin on login (cleared on logout)
@@ -468,10 +470,14 @@ const pageCtx = createPublicPageContext({
 				if (theme === "system") {
 					setCookie("theme", "");
 					root.classList.remove("light", "dark");
+					// daisyUI follows the OS (its dark theme is --prefersdark) when we set nothing.
+					root.removeAttribute("data-theme");
 				} else {
 					setCookie("theme", theme);
 					root.classList.remove("light", "dark");
 					root.classList.add(theme);
+					// Mirror the chosen mode to daisyUI so EmVB components match the site (not a fixed theme).
+					root.setAttribute("data-theme", theme);
 				}
 				updateActiveBtn(theme);
 			}
