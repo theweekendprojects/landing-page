@@ -134,6 +134,8 @@ export default defineConfig({
 			// set in Admin → Plugins → AI Search; no API token is stored.
 			plugins: [formsPlugin(), emdashSmtp(), betterAuthSettingsPlugin(), seoPlugin(), aiSearch(), privacyPlugin(), emvb({
 				canvasCollections: ["pages"],
+				// The editor canvas is a sandboxed iframe, so it needs the daisyUI CSS by URL.
+				canvasStyles: ["/styles/emvb-daisyui.css"],
 				// Register the daisyUI provider: server (render) via `providers`, browser editor via
 				// the `adminEntry` wrapper that imports it.
 				providers: ["@perkyzz/emvb-daisyui"],
