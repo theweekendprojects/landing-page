@@ -3,9 +3,12 @@
    though the class strings only appear at runtime in VNode attrs. Imported by the EmVB page route. */
 @import "tailwindcss";
 @plugin "daisyui" {
+  /* The site's active theme is dark (variation-2 sets color-scheme: dark), so daisyUI defaults to
+     dark too. Otherwise every component took the light theme's white surfaces and borders on a
+     dark page. A visitor's explicit choice still switches it (Base.astro mirrors data-theme). */
   themes:
-    light --default,
-    dark --prefersdark,
+    dark --default,
+    light,
     corporate,
     business,
     cupcake;
