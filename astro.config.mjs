@@ -7,6 +7,7 @@ import { formsPlugin } from "@emdash-cms/plugin-forms";
 import webhookNotifier from "@emdash-cms/plugin-webhook-notifier";
 import { betterAuthProvider, betterAuthSettingsPlugin } from "emdash-better-auth";
 import { emvb } from "@perkyzz/emvb";
+import { daisyUIExtension } from "@perkyzz/emvb-daisyui/extension";
 import { betterAuthAccess } from "emdash-better-auth/access-integration";
 import { seoPlugin } from "@jdevalk/emdash-plugin-seo";
 import aiSearch from "emdash-ai-search";
@@ -136,6 +137,9 @@ export default defineConfig({
 				canvasCollections: ["pages"],
 				// The editor canvas is a sandboxed iframe, so it needs the daisyUI CSS by URL.
 				canvasStyles: ["/styles/emvb-daisyui.css"],
+				// daisyUI as an extension: new blocks store `ext:daisyui/*`. The provider path above
+				// stays so existing content keeps rendering until it is converted.
+				extensions: [daisyUIExtension],
 				// The daisyUI provider is registered server-side by the static import in the
 				// pages/[slug] route (the registry is a globalThis singleton). The `providers`
 				// option is omitted on purpose: its dynamic import(specifier) can't resolve in the

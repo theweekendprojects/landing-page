@@ -58,7 +58,8 @@ const seo = getSeoMeta(page, {
 			<>
 				<DaisyStyles />
 				<EmVBPage page={emvb} />
-				{emvb.needsDaisyRuntime && <DaisyRuntime />}
+				{(emvb.needsDaisyRuntime ||
+					emvb.extensionRuntimes.includes("@perkyzz/emvb-daisyui/runtime")) && <DaisyRuntime />}
 			</>
 		) : (
 			<article class="page-article">
