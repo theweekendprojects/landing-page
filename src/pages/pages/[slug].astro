@@ -11,6 +11,11 @@ import { resolveBlogSiteIdentity } from "../../utils/site-identity";
 // on the public page instead of falling back to "Unknown provider". JS only (no CSS) — the
 // stylesheet ships via <DaisyStyles/> below, only on EmVB pages.
 import "@perkyzz/emvb-daisyui";
+import { rememberExtensions } from "@perkyzz/emvb/core";
+import { daisyUIExtension } from "@perkyzz/emvb-daisyui/extension";
+// The extension's render functions live in the process that renders the page, so register them here
+// too. The registry is per process; astro.config only reaches the processes that load its module.
+rememberExtensions([daisyUIExtension]);
 
 const slug = decodeSlug(Astro.params.slug);
 
