@@ -137,14 +137,9 @@ export default defineConfig({
 				canvasCollections: ["pages"],
 				// The editor canvas is a sandboxed iframe, so it needs the daisyUI CSS by URL.
 				canvasStyles: ["/styles/emvb-daisyui.css"],
-				// daisyUI as an extension: new blocks store `ext:daisyui/*`. The provider path above
-				// stays so existing content keeps rendering until it is converted.
+				// daisyUI through the extension API only: blocks store `ext:daisyui/*`.
 				extensions: [daisyUIExtension],
-				// The daisyUI provider is registered server-side by the static import in the
-				// pages/[slug] route (the registry is a globalThis singleton). The `providers`
-				// option is omitted on purpose: its dynamic import(specifier) can't resolve in the
-				// Cloudflare Worker bundle and only logged a harmless error. The editor (browser)
-				// registers the provider via the adminEntry wrapper below.
+				// The editor registers the extension through the adminEntry wrapper below.
 				adminEntry: "/src/emvb-admin.ts",
 			})],
 			sandboxed: [webhookNotifier],
