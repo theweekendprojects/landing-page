@@ -29,6 +29,6 @@ blockExoticSubdeps: true
 # other via `workspace:*`, which only resolves inside EmVB's own workspace; force them to the
 # local source dirs here so the landing page can install them without that workspace.
 overrides:
-  "@perkyzz/emvb": "file:../emvb-daisyui/vendor/EmVB/packages/emvb"
-  "@perkyzz/emvb-daisyui": "file:../emvb-daisyui"
-  "@perkyzz/emvb-icons": "file:../emvb-daisyui/vendor/EmVB/packages/emvb-icons"
+  "@perkyzz/emvb": "file:/tmp/daisy-o1/vendor/EmVB/packages/emvb"
+  "emvb-ext-daisy": "file:/tmp/daisy-o1/packages/emvb-ext-daisy"
+  "@perkyzz/emvb-icons": "file:/tmp/daisy-o1/vendor/EmVB/packages/emvb-icons"

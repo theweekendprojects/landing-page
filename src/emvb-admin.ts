@@ -3,6 +3,6 @@
 // The canvas is drawn in the browser, so the extension's render functions must be registered here
 // too. The server registers them from astro.config (emvb({ extensions })) for the public site.
 import { rememberExtensions } from "@perkyzz/emvb/core";
-import { daisyUIExtension } from "@perkyzz/emvb-daisyui/extension";
+import { daisyExtension as daisyUIExtension } from "emvb-ext-daisy";
 rememberExtensions([daisyUIExtension]);
 export * from "@perkyzz/emvb/admin";

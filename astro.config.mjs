@@ -7,7 +7,7 @@ import { formsPlugin } from "@emdash-cms/plugin-forms";
 import webhookNotifier from "@emdash-cms/plugin-webhook-notifier";
 import { betterAuthProvider, betterAuthSettingsPlugin } from "emdash-better-auth";
 import { emvb } from "@perkyzz/emvb";
-import { daisyUIExtension } from "@perkyzz/emvb-daisyui/extension";
+import { daisyExtension as daisyUIExtension } from "emvb-ext-daisy";
 import { betterAuthAccess } from "emdash-better-auth/access-integration";
 import { seoPlugin } from "@jdevalk/emdash-plugin-seo";
 import aiSearch from "emdash-ai-search";
@@ -136,7 +136,6 @@ export default defineConfig({
 			plugins: [formsPlugin(), emdashSmtp(), betterAuthSettingsPlugin(), seoPlugin(), aiSearch(), privacyPlugin(), emvb({
 				canvasCollections: ["pages"],
 				// The editor canvas is a sandboxed iframe, so it needs the daisyUI CSS by URL.
-				canvasStyles: ["/styles/emvb-daisyui.css"],
 				// daisyUI through the extension API only: blocks store `ext:daisyui/*`.
 				extensions: [daisyUIExtension],
 				// The editor registers the extension through the adminEntry wrapper below.
