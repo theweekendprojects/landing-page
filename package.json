@@ -40,7 +40,10 @@
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "tailwind-merge": "^3.6.0",
-    "emvb-ext-daisy": "file:/tmp/daisy-o1/packages/emvb-ext-daisy"
+    "emvb-ext-daisy": "file:/tmp/daisy-o1/packages/emvb-ext-daisy",
+        "emvb-ext-daisy-test-a": "file:/tmp/daisy-o1/packages/emvb-ext-daisy-test-a",
+    "emvb-ext-daisy-test-b": "file:/tmp/daisy-o1/packages/emvb-ext-daisy-test-b",
+    "emvb-ext-daisy-test-c": "file:/tmp/daisy-o1/packages/emvb-ext-daisy-test-c"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.7",

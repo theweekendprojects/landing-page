@@ -8,6 +8,10 @@ import webhookNotifier from "@emdash-cms/plugin-webhook-notifier";
 import { betterAuthProvider, betterAuthSettingsPlugin } from "emdash-better-auth";
 import { emvb } from "@perkyzz/emvb";
 import { daisyExtension as daisyUIExtension } from "emvb-ext-daisy";
+// TEST ONLY: the 66 unshipped components (see emvb-ext-daisy-test/generate.ts).
+import { testA } from "emvb-ext-daisy-test-a";
+import { testB } from "emvb-ext-daisy-test-b";
+import { testC } from "emvb-ext-daisy-test-c";
 import { betterAuthAccess } from "emdash-better-auth/access-integration";
 import { seoPlugin } from "@jdevalk/emdash-plugin-seo";
 import aiSearch from "emdash-ai-search";
@@ -137,7 +141,7 @@ export default defineConfig({
 				canvasCollections: ["pages"],
 				// The editor canvas is a sandboxed iframe, so it needs the daisyUI CSS by URL.
 				// daisyUI through the extension API only: blocks store `ext:daisyui/*`.
-				extensions: [daisyUIExtension],
+				extensions: [daisyUIExtension, testA, testB, testC],
 				// The editor registers the extension through the adminEntry wrapper below.
 				adminEntry: "/src/emvb-admin.ts",
 			})],

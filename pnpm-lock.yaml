@@ -7,6 +7,9 @@ settings:
 overrides:
   '@perkyzz/emvb': file:/tmp/daisy-o1/vendor/EmVB/packages/emvb
   emvb-ext-daisy: file:/tmp/daisy-o1/packages/emvb-ext-daisy
+  emvb-ext-daisy-test-a: file:/tmp/daisy-o1/packages/emvb-ext-daisy-test-a
+  emvb-ext-daisy-test-b: file:/tmp/daisy-o1/packages/emvb-ext-daisy-test-b
+  emvb-ext-daisy-test-c: file:/tmp/daisy-o1/packages/emvb-ext-daisy-test-c
   '@perkyzz/emvb-icons': file:/tmp/daisy-o1/vendor/EmVB/packages/emvb-icons
 
 importers:
@@ -76,6 +79,15 @@ importers:
       emvb-ext-daisy:
         specifier: file:/tmp/daisy-o1/packages/emvb-ext-daisy
         version: file:../../../tmp/daisy-o1/packages/emvb-ext-daisy
+      emvb-ext-daisy-test-a:
+        specifier: file:/tmp/daisy-o1/packages/emvb-ext-daisy-test-a
+        version: file:../../../tmp/daisy-o1/packages/emvb-ext-daisy-test-a
+      emvb-ext-daisy-test-b:
+        specifier: file:/tmp/daisy-o1/packages/emvb-ext-daisy-test-b
+        version: file:../../../tmp/daisy-o1/packages/emvb-ext-daisy-test-b
+      emvb-ext-daisy-test-c:
+        specifier: file:/tmp/daisy-o1/packages/emvb-ext-daisy-test-c
+        version: file:../../../tmp/daisy-o1/packages/emvb-ext-daisy-test-c
       kysely-d1:
         specifier: ^0.4.0
         version: 0.4.0(kysely@0.29.5)
@@ -3641,6 +3653,15 @@ packages:
 
   emoji-regex@10.6.0:
     resolution: {integrity: sha512-toUI84YS5YmxW219erniWD0CIVOo46xGKColeNQRgOzDorgBi1v4D71/OFzgD9GO2UGKIv1C3Sp8DAn0+j5w7A==}
+
+  emvb-ext-daisy-test-a@file:../../../tmp/daisy-o1/packages/emvb-ext-daisy-test-a:
+    resolution: {directory: ../../../tmp/daisy-o1/packages/emvb-ext-daisy-test-a, type: directory}
+
+  emvb-ext-daisy-test-b@file:../../../tmp/daisy-o1/packages/emvb-ext-daisy-test-b:
+    resolution: {directory: ../../../tmp/daisy-o1/packages/emvb-ext-daisy-test-b, type: directory}
+
+  emvb-ext-daisy-test-c@file:../../../tmp/daisy-o1/packages/emvb-ext-daisy-test-c:
+    resolution: {directory: ../../../tmp/daisy-o1/packages/emvb-ext-daisy-test-c, type: directory}
 
   emvb-ext-daisy@file:../../../tmp/daisy-o1/packages/emvb-ext-daisy:
     resolution: {directory: ../../../tmp/daisy-o1/packages/emvb-ext-daisy, type: directory}
@@ -9351,6 +9372,12 @@ snapshots:
       '@emmetio/css-abbreviation': 2.1.8
 
   emoji-regex@10.6.0: {}
+
+  emvb-ext-daisy-test-a@file:../../../tmp/daisy-o1/packages/emvb-ext-daisy-test-a: {}
+
+  emvb-ext-daisy-test-b@file:../../../tmp/daisy-o1/packages/emvb-ext-daisy-test-b: {}
+
+  emvb-ext-daisy-test-c@file:../../../tmp/daisy-o1/packages/emvb-ext-daisy-test-c: {}
 
   emvb-ext-daisy@file:../../../tmp/daisy-o1/packages/emvb-ext-daisy: {}
 

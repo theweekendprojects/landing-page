@@ -31,4 +31,7 @@ blockExoticSubdeps: true
 overrides:
   "@perkyzz/emvb": "file:/tmp/daisy-o1/vendor/EmVB/packages/emvb"
   "emvb-ext-daisy": "file:/tmp/daisy-o1/packages/emvb-ext-daisy"
+  "emvb-ext-daisy-test-a": "file:/tmp/daisy-o1/packages/emvb-ext-daisy-test-a"
+  "emvb-ext-daisy-test-b": "file:/tmp/daisy-o1/packages/emvb-ext-daisy-test-b"
+  "emvb-ext-daisy-test-c": "file:/tmp/daisy-o1/packages/emvb-ext-daisy-test-c"
   "@perkyzz/emvb-icons": "file:/tmp/daisy-o1/vendor/EmVB/packages/emvb-icons"
