@@ -5,12 +5,12 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  '@perkyzz/emvb': file:/tmp/daisy-o1/vendor/EmVB/packages/emvb
+  '@perkyzz/emvb': file:/tmp/emvb-port/packages/emvb
   emvb-ext-daisy: file:/tmp/daisy-o1/packages/emvb-ext-daisy
   emvb-ext-daisy-test-a: file:/tmp/daisy-o1/packages/emvb-ext-daisy-test-a
   emvb-ext-daisy-test-b: file:/tmp/daisy-o1/packages/emvb-ext-daisy-test-b
   emvb-ext-daisy-test-c: file:/tmp/daisy-o1/packages/emvb-ext-daisy-test-c
-  '@perkyzz/emvb-icons': file:/tmp/daisy-o1/vendor/EmVB/packages/emvb-icons
+  '@perkyzz/emvb-icons': file:/tmp/emvb-port/packages/emvb-icons
 
 importers:
 
@@ -38,11 +38,11 @@ importers:
         specifier: ^1.30.0
         version: 1.30.0(zod@4.5.4)
       '@perkyzz/emvb':
-        specifier: file:/tmp/daisy-o1/vendor/EmVB/packages/emvb
-        version: file:../../../tmp/daisy-o1/vendor/EmVB/packages/emvb(1ee2d6fc8e0f714fcd290f040d0b01e0)
+        specifier: file:/tmp/emvb-port/packages/emvb
+        version: file:../../../tmp/emvb-port/packages/emvb(1ee2d6fc8e0f714fcd290f040d0b01e0)
       '@perkyzz/emvb-icons':
-        specifier: file:/tmp/daisy-o1/vendor/EmVB/packages/emvb-icons
-        version: file:../../../tmp/daisy-o1/vendor/EmVB/packages/emvb-icons
+        specifier: file:/tmp/emvb-port/packages/emvb-icons
+        version: file:../../../tmp/emvb-port/packages/emvb-icons
       '@tailwindcss/container-queries':
         specifier: ^0.1.1
         version: 0.1.1(tailwindcss@4.3.3)
@@ -2000,11 +2000,11 @@ packages:
     resolution: {integrity: sha512-C2Xj8FZ0uHWeCXXqX5B4/gVFQmtSkiuOolzAgutjTfseNOHT3pUjljDZsTSxXFGgio54bCzVFqmEOUrIVk8RDA==}
     engines: {node: '>=20.0.0'}
 
-  '@perkyzz/emvb-icons@file:../../../tmp/daisy-o1/vendor/EmVB/packages/emvb-icons':
-    resolution: {directory: ../../../tmp/daisy-o1/vendor/EmVB/packages/emvb-icons, type: directory}
+  '@perkyzz/emvb-icons@file:../../../tmp/emvb-port/packages/emvb-icons':
+    resolution: {directory: ../../../tmp/emvb-port/packages/emvb-icons, type: directory}
 
-  '@perkyzz/emvb@file:../../../tmp/daisy-o1/vendor/EmVB/packages/emvb':
-    resolution: {directory: ../../../tmp/daisy-o1/vendor/EmVB/packages/emvb, type: directory}
+  '@perkyzz/emvb@file:../../../tmp/emvb-port/packages/emvb':
+    resolution: {directory: ../../../tmp/emvb-port/packages/emvb, type: directory}
     peerDependencies:
       '@cloudflare/kumo': 2.6.0 || 2.15.0
       '@emdash-cms/plugin-forms': ^0.2.9
@@ -7566,12 +7566,12 @@ snapshots:
       tslib: 2.8.1
       tsyringe: 4.10.0
 
-  '@perkyzz/emvb-icons@file:../../../tmp/daisy-o1/vendor/EmVB/packages/emvb-icons': {}
+  '@perkyzz/emvb-icons@file:../../../tmp/emvb-port/packages/emvb-icons': {}
 
-  '@perkyzz/emvb@file:../../../tmp/daisy-o1/vendor/EmVB/packages/emvb(1ee2d6fc8e0f714fcd290f040d0b01e0)':
+  '@perkyzz/emvb@file:../../../tmp/emvb-port/packages/emvb(1ee2d6fc8e0f714fcd290f040d0b01e0)':
     dependencies:
       '@cloudflare/kumo': 2.15.0(@date-fns/tz@1.5.0)(@phosphor-icons/react@2.1.10(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@types/react@18.3.31)(date-fns@4.4.0)(echarts@6.1.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(zod@4.6.7)
-      '@perkyzz/emvb-icons': file:../../../tmp/daisy-o1/vendor/EmVB/packages/emvb-icons
+      '@perkyzz/emvb-icons': file:../../../tmp/emvb-port/packages/emvb-icons
       '@phosphor-icons/react': 2.1.10(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       astro: 7.2.10(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@26.4.0)(jiti@2.7.0)(yaml@2.9.0)
       emdash: 1.5.0(@astrojs/react@6.0.5(@types/node@26.4.0)(@types/react-dom@19.2.5(@types/react@18.3.31))(@types/react@18.3.31)(esbuild@0.28.2)(jiti@2.7.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(yaml@2.9.0))(@atcute/cbor@2.3.8(@atcute/cid@2.5.0))(@atcute/cid@2.5.0)(@atcute/identity@2.0.2(@atcute/lexicons@2.1.1)(typescript@7.0.2))(@date-fns/tz@1.5.0)(@floating-ui/dom@1.8.0)(@tiptap/extensions@3.32.0(@tiptap/core@3.32.0(@tiptap/pm@3.32.0))(@tiptap/pm@3.32.0))(@types/react-dom@19.2.5(@types/react@18.3.31))(@types/react@18.3.31)(astro@7.2.10(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@26.4.0)(jiti@2.7.0)(yaml@2.9.0))(date-fns@4.4.0)(echarts@6.1.0)(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.6)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@7.0.2)
