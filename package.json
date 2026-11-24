@@ -28,6 +28,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "@perkyzz/emvb": "file:../emvb-daisyui/vendor/EmVB/packages/emvb",
+    "@theweekendprojects/emdash-puck-editor": "file:../emdash-puck-editor",
     "@perkyzz/emvb-daisyui": "file:../emvb-daisyui",
     "@perkyzz/emvb-icons": "file:../emvb-daisyui/vendor/EmVB/packages/emvb-icons",
     "daisyui": "5.7.50",

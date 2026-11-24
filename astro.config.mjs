@@ -7,6 +7,7 @@ import { formsPlugin } from "@emdash-cms/plugin-forms";
 import webhookNotifier from "@emdash-cms/plugin-webhook-notifier";
 import { betterAuthProvider, betterAuthSettingsPlugin } from "emdash-better-auth";
 import { emvb } from "@perkyzz/emvb";
+import { puckEditor } from "@theweekendprojects/emdash-puck-editor";
 import { daisyUIExtension } from "@perkyzz/emvb-daisyui/extension";
 import { betterAuthAccess } from "emdash-better-auth/access-integration";
 import { seoPlugin } from "@jdevalk/emdash-plugin-seo";
@@ -133,7 +134,7 @@ export default defineConfig({
 			// Search (the "easy path"), which needs the AI_SEARCH + R2 bindings in
 			// wrangler.jsonc. Non-secret settings (instance/bucket/collections) are
 			// set in Admin → Plugins → AI Search; no API token is stored.
-			plugins: [formsPlugin(), emdashSmtp(), betterAuthSettingsPlugin(), seoPlugin(), aiSearch(), privacyPlugin(), emvb({
+			plugins: [formsPlugin(), emdashSmtp(), betterAuthSettingsPlugin(), seoPlugin(), aiSearch(), privacyPlugin(), puckEditor(), emvb({
 				canvasCollections: ["pages"],
 				// The editor canvas is a sandboxed iframe, so it needs the daisyUI CSS by URL.
 				canvasStyles: ["/styles/emvb-daisyui.css"],

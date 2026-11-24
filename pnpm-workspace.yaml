@@ -31,4 +31,5 @@ blockExoticSubdeps: true
 overrides:
   "@perkyzz/emvb": "file:../emvb-daisyui/vendor/EmVB/packages/emvb"
   "@perkyzz/emvb-daisyui": "file:../emvb-daisyui"
+  "@perkyzz/emvb-provider-api": "file:../emvb-daisyui/vendor/EmVB/packages/emvb-provider-api"
   "@perkyzz/emvb-icons": "file:../emvb-daisyui/vendor/EmVB/packages/emvb-icons"
