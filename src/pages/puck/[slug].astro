@@ -1,0 +1,28 @@
+---
+// Public page built in the Puck editor (emdash-puck-editor). The plugin serves only published pages,
+// so a draft never reaches this route. Unknown slugs redirect to the 404 page.
+import Base from "../../layouts/Base.astro";
+import { renderPublicPage } from "@theweekendprojects/emdash-puck-editor/render";
+import "@theweekendprojects/emdash-puck-editor/puck-canvas.css";
+
+const slug = Astro.params.slug ?? "";
+const response = await fetch(
+	new URL(`/_emdash/api/plugins/puck-editor/page?slug=${encodeURIComponent(slug)}`, Astro.url),
+);
+if (response.status === 404 || response.status === 400) {
+	return Astro.redirect("/404");
+}
+if (!response.ok) {
+	throw new Error(`puck-editor page lookup failed: ${response.status}`);
+}
+const { data: page } = (await response.json()) as {
+	data: { title: string; data: Parameters<typeof renderPublicPage>[0] };
+};
+const html = renderPublicPage(page.data);
+---
+
+<Base title={page.title}>
+	<main class="mx-auto max-w-5xl p-6">
+		<Fragment set:html={html} />
+	</main>
+</Base>
