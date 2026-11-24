@@ -1,22 +1,30 @@
 ---
 // Public page built in the Puck editor (emdash-puck-editor). The plugin serves only published pages,
-// so a draft never reaches this route. Unknown slugs redirect to the 404 page.
+// so a draft never reaches this route. The page is read in-process through EmDash's public handler
+// (the same way EmVB reads its pages), not with an HTTP call back to this site.
 import Base from "../../layouts/Base.astro";
+import { getPublicPluginApiRouteHandler } from "emdash/plugin-utils";
 import { renderPublicPage } from "@theweekendprojects/emdash-puck-editor/render";
 import "@theweekendprojects/emdash-puck-editor/puck-canvas.css";
 
 const slug = Astro.params.slug ?? "";
-const response = await fetch(
+const handler = getPublicPluginApiRouteHandler(Astro.locals as never);
+if (!handler) {
+	throw new Error("puck-editor: EmDash public plugin handler is not available");
+}
+const request = new Request(
 	new URL(`/_emdash/api/plugins/puck-editor/page?slug=${encodeURIComponent(slug)}`, Astro.url),
 );
-if (response.status === 404 || response.status === 400) {
-	return Astro.redirect("/404");
+const result = await handler("puck-editor", "GET", "/page", request);
+if (!result.success) {
+	if (result.error?.code === "NOT_FOUND" || result.error?.code === "BAD_REQUEST") {
+		return Astro.redirect("/404");
+	}
+	throw new Error(`puck-editor: page lookup failed (${result.error?.code ?? "unknown"})`);
 }
-if (!response.ok) {
-	throw new Error(`puck-editor page lookup failed: ${response.status}`);
-}
-const { data: page } = (await response.json()) as {
-	data: { title: string; data: Parameters<typeof renderPublicPage>[0] };
+const page = result.data as {
+	title: string;
+	data: Parameters<typeof renderPublicPage>[0];
 };
 const html = renderPublicPage(page.data);
 ---
