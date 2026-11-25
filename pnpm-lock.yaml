@@ -3994,6 +3994,7 @@ packages:
 
   emdash-privacy@0.1.0:
     resolution: {integrity: sha512-5fEh0I9UY3cF3LTzK5dSogkVlfMZJbOPxH+DsbE/N6R6gRqVNeGchLgFEuO2a5Aeu0vhdcAd2OQvPsKsEbMFiw==}
+    deprecated: 'Renamed to emdash-c15t: npm install emdash-c15t'
     peerDependencies:
       emdash: '>=0.30.0'
 

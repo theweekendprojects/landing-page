@@ -4,8 +4,20 @@
 // (the same way EmVB reads its pages), not with an HTTP call back to this site.
 import Base from "../../layouts/Base.astro";
 import { getPublicPluginApiRouteHandler } from "emdash/plugin-utils";
-import { renderPublicPage } from "@theweekendprojects/emdash-puck-editor/render";
+import {
+	DAISY_INTERACTIVE_RUNTIME,
+	pageNeedsRuntime,
+	renderPublicPage,
+	type PublicTheme,
+} from "@theweekendprojects/emdash-puck-editor/render";
 import "@theweekendprojects/emdash-puck-editor/puck-canvas.css";
+
+// The host owns the theme. The visitor's choice (the site's theme cookie) wins. With no choice, this
+// site's design is dark, so the blocks are drawn in the dark theme; a site with a light design changes
+// this one line.
+const SITE_DEFAULT_THEME: PublicTheme = "dark";
+const cookieTheme = Astro.cookies.get("theme")?.value;
+const theme: PublicTheme = cookieTheme === "light" || cookieTheme === "dark" ? cookieTheme : SITE_DEFAULT_THEME;
 
 const slug = Astro.params.slug ?? "";
 const handler = getPublicPluginApiRouteHandler(Astro.locals as never);
@@ -26,11 +38,14 @@ const page = result.data as {
 	title: string;
 	data: Parameters<typeof renderPublicPage>[0];
 };
-const html = renderPublicPage(page.data);
+const html = renderPublicPage(page.data, { theme });
+// Load the small browser script only when a block on this page needs it (modal, tabs, countdown...).
+const needsRuntime = pageNeedsRuntime(page.data);
 ---
 
 <Base title={page.title}>
 	<main class="mx-auto max-w-5xl p-6">
 		<Fragment set:html={html} />
 	</main>
+	{needsRuntime && <script is:inline set:html={DAISY_INTERACTIVE_RUNTIME}></script>}
 </Base>
